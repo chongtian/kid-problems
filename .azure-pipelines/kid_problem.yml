@@ -1,0 +1,55 @@
+name: '$(application.version)_$(Date:yyyMMdd)$(Rev:.rr)'
+
+trigger: 
+  branches:
+    include:
+    - main
+  paths:
+    exclude:
+    - README.md 
+    - .azure-pipelines/**/*.yml   
+
+pool:
+  vmImage: windows-latest
+  # vmImage: 'ubuntu-latest'
+
+
+parameters:
+ - name: deploy
+   displayName: Deploy to AWS
+   type: boolean
+   default: true
+ - name: run_test
+   displayName: Run Tests
+   type: boolean
+   default: false   
+
+variables:
+  buildConfiguration: 'Release'
+  vmImageName: 'ubuntu-latest'
+  application.version: '2.0.0'
+
+stages:
+
+- stage: CI
+  displayName: 'Continuous Integration'
+  condition: |
+      in(variables['Build.Reason'], 'PullRequest')
+  jobs:
+    - template: jobs/kidproblem-build.yml
+      parameters:
+        deploy: false
+
+- stage: Build
+  displayName: 'Build and Deploy'
+  dependsOn: []
+  condition: |
+    ne(variables['Build.Reason'], 'PullRequest')
+  jobs:
+    - ${{ if eq(parameters.run_test, false) }}:
+        - template: jobs/kidproblem-build.yml
+          parameters:
+            deploy: ${{parameters.deploy}}
+    - ${{ else }}:
+        - template: jobs/kidproblem-test.yml
+

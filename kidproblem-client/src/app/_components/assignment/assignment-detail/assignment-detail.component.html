@@ -1,0 +1,15 @@
+<app-assignment-detail-view [entity-id]="assignmentId$" [edit]="isEdit$" (changed)="onChanged($event)"
+    (deleted)="onDeleted($event)"></app-assignment-detail-view>
+
+<mat-divider></mat-divider>
+
+<mat-card>
+    <mat-card-actions>
+        <button *ngIf="!isEdit$.value && canEdit" mat-raised-button color="primary" (click)="switchView()"
+            matTooltip="Enable Edit">
+            <i class="material-icons"> edit </i></button>
+        <button *ngIf="isEdit$.value" mat-raised-button color="primary" (click)="switchView()"
+            matTooltip="Back to View-only">
+            <i class="material-icons"> arrow_back </i></button>
+    </mat-card-actions>
+</mat-card>

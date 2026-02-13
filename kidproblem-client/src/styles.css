@@ -1,0 +1,36 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "https://www.w3schools.com/w3css/4/w3.css";
+@import "https://www.w3schools.com/lib/w3-theme-blue.css";
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.mat-form-field-appearance-legacy.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label:not(.mat-empty):not(.mat-form-field-empty) {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+.invalid-feedback {
+  color: red;
+}
+
+.label{
+  font-weight: bold;
+}
+
+.spacer {
+  width: 20px;
+}
+
+@media print {
+  .not-printable {
+    visibility: hidden;
+    display: none;
+  }
+}
+
+@media print {
+  svg {
+    shape-rendering: crispEdges;
+    stroke-width: 0.5px !important;
+  }
+}

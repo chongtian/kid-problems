@@ -1,0 +1,11 @@
+<div *ngIf="readyToRender">
+    <!-- <h3>{{examDefId$.value.ExamCategory}} - {{examDefId$.value.ExamTitle}}</h3> -->
+    <div *ngFor="let problemTitle$ of problemTitles$; index as i" class="w3-container w3-cell-row no-break">
+        <h5>[{{i+1}}] - {{problemTitle$.value}}</h5>
+        <app-problem-detail-view display-all="false" [problem-title]="problemTitle$"></app-problem-detail-view>
+    </div>
+</div>
+<!-- <p>
+    <button *ngIf="readyToRender" (click)="print()" mat-icon-button matTooltip="Print">
+        <i class="material-icons"> print </i></button>
+</p> -->

@@ -1,0 +1,41 @@
+<mat-spinner *ngIf="isLoading"></mat-spinner>
+<h3>Problem Bulk Editor - Move problems out of Staging area</h3>
+
+  <div class="w3-cell-row" style="width:500px">
+    <div class="w3-container w3-cell">
+      <mat-form-field>
+        <mat-label>Keyword</mat-label>
+        <input type="search" matInput placeholder="Select problems" [(ngModel)]="queryKeyword"
+          [ngModelOptions]="{standalone: true}">
+      </mat-form-field>
+    </div>
+    <div class="w3-container w3-cell">
+      <button mat-raised-button color="primary" (click)="openQuery()"><i class="material-icons"> playlist_add
+        </i></button>
+    </div>
+
+    <div class="w3-container w3-cell">
+      <button type="submit" mat-raised-button color="primary" (click)="save()"><i class="material-icons"> save
+        </i></button>
+    </div>
+
+  </div>
+
+  <h4>Staging Problems</h4>
+  <ng-container *ngFor="let element of problems">
+      <div class="w3-card w3-cell-row" style="width:50%">
+        <div class="w3-container w3-cell w3-cell-middle">
+          <span><a routerLink="/problem/view/{{element.ProblemTitle}}">{{element.ProblemTitle}}</a></span>
+        </div>
+        <div class="w3-container w3-cell w3-cell-middle">
+          <span [ngClass]="{'warning':!element.ProblemAnswer}">Answer: {{element.ProblemAnswer}}</span>
+        </div>
+        <div class="w3-container w3-cell w3-cell-middle">
+          <span *ngIf="element.ReturnResult">Status: {{element.ReturnResult}}</span>
+        </div>
+        <div class="w3-container w3-cell w3-cell-middle">
+          <button mat-mini-fab color="warn" (click)="delete(element)">
+            <i class="material-icons">delete</i></button>
+        </div>
+      </div>
+  </ng-container>

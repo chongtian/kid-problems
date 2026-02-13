@@ -1,0 +1,132 @@
+<h3 *ngIf="!isSelectable">List Problem Summaries</h3>
+<form (ngSubmit)="search()">
+    <mat-form-field>
+        <mat-label>Category</mat-label>
+        <mat-select [(ngModel)]="category" name="category">
+            <mat-option *ngFor="let code of categories" [value]="code.Code">
+                {{code.Description}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <span class="spacer">&nbsp;&nbsp;</span>
+    <mat-form-field>
+        <mat-label>Answered By</mat-label>
+        <mat-select [(ngModel)]="answerBy" name="answerBy">
+            <mat-option value="">All Kids</mat-option>
+            <mat-option *ngFor="let child of children" [value]="child">
+                {{child}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <span class="spacer">&nbsp;&nbsp;</span>
+    <mat-form-field>
+        <mat-label>True Correct Rate</mat-label>
+        <input type="text" matInput placeholder="0.0-1.0" [(ngModel)]="trueCorrectRateRng" name="trueCorrectRateRng">
+    </mat-form-field>
+    <span class="spacer">&nbsp;&nbsp;</span>
+    <mat-form-field>
+        <mat-label>Keyword</mat-label>
+        <input type="search" matInput placeholder="category-year-number" [(ngModel)]="keyword" name="keyword">
+    </mat-form-field>
+    <button mat-icon-button><i class="material-icons"> search </i></button>
+</form>
+
+<div class="w3-panel">
+    <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+    <div class="w3-row">
+        <div class="w3-col m4 l4" *ngIf="data && data.length>0">
+            Count of all records: {{data.length}}
+        </div>
+        <div class="w3-col m5 l4" *ngIf="selectedIds && selectedIds.length>0">
+            Count of selected records: {{selectedIds.length}}
+        </div>
+    </div>
+</div>
+
+<div *ngIf="dataSource.data.length" class="w3-responsive">
+    <table mat-table [dataSource]="dataSource" class="w3-table w3-striped w3-hoverable">
+
+        <ng-container *ngIf="isSelectable" matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef> Select </th>
+            <td mat-cell *matCellDef="let element">
+                <mat-checkbox (change)="toggle(element)" [checked]="isChecked(element)"> </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="problemTitle">
+            <th mat-header-cell *matHeaderCellDef>Problem Title</th>
+            <td mat-cell *matCellDef="let element"><span><a routerLink="/problem/view/{{element.ProblemTitle}}">{{element.ProblemTitle}}</a></span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="answerBy">
+            <th mat-header-cell *matHeaderCellDef> Answered By </th>
+            <td mat-cell *matCellDef="let element"> <span>{{element.AnswerByFullname}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="cntAll">
+            <th mat-header-cell *matHeaderCellDef> Count of All </th>
+            <td mat-cell *matCellDef="let element"><span>{{element.TotalCount}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="cntCorrect">
+            <th mat-header-cell *matHeaderCellDef> Correct</th>
+            <td mat-cell *matCellDef="let element">
+                <span>{{element.CorrectCount}} ({{element.CorrectCount / element.TotalCount * 100 |
+                    number:'1.1-1'}}%)</span>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="cntGuess">
+            <th mat-header-cell *matHeaderCellDef> Guess</th>
+            <td mat-cell *matCellDef="let element">
+                <span>{{element.GuessCount}} ({{element.GuessCount / element.TotalCount * 100 |
+                    number:'1.1-1'}}%)</span>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="cntGuessCorrect">
+            <th mat-header-cell *matHeaderCellDef> Guess Correct</th>
+            <td mat-cell *matCellDef="let element">
+                <span>{{element.GuessCorrectCount}} ({{element.GuessCorrectCount / element.CorrectCount * 100 |
+                    number:'1.1-1'}}%)</span>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="trueCorrectRate">
+            <th mat-header-cell *matHeaderCellDef> True Correct Rate</th>
+            <td mat-cell *matCellDef="let element">
+                <span>{{element.TrueCorrectRate * 100 | number:'1.1-1'}} %</span>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="averageDuration">
+            <th mat-header-cell *matHeaderCellDef> Avg. Duration (s)</th>
+            <td mat-cell *matCellDef="let element">
+                <span>{{element.TotalDuration / element.TotalCount | number:'1.1-1' }}</span>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="w3-light-blue"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+</div>
+<mat-paginator [length]="dataSource.data.length" [pageSize]="10" [showFirstLastButtons]="true"
+    [pageSizeOptions]="[10,20,50]" [ngClass]="{'w3-hide':!dataSource.data.length}">
+</mat-paginator>
+
+<div class="w3-panel">
+    <div class="w3-cell-row">
+        <ng-container *ngIf="loadMoreData">
+            <div class="w3-container w3-cell">
+                <button mat-icon-button color="primary" matTooltip="Load More" (click)="more()">
+                    <span class="material-icons"> more </span></button>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="isSelectable && data.length>0">
+            <div class="w3-container w3-cell">
+                <mat-slide-toggle (click)="toggleAll()">Select All</mat-slide-toggle>
+            </div>
+        </ng-container>
+    </div>
+</div>

@@ -1,0 +1,45 @@
+<mat-card>
+  <mat-card-title>Upload Answers</mat-card-title>
+  <mat-card-content>
+    <div class="w3-row">
+
+      <div class="w3-col s6 m4 l2">
+        <mat-form-field floatLabel="auto">
+          <mat-label>Problem Category</mat-label>
+          <input matInput required [(ngModel)]="problemCategory">
+        </mat-form-field>
+      </div>
+
+      <div class="w3-col s6 m4 l2">
+        <mat-form-field floatLabel="auto">
+          <mat-label>Problem Year</mat-label>
+          <input matInput required [(ngModel)]="problemYear">
+        </mat-form-field>
+      </div>
+
+    </div>
+
+    <div class="w3-row">
+      <div class="w3-col s6 m4 l2">
+        <mat-form-field floatLabel="auto">
+          <mat-label>Answers</mat-label>
+          <textarea rows="25" matInput required [(ngModel)]="answerKeys"></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="w3-col s6 m4 l2">
+        <mat-form-field floatLabel="auto">
+          <mat-label>Confirm Answers</mat-label>
+          <textarea rows="25" matInput readonly [(ngModel)]="problemAnswersText"></textarea>
+        </mat-form-field>
+      </div>
+    </div>
+
+  </mat-card-content>
+  <mat-card-actions>
+    <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+    <button mat-raised-button color="primary" (click)="generate()">Generate</button>
+    <span class="spacer"></span>
+    <button mat-raised-button color="primary" (click)="save()" [disabled]="cannotSave">Save</button>
+  </mat-card-actions>
+</mat-card>

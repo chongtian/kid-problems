@@ -1,0 +1,27 @@
+parameters:
+ - name: deploy
+   type: boolean
+   default: false
+
+jobs:
+  - job: Test
+    displayName: "Run Tests"
+    steps:
+      - task: Npm@1
+        displayName: Install Angular packages
+        inputs:
+          command: "ci"
+          workingDir: "$(Build.SourcesDirectory)/kidproblem-client"
+
+      - task: Npm@1
+        displayName: "Test Angular UI"
+        inputs:
+          command: "custom"
+          workingDir: "$(Build.SourcesDirectory)/kidproblem-client"
+          customCommand: "run-script devops-test"
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: '$(Build.SourcesDirectory)/kidproblem-client/TESTS-*.xml'          
+

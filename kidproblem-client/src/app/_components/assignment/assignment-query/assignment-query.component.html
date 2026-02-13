@@ -1,0 +1,2 @@
+<h3>List {{latest?'Latest':'All'}} Assignments</h3>
+<app-assignment-list-view pagination="true" [start-time]="startTime" [end-time]="endTime" (run)="onRun($event)"></app-assignment-list-view>

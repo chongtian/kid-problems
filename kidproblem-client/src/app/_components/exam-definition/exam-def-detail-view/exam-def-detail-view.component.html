@@ -1,0 +1,116 @@
+<h3><span>{{isEdit?'Edit ':'View '}}</span>Exam Definition</h3>
+<mat-progress-bar *ngIf="!examEditorForm && isLoading" mode="indeterminate"></mat-progress-bar>
+
+<form *ngIf="examEditorForm" [formGroup]="examEditorForm">
+
+    <mat-card>
+        <mat-card-content>
+
+            <ng-container *ngIf="isEdit">
+                <div class="w3-cell-row">
+                    <mat-form-field class="w3-container w3-cell">
+                        <mat-label>Exam Category</mat-label>
+                        <mat-select formControlName="ExamCategory">
+                            <mat-option *ngFor="let code of categories" [value]="code.Code">
+                                {{code.Description}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field class="w3-container w3-cell" style="width:30%">
+                        <mat-label>Exam Title</mat-label>
+                        <input matInput required [readonly]="!isNew" formControlName="ExamTitle">
+                    </mat-form-field>
+                </div>
+                <div class="w3-cell-row">
+                    <div class="w3-container w3-cell w3-cell-middle">
+                        <mat-checkbox formControlName="Active">Active</mat-checkbox>
+                    </div>
+                    <mat-form-field class="w3-container w3-cell">
+                        <mat-label>Year</mat-label>
+                        <input matInput formControlName="ExamYear">
+                    </mat-form-field>
+                    <mat-form-field class="w3-container w3-cell">
+                        <mat-label>Exam Type</mat-label>
+                        <mat-select formControlName="ExamType">
+                            <mat-option value="O">Official</mat-option>
+                            <mat-option value="H">Practice</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="w3-container w3-cell">
+                        <mat-label>Memo</mat-label>
+                        <input matInput formControlName="Memo">
+                    </mat-form-field>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="!isEdit">
+                <div class="w3-cell-row">
+                    <div class="w3-container w3-cell w3-large w3-mobile">
+                        <span class="label">Exam Title: </span>
+                        <span>{{examEditorForm.get('ExamTitle').value}}</span>
+                    </div>
+
+                    <div class="w3-container w3-cell w3-mobile">
+                        <span class="label">Exam Category: </span>
+                        <span>{{examEditorForm.get('ExamCategory').value}}</span>
+                    </div>
+
+                    <div class="w3-container w3-cell w3-mobile">
+                        <span class="label">Year: </span>
+                        <span>{{examEditorForm.get('ExamYear').value}}</span>
+                    </div>
+
+                    <div class="w3-container w3-cell w3-mobile">
+                        <span class="label">Exam Type: </span>
+                        <span>{{examEditorForm.get('ExamType').value==='O'?'Official':'Practice'}}</span>
+                    </div>
+
+                    <div class="w3-container w3-cell w3-mobile">
+                        <span class="label">Memo: </span>
+                        <span>{{examEditorForm.get('Memo').value}}</span>
+                    </div>
+
+                    <div class="w3-container w3-cell w3-mobile">
+                        <span class="label">Active: </span>
+                        <span>{{examEditorForm.get('Active').value | booleanLikeToText}}</span>
+                    </div>
+                </div>
+            </ng-container>
+
+            <mat-divider></mat-divider>
+            <h4>Exam Details</h4>
+
+            <ng-container *ngFor="let _ of details.controls; let i = index">
+                <div *ngIf="i%4===0" [ngClass]="{'w3-row':true, 'w3-light-grey':(i/5)%2===0}">
+                    <ng-container *ngFor="let j of [0,1,2,3];">
+                        <div *ngIf="details.controls.at(i+j)"
+                            class="w3-container w3-col l3 w3-center w3-card">
+                            <span> <a routerLink="/problem/view/{{details.controls.at(i+j).get('ProblemTitle').value}}">
+                                    {{details.controls.at(i+j).get('ProblemTitle').value}}</a></span>
+                            <span class="spacer"></span>
+                            <button *ngIf="isEdit" mat-icon-button color="warn" (click)="deleteDetail(i+j)">
+                                <i class="material-icons"> delete </i></button>
+                        </div>
+                    </ng-container>
+                </div>
+            </ng-container>
+
+        </mat-card-content>
+        <mat-card-actions *ngIf="isEdit">
+            <button mat-raised-button color="primary" (click)="add(0)" matTooltip="Add Problems"><i
+                    class="material-icons"> add_circle </i></button>
+            <span class="spacer"></span>
+            <button mat-raised-button color="primary" (click)="add(1)" matTooltip="Add Problems From Historical Data"><i
+                class="material-icons"> note_add </i></button>
+        <span class="spacer"></span>            
+            <button type="submit" [disabled]="examEditorForm.pristine" mat-raised-button color="primary"
+                (click)="save()" matTooltip="Save"><i class="material-icons"> save </i></button>
+            <span class="spacer"></span>
+            <span class="spacer"></span>
+            <button *ngIf="!isNew" mat-raised-button color="warn" (click)="delete()" matTooltip="Delete">
+                <i class="material-icons"> delete </i></button>
+        </mat-card-actions>
+    </mat-card>
+
+</form>

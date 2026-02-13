@@ -1,0 +1,26 @@
+<ng-container *ngIf="!printExam">
+    <app-exam-def-detail-view [entity-id]="examDefId$" [edit]="isEdit$" (created)="onCreated($event)"
+        (changed)="onChanged($event)" (deleted)="onDeleted($event)"></app-exam-def-detail-view>
+</ng-container>
+<ng-container *ngIf="printExam">
+    <app-exam-print [entity-id]="examDefId$"></app-exam-print>
+</ng-container>
+
+<mat-divider class="not-printable"></mat-divider>
+
+<mat-card class="not-printable">
+    <mat-card-actions>
+        <button *ngIf="!isEdit$.value" mat-raised-button color="primary" (click)="switchView()"
+            matTooltip="Enable Edit">
+            <i class="material-icons"> edit </i></button>
+        <button *ngIf="isEdit$.value" mat-raised-button color="primary" (click)="switchView()"
+            matTooltip="Back to View-only">
+            <i class="material-icons"> arrow_back </i></button>
+        <span class="spacer"></span>
+        <button *ngIf="!isEdit$.value" mat-raised-button color="primary" (click)="createAssignment()">
+            Create Assignment</button>
+        <span class="spacer"></span>
+        <button *ngIf="!isEdit$.value" mat-raised-button color="primary" (click)="togglePrint()">
+            Print Exam</button>
+    </mat-card-actions>
+</mat-card>

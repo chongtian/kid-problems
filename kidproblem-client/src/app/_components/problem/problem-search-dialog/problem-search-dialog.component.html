@@ -1,0 +1,18 @@
+<mat-card>
+    <mat-card-title>Query Problems</mat-card-title>
+    <mat-card-actions>
+        <div class="w3-cell">
+            <button mat-raised-button color="primary" matTooltip="Select and Close" (click)="select()">
+                <span class="material-icons"> check_circle </span></button>
+        </div>
+        <span class="spacer"></span>
+        <div class="w3-cell">
+            <button mat-raised-button color="primary" matTooltip="Cancel" (click)="close()">
+                <span class="material-icons"> cancel </span></button>
+        </div>
+    </mat-card-actions>
+    <mat-card-content>
+        <app-problem-list-view [is-staging]="isStaging" is-selectable="true" pagination="false"
+            [keyword]="keyword"></app-problem-list-view>
+    </mat-card-content>
+</mat-card>

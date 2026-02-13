@@ -1,0 +1,57 @@
+<h3 mat-h3>Get Problems from AoP</h3>
+
+<div *ngIf="!isSubmitted">
+
+  <mat-form-field floatLabel="auto" class="longtext">
+    <mat-label>Start Url</mat-label>
+    <input matInput [(ngModel)]="startUrl">
+  </mat-form-field>
+  <br />
+  <mat-form-field floatLabel="auto">
+    <mat-label>Problem Category</mat-label>
+    <input matInput [(ngModel)]="problemCategory">
+  </mat-form-field>
+  <br />
+  <mat-form-field floatLabel="auto">
+    <mat-label>Problem Year</mat-label>
+    <input matInput [(ngModel)]="problemYear">
+  </mat-form-field>
+  <br />
+  <mat-form-field floatLabel="auto" class="longtext">
+    <mat-label>Start Regular Expression</mat-label>
+    <input matInput [(ngModel)]="startPattern">
+  </mat-form-field>
+  <br />
+  <mat-form-field floatLabel="auto" class="longtext">
+    <mat-label>End Regular Expression</mat-label>
+    <input matInput [(ngModel)]="endPattern">
+  </mat-form-field>
+  <br />
+  <button mat-raised-button color="primary" (click)="crawl()">Crawl</button>
+</div>
+
+<mat-spinner *ngIf="isLoading"></mat-spinner>
+<div *ngIf="!problems && !isLoading && isSubmitted">
+  <span>No record is returned</span>
+</div>
+
+<div *ngIf="problems && !isLoading && isSubmitted">
+  <h3 mat-h3>Count of Problems: {{problems.length}}</h3>
+  <button mat-raised-button color="primary" (click)="reset()">Reset</button>
+  <ng-container *ngFor="let problem of problems">
+    <mat-card>
+      <mat-car-header>
+        <mat-card-title> {{problem.ProblemTitle}} </mat-card-title>
+        <mat-card-subtitle *ngIf="problem.IsSuccessful"><a routerLink="/problem/view/{{problem.ProblemTitle}}">View</a>
+        </mat-card-subtitle>
+      </mat-car-header>
+      <mat-card-content>
+        <h4 class="label">Problem Text</h4>
+        <span [appMath]="problem.ProblemText"></span>
+        <h4 class="label">Message</h4>
+        <span>{{problem.ReturnResult}}</span>
+      </mat-card-content>
+    </mat-card>
+    <mat-divider></mat-divider>
+  </ng-container>
+</div>

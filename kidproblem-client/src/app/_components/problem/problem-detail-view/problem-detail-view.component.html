@@ -1,0 +1,43 @@
+<mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+<div *ngIf="problem && !isLoading">
+  <div *ngIf="displayAll">
+    <h4> {{problem.ProblemTitle}} </h4>
+    <div class="w3-row">
+      <div class="w3-col s6 m4 l2"><span class="label">Category</span>:
+        <span>{{problem.ProblemCategory}}</span>
+      </div>
+      <div class="w3-col s6 m4 l2"><span class="label">Year</span>:
+        <span>{{problem.ProblemYear}}</span>
+      </div>
+      <div class="w3-col s6 m4 l2"><span class="label">Number</span>:
+        <span>{{problem.ProblemNumber}}</span>
+      </div>
+      <div class="w3-col s6 m4 l2"><span class="label">Answer Options</span>:
+        <span>{{problem.AnswerOptions}}</span>
+      </div>
+      <div class="w3-col s6 m4 l2"><span class="label">Tags</span>:
+        <span>{{problem.ProblemTags}}</span>
+      </div>
+      <div class="w3-col s6 m4 l2"><span class="label">Is Staging</span>:
+        <span>{{problem.IsStaging | booleanLikeToText}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="w3-row">
+    <div [appMath]="problem.ProblemTextBase64"></div>
+  </div>
+
+  <details *ngIf="displayAll && problem.ProblemAnswer" class="w3-row">
+    <summary class="label">Answer:</summary>
+    <span>{{problem.ProblemAnswer}}</span>
+  </details>
+
+  <details *ngIf="displayAll && problem.SolutionText" class="w3-row">
+    <summary mat-h4>Solution</summary>
+    <div [appMath]="problem.SolutionText"></div>
+  </details>
+  <br /><br />
+  <app-problem-summary-view *ngIf="displayAll" [problem-title]="problemTitle$.value"></app-problem-summary-view>
+
+</div>

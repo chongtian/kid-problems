@@ -1,0 +1,16 @@
+.selected-answer{
+    background-color: red;
+}
+
+.selected-problem{
+    border-color: red;
+    border-style: solid;
+}
+
+.incomplete{
+    background-color: yellow;
+}
+
+.complete{
+    background-color: lightgreen;
+}

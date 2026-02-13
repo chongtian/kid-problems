@@ -1,0 +1,7 @@
+<div class="w3-panel w3-pale-red w3-leftbar w3-border-red" *ngIf="messageService.messages.length">
+  Messages <br />
+  <ul class="w3-ul w3-small">
+    <li *ngFor='let message of messageService.messages'> {{message}}</li>
+  </ul>
+  <button mat-mini-fab (click)="messageService.clear()"><i class="material-icons">clear</i></button>
+</div>

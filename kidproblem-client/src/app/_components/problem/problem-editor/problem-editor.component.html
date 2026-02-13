@@ -1,0 +1,124 @@
+<h3>Problem Editor</h3>
+<mat-progress-bar *ngIf="!problemEditorForm && isLoading" mode="indeterminate"></mat-progress-bar>
+
+<form *ngIf="problemEditorForm" [formGroup]="problemEditorForm">
+
+  <mat-card>
+    <mat-card-content>
+      <div>
+
+        <div class="w3-row">
+
+          <div class="w3-col s6 m4 l2">
+            <mat-form-field>
+              <mat-label>Title</mat-label>
+              <input matInput readonly formControlName="problemTitle">
+            </mat-form-field>
+          </div>
+
+          <div class="w3-col s6 m4 l2">
+            <mat-form-field>
+              <mat-label>Category</mat-label>
+              <input matInput required [readonly]="!isNew" formControlName="problemCategory">
+            </mat-form-field>
+            <div *ngIf="submitted && p.get('problemCategory').errors" class="invalid-feedback">
+              <div *ngIf="p.get('problemCategory').errors.required">{{messageTexts.required}}
+              </div>
+            </div>
+
+          </div>
+
+          <div class="w3-col s6 m4 l2">
+            <mat-form-field>
+              <mat-label>Year</mat-label>
+              <input matInput [readonly]="!isNew" formControlName="problemYear">
+            </mat-form-field>
+          </div>
+
+          <div class="w3-col s6 m4 l2">
+            <mat-form-field>
+              <mat-label>Number</mat-label>
+              <input matInput [readonly]="!isNew" formControlName="problemNumber">
+            </mat-form-field>
+          </div>
+
+          <div class="w3-col s6 m4 l2">
+            <mat-form-field>
+              <mat-label>Answer</mat-label>
+              <input matInput formControlName="problemAnswer">
+            </mat-form-field>
+          </div>
+
+          <div class="w3-col s6 m4 l2">
+            <mat-form-field>
+              <mat-label>Tags</mat-label>
+              <input matInput formControlName="problemTags">
+            </mat-form-field>
+          </div>
+
+          <div class="w3-col s6 m4 l2">
+            <mat-form-field>
+              <mat-label>Answer Options</mat-label>
+              <input matInput formControlName="answerOptions">
+            </mat-form-field>
+          </div>
+
+          <div class="w3-col s6 m4 l2">
+            <mat-checkbox formControlName="isStaging">Is Staging</mat-checkbox>
+          </div>
+
+        </div>
+
+        <div class="w3-cell-row">
+          <mat-form-field class="full-width">
+            <mat-label>Problem Text</mat-label>
+            <textarea matInput formControlName="problemText"></textarea>
+          </mat-form-field>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="w3-cell-row">
+          <mat-form-field class="full-width">
+            <mat-label>Solution Text</mat-label>
+            <textarea matInput formControlName="solutionText" (blur)="onSolutionTextBlur($event)"></textarea>
+          </mat-form-field>
+        </div>
+
+      </div>
+
+      <mat-divider></mat-divider>
+      <div *ngIf="previewProblemText" class="w3-cell-row">
+        <h4>Preview Problem Text:</h4>
+        <div [appMath]="previewProblemText"></div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="w3-cell-row">
+        <h4>Problem Text in Base64:</h4>
+        <div [innerHtml]="problem.ProblemTextBase64"></div>
+      </div>
+      <mat-divider></mat-divider>
+      <div *ngIf="previewSolutionText" class="w3-cell-row">
+        <h4>Preview Solution Text:</h4>
+        <div [appMath]="previewSolutionText"></div>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+  <mat-divider></mat-divider>
+
+  <mat-card>
+    <mat-card-actions>
+      <button type="submit" [disabled]="problemEditorForm.pristine" mat-raised-button color="primary"
+        (click)="save()"><i class="material-icons"> save </i></button>
+      <span class="spacer"></span>
+      <button mat-raised-button color="primary" (click)="previewText()"><i class=" material-icons"> preview
+        </i></button>
+      <span class="spacer"></span>
+      <span class="spacer"></span>
+      <button *ngIf="!isNew" mat-raised-button color="warn" (click)="delete()">
+        <i class="material-icons"> delete </i></button>
+    </mat-card-actions>
+  </mat-card>
+
+</form>

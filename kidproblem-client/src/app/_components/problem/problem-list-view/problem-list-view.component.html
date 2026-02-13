@@ -1,0 +1,52 @@
+<form (ngSubmit)="search()">
+    <mat-form-field>
+        <mat-label>Keyword</mat-label>
+        <input type="search" matInput placeholder="category-year-number" [(ngModel)]="keyword" name="keyword">
+    </mat-form-field>
+    <button mat-icon-button><i class="material-icons"> search </i></button>
+</form>
+
+<div class="w3-panel">
+    <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+    <div class="w3-row">
+        <div class="w3-col m4 l4" *ngIf="data && data.length>0">
+            Count of all records: {{data.length}}
+        </div>
+        <div class="w3-col m5 l4" *ngIf="selectedIds && selectedIds.length>0">
+            Count of selected records: {{selectedIds.length}}
+        </div>
+    </div>
+</div>
+
+<ng-container *ngFor="let _ of data;let i=index;">
+    <div *ngIf="i%5===0" [ngClass]="{'w3-cell-row':true, 'w3-light-grey':(i/5)%2===0}">
+        <ng-container *ngFor="let j of [0,1,2,3,4];">
+            <div *ngIf="data[i+j]" class="w3-container w3-cell w3-center w3-card">
+                <ng-container *ngIf="isSelectable">
+                    <mat-checkbox (change)="toggle(data[i+j])" [checked]="isChecked(data[i+j])">
+                        <span>{{data[i+j].ProblemTitle}}</span>
+                    </mat-checkbox>
+                </ng-container>
+                <ng-container *ngIf="!isSelectable">
+                    <span><a routerLink="/problem/view/{{data[i+j].ProblemTitle}}">{{data[i+j].ProblemTitle}}</a></span>
+                </ng-container>
+            </div>
+        </ng-container>
+    </div>
+</ng-container>
+
+<div class="w3-panel">
+    <div class="w3-cell-row">
+        <ng-container *ngIf="loadMoreData">
+            <div class="w3-container w3-cell">
+                <button mat-icon-button color="primary" matTooltip="Load More" (click)="more()">
+                    <span class="material-icons"> more </span></button>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="isSelectable && data.length>0">
+            <div class="w3-container w3-cell">
+                <mat-slide-toggle (click)="toggleAll()">Select All</mat-slide-toggle>
+            </div>
+        </ng-container>
+    </div>
+</div>

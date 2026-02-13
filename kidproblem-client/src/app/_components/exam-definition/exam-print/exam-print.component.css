@@ -1,0 +1,10 @@
+@media print {
+    .no-break {
+        /* Modern syntax */
+        break-inside: avoid;
+        
+        /* Older syntax for better browser compatibility */
+        page-break-inside: avoid;
+      }
+}
+

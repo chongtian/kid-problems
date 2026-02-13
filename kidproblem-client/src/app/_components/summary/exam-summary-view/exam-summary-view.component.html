@@ -1,0 +1,10 @@
+<mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+<ng-container *ngIf="username && summaries">
+    <ng-container *ngFor="let data of summaries">
+        <div class="w3-container w3-cell">
+            <app-exam-summary-detail-view [data]="data"></app-exam-summary-detail-view>
+        </div>
+    </ng-container>
+</ng-container>
+
+

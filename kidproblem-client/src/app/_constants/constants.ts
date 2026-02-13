@@ -1,0 +1,1 @@
+export const PaginationIndicator = "_first_page_";

@@ -1,0 +1,25 @@
+<mat-expansion-panel *ngIf="summaries.length > 0">
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            Problem Summary
+        </mat-panel-title>
+        <mat-panel-description>
+            Summary of {{problemTitle}}
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+    <mat-list>
+        <mat-list-item *ngFor="let data of summaries">
+            <span class="w3-large">{{data.AnswerByFullname}}</span>
+            <span class="label"> Total: </span>{{data.TotalCount}}
+            <span class="label"> Correct: </span>{{data.CorrectCount}} ({{data.CorrectCount / data.TotalCount * 100 |
+            number:'1.1-1'}}%)
+            <span class="label"> Guess: </span>{{data.GuessCount}} ({{data.GuessCount / data.TotalCount * 100 |
+            number:'1.1-1'}}%)
+            <span class="label"> Guess and Correct: </span>{{data.GuessCorrectCount}}
+            ({{data.GuessCorrectCount / data.CorrectCount * 100 | number:'1.1-1'}}%)
+            <span class="label"> True Correct Rate: </span>{{data.TrueCorrectRate*100 | number:'1.1-1'}}%
+            <span class="label"> Average Duration: </span>{{data.TotalDuration / data.TotalCount | number:'1.1-1' }}
+            seconds
+        </mat-list-item>
+    </mat-list>
+</mat-expansion-panel>
