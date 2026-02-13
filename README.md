@@ -10,9 +10,9 @@ This version represents a complete migration to a Serverless AWS architecture, f
 
 - **Public Mirror:** GitHub (for portfolio visibility).
 
-- **Backend:** C# / .NET 6 (AWS Lambda).
+- **Backend:** C# / .NET 8 (AWS Lambda).
 
-- **Frontend:** Angular 14+ (Amazon S3).
+- **Frontend:** Angular 17+ (hosted in Amazon S3).
 
 - **Database:** DynamoDB (NoSQL).
 

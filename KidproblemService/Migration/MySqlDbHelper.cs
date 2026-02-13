@@ -6,7 +6,7 @@ namespace Migration
 {
     internal class MySqlDbHelper
     {
-        // update the connectionString first
+        // update the connectionString first, this server has been decommissioned. The credential shown here is harmless.
         private const string connectionString = "server=ec2-54-190-58-22.us-west-2.compute.amazonaws.com;user=remote;database=KIDPROBLEMS;port=3306;password=ekfX4hIJZATdchQRTKT2";
 
         public static List<Problem> GetProblems(int offset = 0, int size = 100)
