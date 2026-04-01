@@ -37,10 +37,11 @@ runs:
 
     - name: Update Environment Variable (Staging Only)
       if: inputs.deploy == 'true' && inputs.production == 'false'
-      shell: pwsh
+      shell: bash
       run: |
-        $TARGETDIR = "${{ github.workspace }}/KidproblemService/KidproblemService/aws-lambda-tools-defaults.json"
-        (Get-Content $TARGETDIR).replace('ASPNETCORE_ENVIRONMENT=Production', "ASPNETCORE_ENVIRONMENT=Development") | Set-Content $TARGETDIR
+        TARGETDIR="${{ github.workspace }}/KidproblemService/KidproblemService/aws-lambda-tools-defaults.json"
+        sed -i "s/ASPNETCORE_ENVIRONMENT=Production/ASPNETCORE_ENVIRONMENT=Development/g" "$TARGETDIR"
+
 
     - name: Install Lambda Tools
       if: inputs.deploy == 'true'
@@ -50,7 +51,7 @@ runs:
     - name: Deploy Lambda
       if: inputs.deploy == 'true'
       working-directory: ./KidproblemService/KidproblemService
-      shell: pwsh
+      shell: bash
       run: |
         dotnet lambda deploy-function "${{ inputs.lambdaFunctionName }}" `
           --region us-east-2 `
@@ -65,20 +66,24 @@ runs:
         dotnet publish ./KidproblemService/KidproblemService/KidproblemService.csproj -c Release -o ./publish
         cd ./publish && zip -r ../Services.zip .
 
-    # Angular UI Logic
     - name: Install Angular Dependencies
       shell: bash
       working-directory: ./kidproblem-client
       run: npm ci
 
     - name: Modify Build Number
-      shell: pwsh
+      shell: bash
       run: |
-        $BUILDNUM = "${{ github.run_number }}"
-        $TARGETDIR_PROD = "${{ github.workspace }}/kidproblem-client/src/environments/environment.prod.ts"
-        $TARGETDIR_DEV = "${{ github.workspace }}/kidproblem-client/src/environments/environment.development.ts"
-        (Get-Content $TARGETDIR_PROD).replace('#BuildNumber#', "$BUILDNUM") | Set-Content $TARGETDIR_PROD
-        (Get-Content $TARGETDIR_DEV).replace('#BuildNumber#', "$BUILDNUM") | Set-Content $TARGETDIR_DEV
+        BUILDNUM="$(date +'%y%m%d').${{ github.run_number }}"
+        CLIENT_VER_PROD="${{ github.workspace }}/kidproblem-client/src/environments/environment.prod.ts"
+        CLIENT_VER_DEV="${{ github.workspace }}/kidproblem-client/src/environments/environment.development.ts"
+        SERVICE_VER_PROD="${{ github.workspace }}/KidproblemService/KidproblemService/appsettings.json"
+        SERVICE_VER_DEV="${{ github.workspace }}/KidproblemService/KidproblemService/appsettings.Development.json"
+        sed -i "s/#BuildNumber#/${BUILDNUM}/g" "$CLIENT_VER_PROD"
+        sed -i "s/#BuildNumber#/${BUILDNUM}/g" "$CLIENT_VER_DEV"
+        sed -i "s/__SERVICE_VERSION__/${BUILDNUM}/g" "$SERVICE_VER_PROD"
+        sed -i "s/__SERVICE_VERSION__/${BUILDNUM}/g" "$SERVICE_VER_DEV"
+        echo "Build number set to: $BUILDNUM"
 
     - name: Build Angular UI
       shell: bash
@@ -97,8 +102,7 @@ runs:
         aws s3 sync ./kidproblem-client/dist/browser s3://${{ inputs.s3BucketName }} --region us-east-2
       continue-on-error: true
 
-    # Testing Logic
-    - name: Test Angular UI
+    - name: Run Tests
       if: inputs.runTest == 'true'
       shell: bash
       working-directory: ./kidproblem-client

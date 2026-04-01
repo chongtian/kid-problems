@@ -16,19 +16,16 @@ on:
       deploy_production:
         description: 'Deploy Production'
         type: boolean
-        default: true
+        default: false
       run_test:
         description: 'Run Tests'
         type: boolean
         default: false
 
-env:
-  BUILD_CONFIGURATION: 'Release'
-
 jobs:
   ci:
     if: github.event_name == 'pull_request'
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Run Build Steps
@@ -40,7 +37,7 @@ jobs:
 
   staging:
     if: github.event_name != 'pull_request'
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
@@ -65,7 +62,7 @@ jobs:
     if: |
       github.event_name != 'pull_request' && 
       (github.event.inputs.deploy_production == 'true')
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     environment: aws-kidproblem
     steps:
       - uses: actions/checkout@v4
