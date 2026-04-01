@@ -53,11 +53,11 @@ runs:
       working-directory: ./KidproblemService/KidproblemService
       shell: bash
       run: |
-        dotnet lambda deploy-function "${{ inputs.lambdaFunctionName }}" `
-          --region us-east-2 `
-          --function-role "inforcentralrole" `
-          --function-memory-size 256 `
-          --function-timeout 300
+        dotnet lambda deploy-function "${{ inputs.lambdaFunctionName }}" \
+          --region us-east-2 \
+          --function-role inforcentralrole \
+          --function-memory-size 256 \
+          --function-timeout 30
 
     - name: Publish .NET (If not deploying)
       if: inputs.deploy != 'true'
