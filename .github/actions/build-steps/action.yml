@@ -49,12 +49,14 @@ runs:
 
     - name: Deploy Lambda
       if: inputs.deploy == 'true'
-      shell: bash
+      working-directory: ./KidproblemService/KidproblemService
+      shell: pwsh
       run: |
-        dotnet lambda deploy-function ${{ inputs.lambdaFunctionName }} \
-          --project-location ./KidproblemService/KidproblemService/KidproblemService.csproj \
-          --region us-east-2 \
-          --role inforcentralrole
+        dotnet lambda deploy-function "${{ inputs.lambdaFunctionName }}" `
+          --region us-east-2 `
+          --function-role "inforcentralrole" `
+          --function-memory-size 256 `
+          --function-timeout 300
 
     - name: Publish .NET (If not deploying)
       if: inputs.deploy != 'true'
