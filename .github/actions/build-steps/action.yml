@@ -42,6 +42,19 @@ runs:
         TARGETDIR="${{ github.workspace }}/KidproblemService/KidproblemService/aws-lambda-tools-defaults.json"
         sed -i "s/ASPNETCORE_ENVIRONMENT=Production/ASPNETCORE_ENVIRONMENT=Development/g" "$TARGETDIR"
 
+    - name: Modify Build Number
+      shell: bash
+      run: |
+        BUILDNUM="$(date +'%y%m%d').${{ github.run_number }}"
+        CLIENT_VER_PROD="${{ github.workspace }}/kidproblem-client/src/environments/environment.prod.ts"
+        CLIENT_VER_DEV="${{ github.workspace }}/kidproblem-client/src/environments/environment.development.ts"
+        SERVICE_VER_PROD="${{ github.workspace }}/KidproblemService/KidproblemService/appsettings.json"
+        SERVICE_VER_DEV="${{ github.workspace }}/KidproblemService/KidproblemService/appsettings.Development.json"
+        sed -i "s/#BuildNumber#/${BUILDNUM}/g" "$CLIENT_VER_PROD"
+        sed -i "s/#BuildNumber#/${BUILDNUM}/g" "$CLIENT_VER_DEV"
+        sed -i "s/__SERVICE_VERSION__/${BUILDNUM}/g" "$SERVICE_VER_PROD"
+        sed -i "s/__SERVICE_VERSION__/${BUILDNUM}/g" "$SERVICE_VER_DEV"
+        echo "Build number set to: $BUILDNUM"
 
     - name: Install Lambda Tools
       if: inputs.deploy == 'true'
@@ -70,20 +83,6 @@ runs:
       shell: bash
       working-directory: ./kidproblem-client
       run: npm ci
-
-    - name: Modify Build Number
-      shell: bash
-      run: |
-        BUILDNUM="$(date +'%y%m%d').${{ github.run_number }}"
-        CLIENT_VER_PROD="${{ github.workspace }}/kidproblem-client/src/environments/environment.prod.ts"
-        CLIENT_VER_DEV="${{ github.workspace }}/kidproblem-client/src/environments/environment.development.ts"
-        SERVICE_VER_PROD="${{ github.workspace }}/KidproblemService/KidproblemService/appsettings.json"
-        SERVICE_VER_DEV="${{ github.workspace }}/KidproblemService/KidproblemService/appsettings.Development.json"
-        sed -i "s/#BuildNumber#/${BUILDNUM}/g" "$CLIENT_VER_PROD"
-        sed -i "s/#BuildNumber#/${BUILDNUM}/g" "$CLIENT_VER_DEV"
-        sed -i "s/__SERVICE_VERSION__/${BUILDNUM}/g" "$SERVICE_VER_PROD"
-        sed -i "s/__SERVICE_VERSION__/${BUILDNUM}/g" "$SERVICE_VER_DEV"
-        echo "Build number set to: $BUILDNUM"
 
     - name: Build Angular UI
       shell: bash
