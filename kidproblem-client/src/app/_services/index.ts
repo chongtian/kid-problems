@@ -7,3 +7,4 @@ export * from './exam-definition.service';
 export * from './assignment.service';
 export * from './exam-run.service';
 export * from './summary.service';
+export * from './loading-bus.service';

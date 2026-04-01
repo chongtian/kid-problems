@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DisplayMessages } from '@app/_constants';
 import { ExamDefinition, ExamDefinitionId } from '@app/_models';
-import { AssignmentService, MessageService } from '@app/_services';
+import { AssignmentService, LoadingBusService, MessageService } from '@app/_services';
 import { BehaviorSubject } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,14 +11,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { ExamPrintComponent } from '../exam-print/exam-print.component';
 import { ExamDefDetailViewComponent } from '../exam-def-detail-view/exam-def-detail-view.component';
-import { NgIf } from '@angular/common';
+
 
 @Component({
-    selector: 'app-exam-def-detail',
-    templateUrl: './exam-def-detail.component.html',
-    styleUrls: ['./exam-def-detail.component.css'],
-    standalone: true,
-    imports: [NgIf, ExamDefDetailViewComponent, ExamPrintComponent, MatDividerModule, MatCardModule, MatButtonModule, MatTooltipModule]
+  selector: 'app-exam-def-detail',
+  templateUrl: './exam-def-detail.component.html',
+  styleUrls: ['./exam-def-detail.component.css'],
+  imports: [ExamDefDetailViewComponent, ExamPrintComponent, MatDividerModule, MatCardModule, MatButtonModule, MatTooltipModule]
 })
 export class ExamDefDetailComponent implements OnInit {
 
@@ -27,7 +26,8 @@ export class ExamDefDetailComponent implements OnInit {
   messageTexts = DisplayMessages;
   isNew = false;
   private isChildChanged = false;
-  printExam = false
+  printExam = false;
+  private loading = inject(LoadingBusService);
 
   constructor(
     private route: ActivatedRoute,
@@ -112,14 +112,19 @@ export class ExamDefDetailComponent implements OnInit {
       return;
     }
     const examDef: ExamDefinition = { ExamCategory: this.examDefId$.value.ExamCategory, ExamTitle: this.examDefId$.value.ExamTitle, Active: true };
-    this.assignmentService.createAssignmentFromDefinition(examDef).then(data => {
-      if (data && data.IsSuccessful) {
-        this.router.navigate([`assignment/view/${data.Id}`]);
-      } else {
-        this.messageService.openSnackBar(`${this.messageTexts.saveFailed}`);
-        this.messageService.add(`${this.messageTexts.saveFailed}: ${data.ReturnResult}`);
-      }
-    });
+
+    this.loading.start();
+    this.assignmentService.createAssignmentFromDefinition(examDef)
+      .then(data => {
+        if (data && data.IsSuccessful) {
+          this.router.navigate([`assignment/view/${data.Id}`]);
+        } else {
+          this.messageService.openSnackBar(`${this.messageTexts.saveFailed}`);
+          this.messageService.add(`${this.messageTexts.saveFailed}: ${data.ReturnResult}`);
+        }
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   togglePrint(): void {

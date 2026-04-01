@@ -1,20 +1,18 @@
-import { Component, Input, booleanAttribute } from '@angular/core';
+import { Component, Input, booleanAttribute, inject } from '@angular/core';
 import { DisplayMessages } from '@app/_constants';
 import { Problem } from '@app/_models';
-import { ProblemService, MessageService } from '@app/_services';
+import { ProblemService, MessageService, LoadingBusService } from '@app/_services';
 import { BehaviorSubject } from 'rxjs';
 import { BooleanLikeToTextPipe } from '@app/_pipes';
 import { ProblemSummaryViewComponent } from '../../summary/problem-summary-view/problem-summary-view.component';
 import { MathDirective } from '../../../math/math.directive';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { NgIf } from '@angular/common';
+
 
 @Component({
-    selector: 'app-problem-detail-view',
-    templateUrl: './problem-detail-view.component.html',
-    styleUrls: ['./problem-detail-view.component.css'],
-    standalone: true,
-    imports: [NgIf, MatProgressBarModule, MathDirective, ProblemSummaryViewComponent, BooleanLikeToTextPipe]
+  selector: 'app-problem-detail-view',
+  templateUrl: './problem-detail-view.component.html',
+  styleUrls: ['./problem-detail-view.component.css'],
+  imports: [MathDirective, ProblemSummaryViewComponent, BooleanLikeToTextPipe]
 })
 export class ProblemDetailViewComponent {
   @Input({ alias: 'display-all', transform: booleanAttribute }) displayAll = true;
@@ -22,7 +20,7 @@ export class ProblemDetailViewComponent {
 
   problem: Problem;
   messageTexts = DisplayMessages;
-  isLoading: boolean;
+  private loading = inject(LoadingBusService);
   AnswerOptions: string[] = []; // this property is used by exam-runner component
 
   constructor(
@@ -33,27 +31,29 @@ export class ProblemDetailViewComponent {
   ngOnInit() {
     this.problemTitle$.subscribe(
       problemTitle => {
-        this.isLoading = true;
         this.getProblem(problemTitle);
       }
     );
   }
 
   private getProblem(problemTitle: string) {
-    this.problemService.getProblem(problemTitle).then(
-      data => {
-        if (data != null) {
-          this.problem = data;
-          if (this.problem.AnswerOptions) {
-            this.AnswerOptions = this.problem.AnswerOptions.split(',');
+    this.loading.start();
+    this.problemService.getProblem(problemTitle)
+      .then(
+        data => {
+          if (data != null) {
+            this.problem = data;
+            if (this.problem.AnswerOptions) {
+              this.AnswerOptions = this.problem.AnswerOptions.split(',');
+            }
+          } else {
+            this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${problemTitle}.`);
+            this.problem = null;
           }
-        } else {
-          this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${problemTitle}.`);
-          this.problem = null;
         }
-        this.isLoading = false;
-      }
-    );
+      )
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
 }

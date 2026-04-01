@@ -1,0 +1,112 @@
+name: 'Build and Deploy Steps'
+description: 'Shared build and deployment logic for KidProblem'
+inputs:
+  deploy:
+    description: 'Deploy to AWS'
+    required: true
+    default: 'false'
+  production:
+    description: 'Is production environment'
+    required: true
+    default: 'false'
+  runTest:
+    description: 'Run Angular tests'
+    required: true
+    default: 'false'
+  lambdaFunctionName:
+    description: 'AWS Lambda Name'
+    required: false
+    default: 'kidproblemdev'
+  s3BucketName:
+    description: 'AWS S3 Bucket Name'
+    required: false
+    default: 'kidproblemdev.nowsuncorp.com'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.x' 
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: '24'
+
+    - name: Update Environment Variable (Staging Only)
+      if: inputs.deploy == 'true' && inputs.production == 'false'
+      shell: pwsh
+      run: |
+        $TARGETDIR = "${{ github.workspace }}/KidproblemService/KidproblemService/aws-lambda-tools-defaults.json"
+        (Get-Content $TARGETDIR).replace('ASPNETCORE_ENVIRONMENT=Production', "ASPNETCORE_ENVIRONMENT=Development") | Set-Content $TARGETDIR
+
+    - name: Install Lambda Tools
+      if: inputs.deploy == 'true'
+      shell: bash
+      run: dotnet tool install -g Amazon.Lambda.Tools
+
+    - name: Deploy Lambda
+      if: inputs.deploy == 'true'
+      shell: bash
+      run: |
+        dotnet lambda deploy-function ${{ inputs.lambdaFunctionName }} \
+          --project-location ./KidproblemService/KidproblemService/KidproblemService.csproj \
+          --region us-east-2 \
+          --role inforcentralrole
+
+    - name: Publish .NET (If not deploying)
+      if: inputs.deploy != 'true'
+      shell: bash
+      run: |
+        dotnet publish ./KidproblemService/KidproblemService/KidproblemService.csproj -c Release -o ./publish
+        cd ./publish && zip -r ../Services.zip .
+
+    # Angular UI Logic
+    - name: Install Angular Dependencies
+      shell: bash
+      working-directory: ./kidproblem-client
+      run: npm ci
+
+    - name: Modify Build Number
+      shell: pwsh
+      run: |
+        $BUILDNUM = "${{ github.run_number }}"
+        $TARGETDIR_PROD = "${{ github.workspace }}/kidproblem-client/src/environments/environment.prod.ts"
+        $TARGETDIR_DEV = "${{ github.workspace }}/kidproblem-client/src/environments/environment.development.ts"
+        (Get-Content $TARGETDIR_PROD).replace('#BuildNumber#', "$BUILDNUM") | Set-Content $TARGETDIR_PROD
+        (Get-Content $TARGETDIR_DEV).replace('#BuildNumber#', "$BUILDNUM") | Set-Content $TARGETDIR_DEV
+
+    - name: Build Angular UI
+      shell: bash
+      working-directory: ./kidproblem-client
+      run: |
+        if [ "${{ inputs.production }}" == "true" ]; then
+          npm run build:prod
+        else
+          npm run build:dev
+        fi
+
+    - name: Upload Angular to S3
+      if: inputs.deploy == 'true'
+      shell: bash
+      run: |
+        aws s3 sync ./kidproblem-client/dist/browser s3://${{ inputs.s3BucketName }} --region us-east-2
+      continue-on-error: true
+
+    # Testing Logic
+    - name: Test Angular UI
+      if: inputs.runTest == 'true'
+      shell: bash
+      working-directory: ./kidproblem-client
+      run: npm run devops-test
+
+    - name: Upload Artifacts
+      if: inputs.production == 'false'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ReleaseFiles
+        path: |
+          ./Services.zip
+          ./kidproblem-client/dist/browser

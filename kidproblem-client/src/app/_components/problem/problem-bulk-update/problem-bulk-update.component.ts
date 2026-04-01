@@ -1,26 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Problem } from '@app/_models';
-import { ProblemService, MessageService } from '@app/_services';
+import { ProblemService, MessageService, LoadingBusService } from '@app/_services';
 import { ProblemSearchDialogComponent } from '@app/_components';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { NgIf, NgFor, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
-    selector: 'app-problem-bulk-update',
-    templateUrl: './problem-bulk-update.component.html',
-    styleUrls: ['./problem-bulk-update.component.css'],
-    standalone: true,
-    imports: [NgIf, MatProgressSpinnerModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule, NgFor, RouterLink, NgClass]
+  selector: 'app-problem-bulk-update',
+  templateUrl: './problem-bulk-update.component.html',
+  styleUrls: ['./problem-bulk-update.component.css'],
+  imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule, RouterLink, NgClass]
 })
 export class ProblemBulkUpdateComponent {
 
-  isLoading = false;
+  private loading = inject(LoadingBusService);
   queryKeyword = '';
   problems: Problem[];
   problemTitles: string[];
@@ -65,30 +63,32 @@ export class ProblemBulkUpdateComponent {
     // we shall remove these regular problems
     this.problems = this.problems.filter(p => { return p.IsStaging });
 
-    this.isLoading = true;
-    this.service.updateStagingFlags(this.problems).then(
-      data => {
-        if (data != null) {
-          this.problems = data;
-          let isSuccessful = true;
-          this.problems.forEach(p => {
-            if (p.IsSuccessful) {
-              p.ReturnResult = "Updated.";
+    this.loading.start();
+    this.service.updateStagingFlags(this.problems)
+      .then(
+        data => {
+          if (data != null) {
+            this.problems = data;
+            let isSuccessful = true;
+            this.problems.forEach(p => {
+              if (p.IsSuccessful) {
+                p.ReturnResult = "Updated.";
+              } else {
+                isSuccessful = false;
+                // this.messageService.add(`Failed to update ${p.ProblemTitle}: ${p.Message}`);
+              }
+            });
+            if (isSuccessful) {
+              this.messageService.openSnackBar(`${this.problems.length} problems are updated successfully`);
             } else {
-              isSuccessful = false;
-              // this.messageService.add(`Failed to update ${p.ProblemTitle}: ${p.Message}`);
+              this.messageService.openSnackBar('There is error when updating the problem.');
             }
-          });
-          if (isSuccessful) {
-            this.messageService.openSnackBar(`${this.problems.length} problems are updated successfully`);
-          } else {
-            this.messageService.openSnackBar('There is error when updating the problem.');
-          }
 
+          }
         }
-        this.isLoading = false;
-      }
-    );
+      )
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
 

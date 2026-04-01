@@ -1,4 +1,4 @@
-import { enableProdMode, importProvidersFrom } from '@angular/core';
+import { enableProdMode, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -16,7 +16,7 @@ if (environment.production) {
 bootstrapApplication(AppComponent, {
   providers: [
     // importProvidersFrom(BrowserModule, ReactiveFormsModule, FormsModule, MatSnackBarModule, MatNativeDateModule, MatDialogModule),
-    importProvidersFrom(MatNativeDateModule),
+    provideZoneChangeDetection(),importProvidersFrom(MatNativeDateModule),
     provideRouter(routes),
     HttpInterceptorProviders,
     provideHttpClient(withInterceptorsFromDi()),

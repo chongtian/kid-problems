@@ -6,7 +6,6 @@ import { AssignmentListViewComponent } from '../assignment-list-view/assignment-
     selector: 'app-assignment-query',
     templateUrl: './assignment-query.component.html',
     styleUrls: ['./assignment-query.component.css'],
-    standalone: true,
     imports: [AssignmentListViewComponent]
 })
 export class AssignmentQueryComponent implements OnInit {

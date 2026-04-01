@@ -1,96 +1,99 @@
-<mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
-<ng-container *ngIf="exam">
-  <h3>{{exam.ExamCategory}} {{exam.ExamTitle}}</h3>
+@if (exam) {
+<h3 class="page-title">{{exam.ExamCategory}} {{exam.ExamTitle}}</h3>
+<mat-divider></mat-divider>
+<mat-card>
+  <mat-card-subtitle data-testid="problemTitle">Problem {{currentDetailIndex + 1}} -
+    {{exam.ExamRunDetails[currentDetailIndex].ProblemTitle}}
+  </mat-card-subtitle>
+  <mat-card-content>
+    <app-problem-detail-view display-all="false" [problem-title]="problemTitle$" #problem></app-problem-detail-view>
+  </mat-card-content>
   <mat-divider></mat-divider>
-  <mat-card>
-    <mat-card-subtitle>Problem {{currentDetailIndex + 1}} -
-      {{exam.ExamRunDetails[currentDetailIndex].ProblemTitle}}
-    </mat-card-subtitle>
-    <mat-card-content>
-      <app-problem-detail-view display-all="false" [problem-title]="problemTitle$" #problem></app-problem-detail-view>
-    </mat-card-content>
-    <mat-divider></mat-divider>
-    <mat-card-actions>
-
-      <div class="w3-cell-row">
-
-        <ng-container *ngIf="problem.AnswerOptions">
-          <div class="w3-container w3-cell w3-mobile" *ngFor="let element of problem.AnswerOptions;">
-            <button mat-fab color="primary" [ngClass]="{'selected-answer':element===currentExamRunDetail.UserAnswer}"
-              (click)="answer(element)">{{element}}</button>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="!problem.AnswerOptions">
-          <mat-form-field class="w3-container w3-cell w3-mobile" appearance="fill">
-            <mat-label>Your Answer:</mat-label>
-            <input matInput type="text" [(ngModel)]="currentExamRunDetail.UserAnswer">
-          </mat-form-field>
-        </ng-container>
-
-        <div class="w3-container w3-cell w3-mobile">
-          <button mat-raised-button color="warn" (click)="reset()">Delete My Answer</button>
-        </div>
-
-        <div class="w3-container w3-cell w3-mobile">
-          <mat-slide-toggle color="primary" [(ngModel)]="currentExamRunDetail.IsGuess">I Guessed
-          </mat-slide-toggle>
-        </div>
-
-        <div class="w3-container w3-cell w3-mobile">
-          <button mat-raised-button color="accent" (click)="submit()">Submit and Next</button>
-        </div>
-
-        <div class="w3-container w3-cell w3-mobile">
-          <button mat-raised-button color="warn" (click)="reviewBeforeComplete()">I Complete Exam</button>
-        </div>
-
+  <mat-card-actions>
+    <div class="w3-cell-row">
+      @if (problem.AnswerOptions) {
+      @for (element of problem.AnswerOptions; track element) {
+      <div class="w3-container w3-cell w3-mobile">
+        <button mat-fab color="primary" [ngClass]="{'selected-answer':element===currentExamRunDetail.UserAnswer}"
+          (click)="answer(element)" data-testid="btnAnswers">{{element}}</button>
       </div>
-    </mat-card-actions>
-
-    <mat-card-subtitle>Navigate Problems - Count of Problems: {{exam.TotalCount}} </mat-card-subtitle>
-    <mat-card-footer>
-      <button mat-stroked-button *ngFor="let element of exam.ExamRunDetails; let index = index;"
-        [ngClass]="{'selected-problem':index===currentDetailIndex, 'incomplete': !element.UserAnswer, 'complete':element.UserAnswer}"
-        (click)="viewDetail(index)">{{index + 1}}</button>
-      <mat-divider></mat-divider>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Summary
-          </mat-panel-title>
-          <mat-panel-description>
-            Review all your answers
-          </mat-panel-description>
-        </mat-expansion-panel-header>
-        <table class="w3-table w3-striped w3-border">
-          <thead>
-            <tr>
-              <th>No.</th>
-              <th>Problem Title</th>
-              <th>Your Answer</th>
-              <th>is Guess</th>
-              <th>Duration (s)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let element of exam.ExamRunDetails; let index = index;" (click)="viewDetail(index)"
-              [ngClass]="{'w3-text-red':!element.UserAnswer}">
-              <td><span>{{index+1}}</span></td>
-              <td><span>{{element.ProblemTitle}}</span></td>
-              <td><span>{{element.UserAnswer || ''}}</span></td>
-              <td><span>{{element.IsGuess | booleanLikeToText}}</span></td>
-              <td><span *ngIf="element.Duration">{{element.Duration | number:'1.0-0' }}</span></td>
-            </tr>
-          </tbody>
-        </table>
-        <br />
-        <button *ngIf="readyForComplete" mat-raised-button color="primary" (click)="complete(0)">
-          I need more time.</button>
-        <span>&nbsp;&nbsp;</span>
-        <button *ngIf="readyForComplete" mat-raised-button color="warn" [disabled]="isLoading" (click)="complete(1)">
-          I am sure to submit and complete this exam.</button>
-      </mat-expansion-panel>
-    </mat-card-footer>
-  </mat-card>
-
-</ng-container>
+      }
+      }
+      @if (!problem.AnswerOptions) {
+      <mat-form-field class="w3-container w3-cell w3-mobile" appearance="fill">
+        <mat-label>Your Answer:</mat-label>
+        <input matInput type="text" [(ngModel)]="currentExamRunDetail.UserAnswer" data-testid="textAnswer">
+      </mat-form-field>
+      }
+      <div class="w3-container w3-cell w3-mobile">
+        <button mat-raised-button color="warn" (click)="reset()" data-testid="btnDeleteAnswer">Delete My Answer</button>
+      </div>
+      <div class="w3-container w3-cell w3-mobile">
+        <mat-slide-toggle color="primary" [(ngModel)]="currentExamRunDetail.IsGuess" data-testid="btnIsGuess">I Guessed
+        </mat-slide-toggle>
+      </div>
+      <div class="w3-container w3-cell w3-mobile">
+        <button mat-raised-button color="accent" (click)="submit()" data-testid="btnSubmit">Submit and Next</button>
+      </div>
+      <div class="w3-container w3-cell w3-mobile">
+        <button mat-raised-button color="warn" (click)="reviewBeforeComplete()" data-testid="btnComplete">I Complete
+          Exam</button>
+      </div>
+    </div>
+  </mat-card-actions>
+  <mat-card-subtitle>Navigate Problems - Count of Problems: {{exam.TotalCount}} </mat-card-subtitle>
+  <mat-card-footer>
+    @for (element of exam.ExamRunDetails; track element; let index = $index) {
+    <button mat-stroked-button
+      [ngClass]="{'selected-problem':index===currentDetailIndex, 'incomplete': !element.UserAnswer, 'complete':element.UserAnswer}"
+      (click)="viewDetail(index)" data-testid="navigateButtons">{{index + 1}}</button>
+    }
+    <mat-divider></mat-divider>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Summary
+        </mat-panel-title>
+        <mat-panel-description>
+          Review all your answers
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <table class="w3-table w3-striped w3-border" data-testid="reviewAnswers">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Problem Title</th>
+            <th>Your Answer</th>
+            <th>is Guess</th>
+            <th>Duration (s)</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (element of exam.ExamRunDetails; track element; let index = $index) {
+          <tr (click)="viewDetail(index)" [ngClass]="{'w3-text-red':!element.UserAnswer}">
+            <td data-testid="rowNumber"><span>{{index+1}}</span></td>
+            <td data-testid="problem"><span>{{element.ProblemTitle}}</span></td>
+            <td data-testid="answer"><span>{{element.UserAnswer || ''}}</span></td>
+            <td data-testid="guess"><span>{{element.IsGuess | booleanLikeToText}}</span></td>
+            <td data-testid="duration"><span>
+                @if (element.Duration) {
+                {{element.Duration | number:'1.0-0' }}
+                }
+              </span>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      <br />
+      @if (readyForComplete) {
+      <button mat-raised-button color="primary" (click)="complete(0)" data-testid="btnNotComplete">
+        I need more time.</button>
+      <span>&nbsp;&nbsp;</span>
+      <button mat-raised-button color="warn" [disabled]="isLoading" (click)="complete(1)" data-testid="btnComplete">
+        I am sure to submit and complete this exam.</button>
+      }
+    </mat-expansion-panel>
+  </mat-card-footer>
+</mat-card>
+}

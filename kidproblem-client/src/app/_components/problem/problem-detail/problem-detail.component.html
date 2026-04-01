@@ -1,27 +1,37 @@
-<ng-container *ngIf="!isEdit">
+@if (!isEdit) {
   <app-problem-detail-view display-all="true" [problem-title]="problemTitle$"></app-problem-detail-view>
-</ng-container>
-<ng-container *ngIf="isEdit">
+}
+@if (isEdit) {
   <app-problem-editor [problem-title]="problemTitle$" (created)="onCreated($event)" (deleted)="onDeleted($event)" (changed)="onChanged($event)"></app-problem-editor>
-</ng-container>
+}
 
 <mat-divider></mat-divider>
 
-<mat-card *ngIf="!isEdit">
-  <mat-card-actions>
-    <a *ngIf="currProblemTitle" mat-raised-button color="primary" routerLink="/problem/edit/{{currProblemTitle}}">
-      <i class="material-icons"> edit </i></a>
-    <span class="spacer"></span>
-    <a *ngIf="prevProblemTitle" mat-raised-button color="primary" routerLink="/problem/view/{{prevProblemTitle}}">
-      <i class=" material-icons"> skip_previous </i></a>
-    <span class="spacer"></span>
-    <a *ngIf="nextProblemTitle" mat-raised-button color="primary" routerLink="/problem/view/{{nextProblemTitle}}">
-      <i class=" material-icons"> skip_next </i></a>
-  </mat-card-actions>
-</mat-card>
-<mat-card *ngIf="isEdit">
-  <mat-card-actions>
-    <button mat-raised-button color="primary" (click)="goBack()" matTooltip="Back to View-only">
-      <i class="material-icons"> arrow_back </i></button>
-  </mat-card-actions>
-</mat-card>
+@if (!isEdit) {
+  <mat-card>
+    <mat-card-actions>
+      @if (currProblemTitle) {
+        <a mat-raised-button color="primary" routerLink="/problem/edit/{{currProblemTitle}}" data-testid="btnEdit">
+          <i class="material-icons"> edit </i></a>
+        }
+        <span class="spacer"></span>
+        @if (prevProblemTitle) {
+          <a mat-raised-button color="primary" routerLink="/problem/view/{{prevProblemTitle}}" data-testid="btnPrevious">
+            <i class=" material-icons"> skip_previous </i></a>
+          }
+          <span class="spacer"></span>
+          @if (nextProblemTitle) {
+            <a mat-raised-button color="primary" routerLink="/problem/view/{{nextProblemTitle}}" data-testid="btnNext">
+              <i class=" material-icons"> skip_next </i></a>
+            }
+          </mat-card-actions>
+        </mat-card>
+      }
+      @if (isEdit) {
+        <mat-card>
+          <mat-card-actions>
+            <button mat-raised-button color="primary" (click)="goBack()" matTooltip="Back to View-only" data-testid="btnSwitchView">
+              <i class="material-icons"> arrow_back </i></button>
+            </mat-card-actions>
+          </mat-card>
+        }

@@ -1,19 +1,18 @@
-import { Component, Input, OnInit, ViewChild, booleanAttribute } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, booleanAttribute, inject } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PaginationIndicator } from '@app/_constants';
 import { ExamDefinition, InfoCentralCodeDetail } from '@app/_models';
-import { ExamDefinitionService, AdminService, MessageService } from '@app/_services';
+import { ExamDefinitionService, AdminService, MessageService, LoadingBusService } from '@app/_services';
 import { BooleanLikeToTextPipe } from '@app/_pipes';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatOptionModule } from '@angular/material/core';
-import { NgFor, NgIf, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -21,11 +20,10 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 const PageSize = 25;
 
 @Component({
-    selector: 'app-exam-def-list-view',
-    templateUrl: './exam-def-list-view.component.html',
-    styleUrls: ['./exam-def-list-view.component.css'],
-    standalone: true,
-    imports: [ReactiveFormsModule, FormsModule, MatFormFieldModule, MatSelectModule, NgFor, MatOptionModule, MatInputModule, MatButtonModule, NgIf, MatProgressBarModule, MatTableModule, MatCheckboxModule, RouterLink, MatPaginatorModule, NgClass, MatTooltipModule, MatSlideToggleModule, BooleanLikeToTextPipe]
+  selector: 'app-exam-def-list-view',
+  templateUrl: './exam-def-list-view.component.html',
+  styleUrls: ['./exam-def-list-view.component.css'],
+  imports: [ReactiveFormsModule, FormsModule, MatFormFieldModule, MatSelectModule, MatOptionModule, MatInputModule, MatButtonModule, MatTableModule, MatCheckboxModule, RouterLink, MatPaginatorModule, NgClass, MatTooltipModule, MatSlideToggleModule, BooleanLikeToTextPipe]
 })
 export class ExamDefListViewComponent implements OnInit {
 
@@ -41,7 +39,7 @@ export class ExamDefListViewComponent implements OnInit {
   displayedColumns = ['select', 'category', 'year', 'title', 'type', 'count', 'active', 'memo'];
   selected: ExamDefinition[] = [];
   loadMoreData = false;
-  isLoading = false;
+  private loading = inject(LoadingBusService);
   private paginationToken = PaginationIndicator;
   private currentKeyword = '';
   private currentCategory = '';
@@ -54,9 +52,13 @@ export class ExamDefListViewComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.adminService.getCategoryCodes().then(codes => {
-      this.categories = codes.filter(c => { return c.Active; })
-    });
+    this.loading.start();
+    this.adminService.getCategoryCodes()
+      .then(codes => {
+        this.categories = codes.filter(c => { return c.Active; })
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
 
     if (!this.isSelectable) {
       // remove the first element which is 'select'
@@ -68,7 +70,6 @@ export class ExamDefListViewComponent implements OnInit {
       this.search();
     }
   }
-
 
   onCategoryChange(_: any) {
     this.keyword = this.category + ' ';
@@ -84,22 +85,24 @@ export class ExamDefListViewComponent implements OnInit {
     }
 
     this.paginationToken = this.pagination === true ? PaginationIndicator : '';
-    this.isLoading = true;
-    this.service.queryExamDefinitions(this.category, this.activeOnly, this.paginationToken, PageSize, this.keyword).then(d => {
-      this.dataSource.data = d.data;
-      this.dataSource.paginator = this.paginator;
-      if (d.data.length > 0) {
-        this.paginationToken = d.pagination;
-        if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
-          this.loadMoreData = true;
+    this.loading.start();
+    this.service.queryExamDefinitions(this.category, this.activeOnly, this.paginationToken, PageSize, this.keyword)
+      .then(d => {
+        this.dataSource.data = d.data;
+        this.dataSource.paginator = this.paginator;
+        if (d.data.length > 0) {
+          this.paginationToken = d.pagination;
+          if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
+            this.loadMoreData = true;
+          } else {
+            this.loadMoreData = false;
+          }
         } else {
-          this.loadMoreData = false;
+          this.messageService.openSnackBar("No record is found.");
         }
-      } else {
-        this.messageService.openSnackBar("No record is found.");
-      }
-      this.isLoading = false;
-    });
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   more(): void {
@@ -107,18 +110,20 @@ export class ExamDefListViewComponent implements OnInit {
       // the search filter criteria have changed, reset search
       this.search();
     }
-    this.isLoading = true;
-    this.service.queryExamDefinitions(this.category, this.activeOnly, this.paginationToken, PageSize, this.keyword).then(d => {
-      this.dataSource.data.push(...d.data);
-      // this.dataSource.paginator = this.paginator;
-      this.paginationToken = d.pagination;
-      if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
-        this.loadMoreData = true;
-      } else {
-        this.loadMoreData = false;
-      }
-      this.isLoading = false;
-    });
+    this.loading.start();
+    this.service.queryExamDefinitions(this.category, this.activeOnly, this.paginationToken, PageSize, this.keyword)
+      .then(d => {
+        this.dataSource.data.push(...d.data);
+        // this.dataSource.paginator = this.paginator;
+        this.paginationToken = d.pagination;
+        if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
+          this.loadMoreData = true;
+        } else {
+          this.loadMoreData = false;
+        }
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   toggle(element: ExamDefinition): void {

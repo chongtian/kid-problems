@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExamRun, ExamRunDetail } from '@app/_models';
-import { ExamRunService } from '@app/_services';
+import { ExamRunService, LoadingBusService } from '@app/_services';
 import { MessageService } from '@app/_services/message.service';
 import { DisplayMessages } from '@app/_constants';
 import { BehaviorSubject } from 'rxjs';
@@ -15,22 +15,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { ProblemDetailViewComponent } from '../../problem/problem-detail-view/problem-detail-view.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { NgIf, NgFor, NgClass, DecimalPipe } from '@angular/common';
+import { NgClass, DecimalPipe } from '@angular/common';
 
 @Component({
-    selector: 'app-exam-runner',
-    templateUrl: './exam-runner.component.html',
-    styleUrls: ['./exam-runner.component.css'],
-    standalone: true,
-    imports: [NgIf, MatProgressBarModule, MatDividerModule, MatCardModule, ProblemDetailViewComponent, NgFor, MatButtonModule, NgClass, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatSlideToggleModule, MatExpansionModule, DecimalPipe, BooleanLikeToTextPipe]
+  selector: 'app-exam-runner',
+  templateUrl: './exam-runner.component.html',
+  styleUrls: ['./exam-runner.component.css'],
+  imports: [MatDividerModule, MatCardModule, ProblemDetailViewComponent, MatButtonModule, NgClass, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatSlideToggleModule, MatExpansionModule, DecimalPipe, BooleanLikeToTextPipe]
 })
 export class ExamRunnerComponent implements OnInit {
 
   @ViewChild(MatExpansionPanel) panel: MatExpansionPanel;
   readyForComplete = false;
   exam: ExamRun;
-  isLoading: boolean;
+  private loading = inject(LoadingBusService);
   problemTitle$ = new BehaviorSubject<string>(null);
   currentDetailIndex = 0;
   currentExamRunDetail: ExamRunDetail;
@@ -45,7 +43,6 @@ export class ExamRunnerComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.isLoading = true;
     this.route.url.subscribe(urls => {
       const action = urls[1].path.toLowerCase();
       this.route.paramMap.subscribe(params => {
@@ -58,58 +55,65 @@ export class ExamRunnerComponent implements OnInit {
   }
 
   private getExamRun(id: string) {
-    this.service.getExamRun(id).then(
-      data => {
-        if (data != null) {
-          this.exam = data;
-          // set the current Problem to the first Problem of the exam
-          this.problemTitle$.next(this.exam.ExamRunDetails[this.currentDetailIndex].ProblemTitle);
-          // set the current ExamRunDetail to the first detail of the exam
-          this.currentExamRunDetail = this.exam.ExamRunDetails[this.currentDetailIndex];
-          this.startTime = new Date();
-        } else {
-          this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id}.`);
-          this.exam = null;
+    this.loading.start();
+    this.service.getExamRun(id)
+      .then(
+        data => {
+          if (data != null) {
+            this.exam = data;
+            // set the current Problem to the first Problem of the exam
+            this.problemTitle$.next(this.exam.ExamRunDetails[this.currentDetailIndex].ProblemTitle);
+            // set the current ExamRunDetail to the first detail of the exam
+            this.currentExamRunDetail = this.exam.ExamRunDetails[this.currentDetailIndex];
+            this.startTime = new Date();
+          } else {
+            this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id}.`);
+            this.exam = null;
+          }
         }
-        this.isLoading = false;
-      }
-    );
+      )
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   viewDetail(index: number) {
     if (index !== this.currentDetailIndex) {
       this.updateCurrentExamDetail();
 
-      this.isLoading = true;
+      this.loading.start();
       this.problemTitle$.next(this.exam.ExamRunDetails[index].ProblemTitle);
-      this.service.getExamRunDetail(this.exam.ExamRunDetails[index].Id).then(d => {
-        if (d) {
-          this.currentExamRunDetail = d;
-          this.exam.ExamRunDetails[index] = d;
-        } else {
-          this.currentExamRunDetail = this.exam.ExamRunDetails[index];
-        }
-        this.currentDetailIndex = index;
-        this.startTime = new Date();
-        this.isLoading = false;
-      });
+      this.service.getExamRunDetail(this.exam.ExamRunDetails[index].Id)
+        .then(d => {
+          if (d) {
+            this.currentExamRunDetail = d;
+            this.exam.ExamRunDetails[index] = d;
+          } else {
+            this.currentExamRunDetail = this.exam.ExamRunDetails[index];
+          }
+          this.currentDetailIndex = index;
+          this.startTime = new Date();
+        })
+        .catch(err => { console.log(err); })
+        .finally(() => { this.loading.stop(); });
 
     }
   }
 
-  private updateCurrentExamDetail(){
-    this.isLoading = true;
+  private updateCurrentExamDetail() {
+    this.loading.start();
     const diff = (new Date().getTime() - this.startTime.getTime()) / 1000
     this.currentExamRunDetail.Duration += diff;
     const prevIndex = this.currentDetailIndex;
-    this.service.updateExamRunDetail(this.currentExamRunDetail).then(d => {
-      if (d) {
-        this.exam.ExamRunDetails[prevIndex] = d;
-      } else{
-        this.messageService.openSnackBar('Failed to update answer');
-      }
-      this.isLoading = false;
-    });
+    this.service.updateExamRunDetail(this.currentExamRunDetail)
+      .then(d => {
+        if (d) {
+          this.exam.ExamRunDetails[prevIndex] = d;
+        } else {
+          this.messageService.openSnackBar('Failed to update answer');
+        }
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   answer(answer: string) {
@@ -148,20 +152,22 @@ export class ExamRunnerComponent implements OnInit {
     if (action === 0) {
       this.readyForComplete = false;
     } else {
-      this.isLoading = true;
-        this.exam.CompleteTime = new Date(); // the service will ignore this value
-        this.service.completeExamRun(this.exam.Id).then(
+      this.loading.start();
+      this.exam.CompleteTime = new Date(); // the service will ignore this value
+      this.service.completeExamRun(this.exam.Id)
+        .then(
           data => {
-            this.isLoading = false;
             if (data != null && data.IsSuccessful) {
               this.messageService.openSnackBar('You have completed exam');
               this.router.navigate([`examrun/view/${this.exam.Id}`]);
             } else {
               this.messageService.openSnackBar('Failed to complete exam');
               this.messageService.add(`Failed to complete exam:${this.exam.ReturnResult}.`);
-            }    
+            }
           }
-        );
+        )
+        .catch(err => { console.log(err); })
+        .finally(() => { this.loading.stop(); });
     }
   }
 

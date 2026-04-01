@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { DisplayMessages } from '@app/_constants';
-import { ExamDefinitionId, Assignment } from '@app/_models';
-import { AssignmentService, MessageService } from '@app/_services';
+import { Assignment } from '@app/_models';
+import { AssignmentService, LoadingBusService, MessageService } from '@app/_services';
 import { BehaviorSubject } from 'rxjs';
 import { BooleanLikeToTextPipe } from '@app/_pipes';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -14,15 +14,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 @Component({
-    selector: 'app-assignment-detail-view',
-    templateUrl: './assignment-detail-view.component.html',
-    styleUrls: ['./assignment-detail-view.component.css'],
-    standalone: true,
-    imports: [NgIf, MatProgressBarModule, ReactiveFormsModule, MatCardModule, MatListModule, MatFormFieldModule, MatInputModule, MatCheckboxModule, MatDividerModule, NgFor, RouterLink, MatButtonModule, MatTooltipModule, DatePipe, BooleanLikeToTextPipe]
+  selector: 'app-assignment-detail-view',
+  templateUrl: './assignment-detail-view.component.html',
+  styleUrls: ['./assignment-detail-view.component.css'],
+  imports: [ReactiveFormsModule, MatCardModule, MatListModule, MatFormFieldModule, MatInputModule, MatCheckboxModule, MatDividerModule, RouterLink, MatButtonModule, MatTooltipModule, DatePipe, BooleanLikeToTextPipe]
 })
 export class AssignmentDetailViewComponent implements OnInit {
 
@@ -33,7 +31,7 @@ export class AssignmentDetailViewComponent implements OnInit {
 
   private assignment: Assignment;
   messageTexts = DisplayMessages;
-  isLoading: boolean;
+  private loading = inject(LoadingBusService);
   isEdit = false;
   editorForm: FormGroup;
 
@@ -46,7 +44,6 @@ export class AssignmentDetailViewComponent implements OnInit {
   ngOnInit() {
     this.assignmentId$.subscribe(
       id => {
-        this.isLoading = true;
         this.getAssignment(id);
       }
     );
@@ -55,6 +52,7 @@ export class AssignmentDetailViewComponent implements OnInit {
 
   private getAssignment(id: string) {
     if (id) {
+      this.loading.start();
       this.service.getAssignment(id).then(
         data => {
           if (data != null) {
@@ -65,9 +63,9 @@ export class AssignmentDetailViewComponent implements OnInit {
             this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id}.`);
             this.assignment = null;
           }
-          this.isLoading = false;
         }
-      );
+      ).catch(err => { console.log(err); })
+        .finally(() => { this.loading.stop(); });
     }
   }
 
@@ -101,7 +99,11 @@ export class AssignmentDetailViewComponent implements OnInit {
     }
 
     const entity = this.editorForm.value as Assignment;
-    this.service.updateAssignment(entity).then(data => this.handleSaveResponse(data));
+    this.loading.start();
+    this.service.updateAssignment(entity)
+      .then(data => this.handleSaveResponse(data))
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   private handleSaveResponse(data: Assignment) {
@@ -129,17 +131,21 @@ export class AssignmentDetailViewComponent implements OnInit {
     if (!window.confirm(this.messageTexts.confirmDelete)) {
       return;
     }
-    this.service.deleteAssignment(this.assignment.Id).then(
-      data => {
-        if (data != null && data.IsSuccessful) {
-          this.messageService.openSnackBar('Record is deleted');
-          this.deleted.emit(true);
-        } else {
-          this.messageService.openSnackBar(`${this.messageTexts.deleteFailed}.`);
-          this.messageService.add(`${this.messageTexts.deleteFailed}.`);
+    this.loading.start();
+    this.service.deleteAssignment(this.assignment.Id)
+      .then(
+        data => {
+          if (data != null && data.IsSuccessful) {
+            this.messageService.openSnackBar('Record is deleted');
+            this.deleted.emit(true);
+          } else {
+            this.messageService.openSnackBar(`${this.messageTexts.deleteFailed}.`);
+            this.messageService.add(`${this.messageTexts.deleteFailed}.`);
+          }
         }
-      }
-    );
+      )
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
 }

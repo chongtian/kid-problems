@@ -19,8 +19,8 @@ describe('Test MessageService', () => {
 
         // Inject both the service-to-test and its (spy) dependency
         // TestBed.get() was deprecated as of Angular version 9. Use TestBed.inject() after version 9
-        messageService = TestBed.get(MessageService);
-        matSnackBar = TestBed.get(MatSnackBar) as jasmine.SpyObj<MatSnackBar>;
+        messageService = TestBed.inject(MessageService);
+        matSnackBar = TestBed.inject(MatSnackBar) as jasmine.SpyObj<MatSnackBar>;
     });
 
     it('add() adds message to MessageService', () => {

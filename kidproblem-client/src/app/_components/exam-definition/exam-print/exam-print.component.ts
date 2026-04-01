@@ -5,14 +5,13 @@ import { BehaviorSubject } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { ProblemDetailViewComponent } from '../../problem/problem-detail-view/problem-detail-view.component';
-import { NgIf, NgFor } from '@angular/common';
+
 
 @Component({
     selector: 'app-exam-print',
     templateUrl: './exam-print.component.html',
     styleUrls: ['./exam-print.component.css'],
-    standalone: true,
-    imports: [NgIf, NgFor, ProblemDetailViewComponent, MatButtonModule, MatTooltipModule]
+    imports: [ProblemDetailViewComponent, MatButtonModule, MatTooltipModule]
 })
 export class ExamPrintComponent implements OnInit {
 

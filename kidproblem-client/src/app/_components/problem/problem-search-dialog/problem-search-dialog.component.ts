@@ -26,7 +26,6 @@ import { MatCardModule } from '@angular/material/card';
     selector: 'app-problem-search-dialog',
     templateUrl: './problem-search-dialog.component.html',
     styleUrls: ['./problem-search-dialog.component.css'],
-    standalone: true,
     imports: [MatCardModule, ProblemListViewComponent, MatButtonModule, MatTooltipModule]
 })
 export class ProblemSearchDialogComponent {

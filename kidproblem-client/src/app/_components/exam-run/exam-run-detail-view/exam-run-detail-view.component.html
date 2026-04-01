@@ -1,90 +1,113 @@
-<h3>View Exam Run</h3>
-<mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
-<ng-container *ngIf="data">
-    <div class="w3-container w3-cell w3-large">
-        <span class="label">Exam Category: </span><span>{{data.ExamCategory}}</span>
-    </div>
-    <div class="w3-container w3-cell w3-large">
-        <span class="label">Exam Title: </span><span>{{data.ExamTitle}}</span>
-    </div>
-    <div class="w3-container w3-cell">
-        <span class="label">Answered By: </span><span>{{data.AnswerByFullname || 'Unknown'}}</span>
-    </div>
-    <div class="w3-container w3-cell">
-        <span class="label">Start Time: </span><span>{{data.StartTime | date:'long'}}</span>
-    </div>
-    <div class="w3-container w3-cell">
-        <span class="label">Complete Time: </span><span *ngIf="data.CompleteTime">{{data.CompleteTime |
-            date:'long'}}</span>
-    </div>
-    <div class="w3-container w3-cell">
-        <span class="label">Total Duration: </span><span *ngIf="data.TotalDuration">{{data.TotalDuration |
-            number:'1.0-0'}}</span>
-    </div>
-    <div class="w3-container w3-cell">
-        <span class="label">Total Count: </span><span>{{data.TotalCount}}</span>
-    </div>
-    <div class="w3-container w3-cell">
-        <span class="label">Correct Count: </span><span *ngIf="data.CorrectCount">{{data.CorrectCount}}</span>
-    </div>
-    <div class="w3-container w3-cell">
-        <span class="label">Guess Count: </span><span *ngIf="data.GuessCount">{{data.GuessCount}}</span>
-    </div>
-    <div class="w3-container w3-cell">
-        <span class="label">Guess Correct Count: </span><span
-            *ngIf="data.GuessCorrectCount">{{data.GuessCorrectCount}}</span>
-    </div>
-    <div class="w3-container w3-cell" *ngIf="data.Amc10Score">
-        <span class="label">Amc10 Score: </span><span *ngIf="data.Amc10Score">{{data.Amc10Score}}</span>
-    </div>
-    <div class="w3-container w3-cell">
-        <span><a routerLink="/assignment/view/{{data.AssignmentId}}">Go to Assignment</a></span>
-    </div>
-    <div class="w3-container w3-cell" *ngIf="!data.CompleteTime">
-        <span><a mat-raised-button color="primary" routerLink="/examrun/run/{{data.Id}}">Resume Exam Run</a></span>
-    </div>
-    <div class="w3-container w3-cell" *ngIf="canDelete">
-        <span><button mat-raised-button color="warn" (click)="delete()" matTooltip="Delete Exam Run"><i class="material-icons"> delete </i></button></span>
-    </div>
-
-    <h4>Exam Details</h4>
-    <table mat-table [dataSource]="data.ExamRunDetails" class="w3-table w3-striped w3-hoverable w3-centered">
-
-        <ng-container matColumnDef="problemTitle">
-            <th mat-header-cell *matHeaderCellDef> Problem Title </th>
-            <td mat-cell *matCellDef="let detail">
-                <a routerLink="/problem/view/{{detail.ProblemTitle}}">{{detail.ProblemTitle}}</a>
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="answer">
-            <th mat-header-cell *matHeaderCellDef> User Answer </th>
-            <td mat-cell *matCellDef="let detail"> {{detail.UserAnswer || ''}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="isCorrect">
-            <th mat-header-cell *matHeaderCellDef> Correct? </th>
-            <td mat-cell *matCellDef="let detail"
-                [ngClass]="{'review':detail.IsCorrect === false}">
-                {{detail.IsCorrect | booleanLikeToText}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="isGuess">
-            <th mat-header-cell *matHeaderCellDef> Guess? </th>
-            <td mat-cell *matCellDef="let detail"
-                [ngClass]="{'review':detail.IsGuess === true}">
-                {{detail.IsGuess | booleanLikeToText}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="duration">
-            <th mat-header-cell *matHeaderCellDef> Duration(second)</th>
-            <td mat-cell *matCellDef="let detail"> <span *ngIf="detail.Duration">{{detail.Duration | number:'1.0-0' }}
-            </span></td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="w3-light-blue"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-
-</ng-container>
-
+<h3 class="page-title">View Exam Run</h3>
+@if (data) {
+<div class="w3-container w3-cell w3-large" data-testid="examCategory">
+  <span class="label">Exam Category: </span>
+  <span>{{data.ExamCategory}}</span>
+</div>
+<div class="w3-container w3-cell w3-large" data-testid="examTitle">
+  <span class="label">Exam Title: </span>
+  <span>{{data.ExamTitle}}</span>
+</div>
+<div class="w3-container w3-cell" data-testid="answerBy">
+  <span class="label">Answered By: </span>
+  <span>{{data.AnswerByFullname || 'Unknown'}}</span>
+</div>
+<div class="w3-container w3-cell" data-testid="startTime">
+  <span class="label">Start Time: </span>
+  <span>{{data.StartTime | date:'long'}}</span>
+</div>
+<div class="w3-container w3-cell" data-testid="completeTime">
+  <span class="label">Complete Time: </span>
+  <span>
+    @if (data.CompleteTime) {
+    {{data.CompleteTime |
+    date:'long'}}
+    }
+  </span>
+</div>
+<div class="w3-container w3-cell" data-testid="totalDuration">
+  <span class="label">Total Duration: </span>
+  <span>
+    @if (data.TotalDuration) {
+    {{data.TotalDuration |
+    number:'1.0-0'}}
+    }
+  </span>
+</div>
+<div class="w3-container w3-cell" data-testid="totalCount">
+  <span class="label">Total Count: </span>
+  <span>{{data.TotalCount || 0}}</span>
+</div>
+<div class="w3-container w3-cell" data-testid="correctCount">
+  <span class="label">Correct Count: </span>
+  <span> {{data.CorrectCount || 0}} </span>
+</div>
+<div class="w3-container w3-cell" data-testid="guessCount">
+  <span class="label">Guess Count: </span>
+  <span>
+    {{data.GuessCount || 0}}
+  </span>
+</div>
+<div class="w3-container w3-cell" data-testid="guessCorrectCount">
+  <span class="label">Guess Correct Count: </span>
+  <span>{{data.GuessCorrectCount || 0}}</span>
+</div>
+@if (data.Amc10Score) {
+<div class="w3-container w3-cell" data-testid="amcScore">
+  <span class="label">AMC10/12 Score: </span>
+  <span>{{data.Amc10Score || 0}}</span>
+</div>
+}
+<div class="w3-container w3-cell">
+  <span data-testid="linkToAssignment"><a routerLink="/assignment/view/{{data.AssignmentId}}">Go to
+      Assignment</a></span>
+</div>
+@if (!data.CompleteTime) {
+<div class="w3-container w3-cell">
+  <span data-testid="resumeExamRun"><a mat-raised-button color="primary" routerLink="/examrun/run/{{data.Id}}">Resume
+      Exam Run</a></span>
+</div>
+}
+@if (canDelete) {
+<div class="w3-container w3-cell">
+  <span><button mat-raised-button color="warn" (click)="delete()" matTooltip="Delete Exam Run"
+      data-testid="btnDelete"><i class="material-icons"> delete </i></button></span>
+</div>
+}
+<h4>Exam Details</h4>
+<table mat-table [dataSource]="data.ExamRunDetails" class="w3-table w3-striped w3-hoverable w3-centered"
+  data-testid="details">
+  <ng-container matColumnDef="problemTitle">
+    <th mat-header-cell *matHeaderCellDef> Problem Title </th>
+    <td mat-cell *matCellDef="let detail" data-testid="problemTitle">
+      <a routerLink="/problem/view/{{detail.ProblemTitle}}">{{detail.ProblemTitle}}</a>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="answer">
+    <th mat-header-cell *matHeaderCellDef> User Answer </th>
+    <td mat-cell *matCellDef="let detail" data-testid="userAnswer"> {{detail.UserAnswer || ''}}</td>
+  </ng-container>
+  <ng-container matColumnDef="isCorrect">
+    <th mat-header-cell *matHeaderCellDef> Correct? </th>
+    <td mat-cell *matCellDef="let detail" [ngClass]="{'review':detail.IsCorrect === false}" data-testid="isCorrect">
+      {{detail.IsCorrect | booleanLikeToText}}</td>
+  </ng-container>
+  <ng-container matColumnDef="isGuess">
+    <th mat-header-cell *matHeaderCellDef> Guess? </th>
+    <td mat-cell *matCellDef="let detail" [ngClass]="{'review':detail.IsGuess === true}" data-testid="isGuess">
+      {{detail.IsGuess | booleanLikeToText}}</td>
+  </ng-container>
+  <ng-container matColumnDef="duration">
+    <th mat-header-cell *matHeaderCellDef> Duration(second)</th>
+    <td mat-cell *matCellDef="let detail" data-testid="duration">
+      <span>
+        @if (detail.Duration) {
+        {{detail.Duration | number:'1.0-0' }}
+        }
+      </span>
+    </td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns" class="w3-light-blue"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+}

@@ -1,10 +1,18 @@
 <div class="w3-container">
   <div class="w3-mobile">
     <header class="navbar not-printable">
-      <kp-menu *ngIf="isAuthenticated" [username]="user.name" [version]="appInfo.Version"
-        (sign-out)="onSignOut($event)"></kp-menu>
+      @if (isAuthenticated) {
+      <kp-menu [username]="user.name" [version]="appInfo.Version" (sign-out)="onSignOut($event)"></kp-menu>
+      }
     </header>
   </div>
+
+  <!-- The overlay -->
+  @if (loading.isLoading()){
+  <div class="global-overlay">
+    <div class="spinner"></div>
+  </div>
+  }
 
   <div class="w3-panel main">
     <router-outlet></router-outlet>
@@ -15,12 +23,17 @@
   </div>
 
   <div class="w3-panel not-printable">
+    @if (isAuthenticated) {
     <footer
       style="padding: 20px; text-align: center; background: #f9f9f9; color: #666; font-size: 0.85rem; border-top: 1px solid #eee;">
       <p style="max-width: 600px; margin: 0 auto; line-height: 1.5;">
-        <strong>Disclaimer:</strong> This application is a personal, non-commercial project created solely for learning and educational purposes. Some math problems displayed in this application are sourced from Art of Problem Solving (AoPS). <br />
-        All such problems are the intellectual property of their respective creators and AoPS. If you are the copyright owner and would like any content removed, please contact me.
+        <strong>Disclaimer:</strong> This application is a personal, non-commercial project created solely for learning
+        and educational purposes. Some math problems displayed in this application are sourced from Art of Problem
+        Solving (AoPS). <br />
+        All such problems are the intellectual property of their respective creators and AoPS. If you are the copyright
+        owner and would like any content removed, please contact me.
       </p>
     </footer>
+    }
   </div>
 </div>

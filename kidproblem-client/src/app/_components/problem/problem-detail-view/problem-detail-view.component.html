@@ -1,43 +1,57 @@
-<mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
-<div *ngIf="problem && !isLoading">
-  <div *ngIf="displayAll">
+@if (problem) {
+<div>
+  @if (displayAll) {
+  <div>
     <h4> {{problem.ProblemTitle}} </h4>
     <div class="w3-row">
-      <div class="w3-col s6 m4 l2"><span class="label">Category</span>:
+      <div class="w3-col s6 m4 l2" data-testid="problemCategory">
+        <span class="label">Category</span>:
         <span>{{problem.ProblemCategory}}</span>
       </div>
-      <div class="w3-col s6 m4 l2"><span class="label">Year</span>:
+      <div class="w3-col s6 m4 l2" data-testid="problemYear">
+        <span class="label">Year</span>:
         <span>{{problem.ProblemYear}}</span>
       </div>
-      <div class="w3-col s6 m4 l2"><span class="label">Number</span>:
+      <div class="w3-col s6 m4 l2" data-testid="problemNumber">
+        <span class="label">Number</span>:
         <span>{{problem.ProblemNumber}}</span>
       </div>
-      <div class="w3-col s6 m4 l2"><span class="label">Answer Options</span>:
+      <div class="w3-col s6 m4 l2" data-testid="answerOptions">
+        <span class="label">Answer Options</span>:
         <span>{{problem.AnswerOptions}}</span>
       </div>
-      <div class="w3-col s6 m4 l2"><span class="label">Tags</span>:
+      <div class="w3-col s6 m4 l2" data-testid="tags">
+        <span class="label">Tags</span>:
         <span>{{problem.ProblemTags}}</span>
       </div>
-      <div class="w3-col s6 m4 l2"><span class="label">Is Staging</span>:
+      <div class="w3-col s6 m4 l2" data-testid="isStaging"><span class="label">Is Staging</span>:
         <span>{{problem.IsStaging | booleanLikeToText}}</span>
       </div>
     </div>
   </div>
+  }
 
   <div class="w3-row">
-    <div [appMath]="problem.ProblemTextBase64"></div>
+    <div [appMath]="problem.ProblemTextBase64" data-testid="problemRichText"></div>
   </div>
 
-  <details *ngIf="displayAll && problem.ProblemAnswer" class="w3-row">
+  @if (displayAll && problem.ProblemAnswer) {
+  <details class="w3-row" data-testid="problemAnswer">
     <summary class="label">Answer:</summary>
     <span>{{problem.ProblemAnswer}}</span>
   </details>
+  }
 
-  <details *ngIf="displayAll && problem.SolutionText" class="w3-row">
+  @if (displayAll && problem.SolutionText) {
+  <details class="w3-row" data-testid="solutionText">
     <summary mat-h4>Solution</summary>
     <div [appMath]="problem.SolutionText"></div>
   </details>
-  <br /><br />
-  <app-problem-summary-view *ngIf="displayAll" [problem-title]="problemTitle$.value"></app-problem-summary-view>
+  }
 
+  <br /><br />
+  @if (displayAll) {
+  <app-problem-summary-view [problem-title]="problemTitle$.value"></app-problem-summary-view>
+  }
 </div>
+}

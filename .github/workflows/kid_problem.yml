@@ -1,0 +1,87 @@
+name: KidProblem CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - '.github/**'
+      - '.azure-pipelines/**'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      deploy_production:
+        description: 'Deploy Production'
+        type: boolean
+        default: true
+      run_test:
+        description: 'Run Tests'
+        type: boolean
+        default: false
+
+env:
+  BUILD_CONFIGURATION: 'Release'
+
+jobs:
+  ci:
+    if: github.event_name == 'pull_request'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Build Steps
+        uses: ./.github/actions/build-steps
+        with:
+          deploy: 'false'
+          runTest: 'false'
+          production: 'false'
+
+  staging:
+    if: github.event_name != 'pull_request'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Run Build and Deploy
+        uses: ./.github/actions/build-steps
+        with:
+          deploy: ${{ github.event.inputs.deploy || 'true' }}
+          runTest: ${{ github.event.inputs.run_test || 'false' }}
+          production: 'false'
+          lambdaFunctionName: 'kidproblemdev'
+          s3BucketName: 'kidproblemdev.nowsuncorp.com'
+
+  production:
+    needs: staging
+    if: |
+      github.event_name != 'pull_request' && 
+      (github.event.inputs.deploy_production == 'true')
+    runs-on: windows-latest
+    environment: aws-kidproblem
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Run Production Deploy
+        uses: ./.github/actions/build-steps
+        with:
+          deploy: 'true'
+          runTest: 'false'
+          production: 'true'
+          lambdaFunctionName: 'kidproblem'
+          s3BucketName: 'kidproblem.nowsuncorp.com'

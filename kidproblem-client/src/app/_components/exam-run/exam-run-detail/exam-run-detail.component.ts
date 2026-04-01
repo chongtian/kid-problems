@@ -8,7 +8,6 @@ import { ExamRunDetailViewComponent } from '../exam-run-detail-view/exam-run-det
     selector: 'app-exam-run-detail',
     templateUrl: './exam-run-detail.component.html',
     styleUrls: ['./exam-run-detail.component.css'],
-    standalone: true,
     imports: [ExamRunDetailViewComponent]
 })
 export class ExamRunDetailComponent {

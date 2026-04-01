@@ -1,20 +1,20 @@
 <div class="w3-row">
-  <div class="w3-container w3-cell">
-    <ng-container *ngIf="!parentUser">
-      <app-exam-summary-view></app-exam-summary-view>
-    </ng-container>
-    <ng-container *ngIf="parentUser">
-      <app-exam-summary-list-view></app-exam-summary-list-view>
-    </ng-container>
+  <div class="w3-container w3-cell" data-testid="dashboardExamSummary">
+    @if (!parentUser) {
+    <app-exam-summary-view></app-exam-summary-view>
+    }
+    @if (parentUser) {
+    <app-exam-summary-list-view></app-exam-summary-list-view>
+    }
   </div>
   <mat-divider></mat-divider>
-  <div class="w3-container w3-cell-row">
+  <div class="w3-container w3-cell-row" data-testid="dashboardAssignmentList">
     <h3>Latest Assignments</h3>
     <app-assignment-list-view pagination="true" [start-time]="startTime" [end-time]="endTime"
       (run)="onRun($event)"></app-assignment-list-view>
   </div>
   <mat-divider></mat-divider>
-  <div class="w3-container w3-cell-row">
+  <div class="w3-container w3-cell-row" data-testid="dashboardExamRunList">
     <h3>Latest Exam Runs</h3>
     <app-exam-run-list-view [start-time]="startTime" [end-time]="endTime"
       [query-family]="queryFamily$"></app-exam-run-list-view>

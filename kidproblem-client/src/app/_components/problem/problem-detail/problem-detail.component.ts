@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Location, NgIf } from '@angular/common';
+import { Location } from '@angular/common';
 import { DisplayMessages } from '@app/_constants';
 import { BehaviorSubject } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -14,8 +14,7 @@ import { ProblemDetailViewComponent } from '../problem-detail-view/problem-detai
     selector: 'app-problem-detail',
     templateUrl: './problem-detail.component.html',
     styleUrls: ['./problem-detail.component.css'],
-    standalone: true,
-    imports: [NgIf, ProblemDetailViewComponent, ProblemEditorComponent, MatDividerModule, MatCardModule, MatButtonModule, RouterLink, MatTooltipModule]
+    imports: [ProblemDetailViewComponent, ProblemEditorComponent, MatDividerModule, MatCardModule, MatButtonModule, RouterLink, MatTooltipModule]
 })
 export class ProblemDetailComponent implements OnInit {
 

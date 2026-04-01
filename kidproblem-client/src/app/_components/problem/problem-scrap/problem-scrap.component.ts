@@ -1,23 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { ProblemService } from '@app/_services';
+import { Component, inject, OnInit } from '@angular/core';
+import { LoadingBusService, ProblemService } from '@app/_services';
 import { Problem, CrawlProblemDefinition } from '@app/_models';
 import { MatDividerModule } from '@angular/material/divider';
 import { MathDirective } from '../../../math/math.directive';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { NgIf, NgFor } from '@angular/common';
+
 
 @Component({
-    selector: 'app-problem-scrap',
-    templateUrl: './problem-scrap.component.html',
-    styleUrls: ['./problem-scrap.component.css'],
-    standalone: true,
-    imports: [NgIf, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule, MatProgressSpinnerModule, NgFor, MatCardModule, RouterLink, MathDirective, MatDividerModule]
+  selector: 'app-problem-scrap',
+  templateUrl: './problem-scrap.component.html',
+  styleUrls: ['./problem-scrap.component.css'],
+  imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule, MatCardModule, RouterLink, MathDirective, MatDividerModule]
 })
 export class ProblemScrapComponent implements OnInit {
   startUrl: string;
@@ -28,14 +26,13 @@ export class ProblemScrapComponent implements OnInit {
   endPattern = '<a.+?>Solution<\\/a>';
   isSubmitted: boolean;
   problems: Problem[];
-  isLoading: boolean;
+  private loading = inject(LoadingBusService);
 
   constructor(
     private service: ProblemService) { }
 
   ngOnInit() {
     this.isSubmitted = false;
-    this.isLoading = false;
   }
 
   crawl(): void {
@@ -54,21 +51,22 @@ export class ProblemScrapComponent implements OnInit {
       EndPattern: this.endPattern,
       UseSinglePattern: false
     };
-    this.isLoading = true;
+
     this.isSubmitted = true;
+    this.loading.start();
     this.service.crawlProblems(def).then(data => {
       if (data != null) {
         this.problems = data;
       } else {
         this.problems = [];
       }
-      this.isLoading = false;
-    });
+    })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   reset(): void {
     this.isSubmitted = false;
-    this.isLoading = false;
     this.problems = [];
   }
 

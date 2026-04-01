@@ -1,33 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IUser } from '@app/_models';
-import { CognitoService } from '@app/_services';
+import { CognitoService, LoadingBusService } from '@app/_services';
 import { MatButtonModule } from '@angular/material/button';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
-import { NgIf } from '@angular/common';
+
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  standalone: true,
-  imports: [NgIf, MatCardModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule, RouterLink]
+  imports: [MatCardModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule, RouterLink]
 })
 export class LoginComponent {
 
   user: IUser;
   result = '';
   showPassword = false;
-
   newPasswordRequired = false;
   password1 = '';
   password2 = '';
   resetPassword = false;
   code = '';
-
+  private loading = inject(LoadingBusService);
   private cognitoUser: any;
 
   constructor(private router: Router,
@@ -40,6 +38,7 @@ export class LoginComponent {
 
   signIn(): void {
     this.result = '';
+    this.loading.start();
     this.cognitoService.signIn(this.user)
       .then((result) => {
         console.log(result);
@@ -60,7 +59,8 @@ export class LoginComponent {
         }
       }).catch((err) => {
         this.result = err.message;
-      });
+      })
+      .finally(() => { this.loading.stop(); });
   }
 
   submit(): void {
@@ -75,6 +75,7 @@ export class LoginComponent {
       return;
     }
 
+    this.loading.start();
     if (this.resetPassword) {
       this.cognitoService.submitForgetPassword(this.user.email, this.code, this.password1)
         .then(
@@ -91,7 +92,8 @@ export class LoginComponent {
         .catch((err) => {
           // console.log(err);
           this.result = err.message;
-        });
+        })
+        .finally(() => { this.loading.stop(); });
 
     } else {
       this.cognitoService.submitNewPassword(this.cognitoUser, this.password1).then(
@@ -103,7 +105,8 @@ export class LoginComponent {
       ).catch((err) => {
         // console.log(err);
         this.result = err.message;
-      });
+      })
+        .finally(() => { this.loading.stop(); });
     }
 
   }
@@ -114,6 +117,7 @@ export class LoginComponent {
       this.result = 'Enter user name (email)';
     }
 
+    this.loading.start();
     this.cognitoService.forgetPasswordRequest(this.user.email)
       .then(result => {
         // console.log(result);
@@ -121,7 +125,8 @@ export class LoginComponent {
         this.resetPassword = true;
       }).catch(err => {
         this.result = err.message;
-      });
+      })
+      .finally(() => { this.loading.stop(); });
   }
 
 }

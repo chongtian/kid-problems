@@ -1,24 +1,24 @@
-import { Component } from '@angular/core';
-import { AdminService, CognitoService } from '@app/_services';
+import { Component, inject } from '@angular/core';
+import { AdminService, CognitoService, LoadingBusService } from '@app/_services';
 import { AppInfo, IUser } from '@app/_models';
 import { environment } from '@environments/environment';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { MessagesComponent } from './_components/messages/messages.component';
-import { NgIf } from '@angular/common';
+
 import { KpMenuComponent } from './_components';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  standalone: true,
-  imports: [RouterLink, KpMenuComponent, NgIf, RouterOutlet, MessagesComponent]
+  imports: [KpMenuComponent, RouterOutlet, MessagesComponent]
 })
 export class AppComponent {
 
   appInfo: AppInfo;
   user: IUser;
   isAuthenticated = false;
+  loading = inject(LoadingBusService);
 
   constructor(private router: Router, private cognitoService: CognitoService, private adminService: AdminService) {
     this.appInfo = { AppName: environment.applicationName, Version: environment.applicationVersion };
@@ -35,22 +35,33 @@ export class AppComponent {
   }
 
   ngOnInit(): void {
+    this.loading.start();
     this.cognitoService.getUser()
       .then((user: any) => {
         if (user) {
           this.user = user.attributes;
         }
-      });
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
 
+    this.loading.start();
     this.cognitoService.isAuthenticated()
       .then((success: boolean) => {
         this.isAuthenticated = success;
-      });
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
 
-    this.adminService.ping().then(
-      r => {
-        console.log(r);
-      });
+    this.loading.start();
+    this.adminService.ping()
+      .then(
+        r => {
+          console.log(r);
+          this.appInfo.Version = `${r.DynamoDbTableNamePrefix}${this.appInfo.Version}`;
+        })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
 
     // activate AWS Lambda every 900 seconds
     // setInterval(() => {

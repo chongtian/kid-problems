@@ -1,22 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DisplayMessages } from '@app/_constants';
 import { Access } from '@app/_guards';
-import { CognitoService } from '@app/_services';
+import { CognitoService, LoadingBusService } from '@app/_services';
 import { BehaviorSubject } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
-import { NgIf } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { AssignmentDetailViewComponent } from '../assignment-detail-view/assignment-detail-view.component';
 
 @Component({
-    selector: 'app-assignment-detail',
-    templateUrl: './assignment-detail.component.html',
-    styleUrls: ['./assignment-detail.component.css'],
-    standalone: true,
-    imports: [AssignmentDetailViewComponent, MatDividerModule, MatCardModule, NgIf, MatButtonModule, MatTooltipModule]
+  selector: 'app-assignment-detail',
+  templateUrl: './assignment-detail.component.html',
+  styleUrls: ['./assignment-detail.component.css'],
+  imports: [AssignmentDetailViewComponent, MatDividerModule, MatCardModule, MatButtonModule, MatTooltipModule]
 })
 export class AssignmentDetailComponent implements OnInit {
   assignmentId$ = new BehaviorSubject<string>(null);
@@ -24,6 +22,7 @@ export class AssignmentDetailComponent implements OnInit {
   messageTexts = DisplayMessages;
   private isChildChanged = false;
   canEdit = false;
+  private loading = inject(LoadingBusService);
 
   constructor(
     private route: ActivatedRoute,
@@ -43,9 +42,13 @@ export class AssignmentDetailComponent implements OnInit {
       });
     });
 
-    this.cognitoService.getUserAccess().then(a => {
-      this.canEdit = ((a | Access.parent) === a);
-    });
+    this.loading.start();
+    this.cognitoService.getUserAccess()
+      .then(a => {
+        this.canEdit = ((a | Access.parent) === a);
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   /**

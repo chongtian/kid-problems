@@ -1,16 +1,21 @@
-<mat-card *ngIf="data">
-    <mat-card-header>
-        <mat-card-title>Statistics of {{data.AnswerByFullname}} for {{data.ProblemCategory}}</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-        <p><span>All: </span>{{data.TotalCount}}</p>
-        <p><span>Correct: </span>{{data.CorrectCount}} ({{data.CorrectCount / data.TotalCount * 100 |
-            number:'1.1-1'}}%)
-        </p>
-        <p><span>Guess: </span>{{data.GuessCount}} ({{data.GuessCount / data.TotalCount * 100 | number:'1.1-1'}}%)
-        </p>
-        <p><span>Guess and Correct: </span>{{data.GuessCorrectCount}}
-            ({{data.GuessCorrectCount / data.CorrectCount * 100 | number:'1.1-1'}}%)</p>
-        <p><span>Average Duration: </span>{{data.TotalDuration / data.TotalCount | number:'1.1-1' }} seconds </p>
-    </mat-card-content>
+@if (data) {
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Statistics of {{data.AnswerByFullname}} for {{data.ProblemCategory}}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p data-testid="totalCount"><span>All: </span> {{data.TotalCount}}</p>
+    <p data-testid="correctRatio"><span>Correct: </span>{{data.CorrectCount}} ({{data.CorrectCount / data.TotalCount *
+      100 |
+      number:'1.1-1'}}%)
+    </p>
+    <p data-testid="guessRatio"><span>Guess: </span>{{data.GuessCount}} ({{data.GuessCount / data.TotalCount * 100 |
+      number:'1.1-1'}}%)
+    </p>
+    <p data-testid="guessCorrectCount"><span>Guess and Correct: </span>{{data.GuessCorrectCount}}
+      ({{data.GuessCorrectCount / data.CorrectCount * 100 | number:'1.1-1'}}%)</p>
+    <p data-testid="averageDuration"><span>Average Duration: </span>{{data.TotalDuration / data.TotalCount |
+      number:'1.1-1' }} seconds </p>
+  </mat-card-content>
 </mat-card>
+}
