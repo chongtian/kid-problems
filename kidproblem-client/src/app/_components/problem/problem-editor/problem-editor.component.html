@@ -56,7 +56,7 @@
               </mat-form-field>
             </div>
             <div class="w3-col s6 m4 l2">
-              <mat-checkbox formControlName="isStaging" data-testid="isStanging">Is Staging</mat-checkbox>
+              <mat-checkbox formControlName="isStaging" data-testid="isStaging">Is Staging</mat-checkbox>
             </div>
           </div>
           <div class="w3-cell-row">
@@ -100,7 +100,7 @@
         <button type="submit" [disabled]="problemEditorForm.pristine" mat-raised-button color="primary"
           (click)="save()" data-testid="btnSave"><i class="material-icons"> save </i></button>
           <span class="spacer"></span>
-          <button mat-raised-button color="primary" (click)="previewText()"><i class=" material-icons" data-testid="btnPreview"> preview
+          <button mat-raised-button color="primary" (click)="previewText()" data-testid="btnPreview"><i class=" material-icons"> preview
           </i></button>
           <span class="spacer"></span>
           <span class="spacer"></span>

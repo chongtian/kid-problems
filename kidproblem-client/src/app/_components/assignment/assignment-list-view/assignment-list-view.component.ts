@@ -53,9 +53,11 @@ export class AssignmentListViewComponent implements OnInit {
       this.search();
     }
 
+    this.loading.start();
     this.cognitoService.getUserAccess().then(a => {
       this.parentUser = ((a | Access.parent) === a);
-    });
+    }).catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   search() {

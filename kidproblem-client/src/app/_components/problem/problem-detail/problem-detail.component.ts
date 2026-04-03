@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Location } from '@angular/common';
 import { DisplayMessages } from '@app/_constants';
 import { BehaviorSubject } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -22,15 +21,14 @@ export class ProblemDetailComponent implements OnInit {
   messageTexts = DisplayMessages;
   isEdit = false;
   isNew = false;
-  nextProblemTitle: string;
-  prevProblemTitle: string;
-  currProblemTitle: string;
+  nextProblemTitle: string = '';
+  prevProblemTitle: string = '';
+  currProblemTitle: string = '';
   private isChildChanged = false;
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
-    private location: Location
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -64,7 +62,7 @@ export class ProblemDetailComponent implements OnInit {
    */
   goBack(): void {
     if (this.isChildChanged && !window.confirm(this.messageTexts.warningUnsavedChanges)) return;
-    this.location.back();
+    this.router.navigate([`problem/view/${this.currProblemTitle}`]);
   }
 
   /**

@@ -51,9 +51,13 @@ export class ExamDefDetailViewComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.adminService.getCategoryCodes().then(codes => {
-      this.categories = codes.filter(c => { return c.Active; })
-    });
+    this.loading.start();
+    this.adminService.getCategoryCodes()
+      .then(codes => {
+        this.categories = codes.filter(c => { return c.Active; })
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
 
     this.examDefId$.subscribe(
       id => {
