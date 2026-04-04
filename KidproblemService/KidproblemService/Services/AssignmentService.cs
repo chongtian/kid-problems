@@ -58,7 +58,7 @@ namespace KidproblemService.Services
 
         public async Task<Assignment?> GetAssignmentAsync(string id)
         {
-            //Assignment? entity = _cacheService.Get<Assignment>(id);
+            Assignment? entity = _cacheService.Get<Assignment>(id);
             //if(entity != null)
             //{
             //    return entity;
@@ -77,10 +77,10 @@ namespace KidproblemService.Services
 
             var entities = await _context.FromQueryAsync<Assignment>(queryConfig).GetRemainingAsync();
             var entity = entities.FirstOrDefault();
-            // if (entity != null)
-            // {
-            //     _cacheService.Set(entity);
-            // }
+            if (entity != null)
+            {
+                _cacheService.Set(entity);
+            }
             return entity;
         }
 

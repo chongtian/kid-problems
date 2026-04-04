@@ -36,7 +36,7 @@ namespace KidproblemService.Services
 
         public async Task<ExamDefinition?> GetExamDefinitionAsync(string category, string title)
         {
-            // ExamDefinition? entity = _cacheService.Get<ExamDefinition>(category, title);
+            ExamDefinition? entity = _cacheService.Get<ExamDefinition>(category, title);
             // if(entity != null)
             // {
             //     return entity;
@@ -56,10 +56,10 @@ namespace KidproblemService.Services
 
             var entities = await _context.FromQueryAsync<ExamDefinition>(queryConfig).GetRemainingAsync();
             entity = entities.FirstOrDefault();
-            // if (entity != null)
-            // {
-            //     _cacheService.Set(entity);
-            // }
+            if (entity != null)
+            {
+                _cacheService.Set(entity);
+            }
 
             return entity;
         }
