@@ -77,10 +77,10 @@ namespace KidproblemService.Services
 
             var entities = await _context.FromQueryAsync<Assignment>(queryConfig).GetRemainingAsync();
             var entity = entities.FirstOrDefault();
-            if (entity != null)
-            {
-                _cacheService.Set(entity);
-            }
+            // if (entity != null)
+            // {
+            //     _cacheService.Set(entity);
+            // }
             return entity;
         }
 
