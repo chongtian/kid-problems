@@ -58,7 +58,7 @@ namespace KidproblemService.Services
 
         public async Task<Assignment?> GetAssignmentAsync(string id)
         {
-            Assignment? entity = _cacheService.Get<Assignment>(id);
+            // Assignment? entity = _cacheService.Get<Assignment>(id);
             //if(entity != null)
             //{
             //    return entity;
