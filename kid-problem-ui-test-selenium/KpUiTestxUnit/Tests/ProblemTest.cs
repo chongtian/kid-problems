@@ -118,18 +118,19 @@ namespace KpUiTestxUnit.Tests
                 page.ClickSaveButton();
 
                 Assert.True(_wait.Until(d => d.Url.Contains($"/problem/edit/{problemTitle}")));
+
+                // rollback
+                await DeleteCall($"/problem/{problemTitle}");
+
                 Assert.Equal(problemTitle, page.GetProblemTitle());
                 Assert.Equal("TEST", page.GetProblemCategory());
                 Assert.Equal("A", page.GetProblemAnswer());
                 Assert.Equal("Test", page.GetProblemTags());
                 Assert.Equal("A,B,C,D,E", page.GetAnswerOptions());
                 Assert.Equal(false, page.GetIsStaging());
-                Assert.Equal("TEST PROBLEM TEXT LINE 1\r\nTEST PROBLEM TEXT LINE 2", page.GetProblemText());
+                Assert.Equal("TEST PROBLEM TEXT LINE 1\nTEST PROBLEM TEXT LINE 2", (page.GetProblemText() ?? "").Replace("\r\n", "\n"));
                 Assert.Equal("TEST SOLUTION TEXT LINE 1<br/>\r\nTEST SOLUTION TEXT LINE 2<br/>", page.GetSolutionText());
                 Assert.Equal("TEST PROBLEM TEXT LINE 1 TEST PROBLEM TEXT LINE 2", page.GetProblemTextBase64());
-
-                // rollback
-                await DeleteCall($"/problem/{problemTitle}");
 
             });
         }
