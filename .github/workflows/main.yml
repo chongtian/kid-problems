@@ -38,6 +38,7 @@ jobs:
   staging:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    environment: aws-kidproblem-staging
     steps:
       - uses: actions/checkout@v4
       
@@ -56,6 +57,10 @@ jobs:
           production: 'false'
           lambdaFunctionName: 'kidproblemdev'
           s3BucketName: 'kidproblemdev.nowsuncorp.com'
+
+      - name: Run Tests
+        if: github.event.inputs.run_test == 'true'
+        uses: ./.github/actions/run-tests-steps
 
   production:
     needs: staging

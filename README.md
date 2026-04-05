@@ -18,6 +18,8 @@ This version represents a complete migration to a Serverless AWS architecture, f
 
 - **Security:** Amazon Cognito (JWT-based Auth).
 
+- **UI Test:** Selenium WebDriver + xUnit.
+
 #### Build and Test
 To enable development mode in Lambda, change the value of environment variable *ASPNETCORE_ENVIRONMENT* to **Development**
 
@@ -30,3 +32,6 @@ This can be done in *aws-lambda-tools-defaults.json*, or update the environment 
 |---|---|---|
 |Parent|testuser|Demo123456!|
 |Child|testkid|Demo123456!|
+
+#### Notes
+This project was originally hosted in Azure DevOps as a private repository. I migrated it to GitHub to better showcase my SDET and web application development skills. Not all features have been migrated yet, as this is an ongoing project that I continue to develop and improve.

@@ -1,0 +1,11 @@
+{
+  "Credentials": {
+    "AdminUsername": "",
+    "AdminPassword": "",
+    "ChildUsername": "",
+    "ChildPassword": ""
+  },
+  "BaseUrl": "http://kidproblemdev.nowsuncorp.com",
+  "BaseApiUrl": "https://qajvrb7w7waa5icxlfm6tqustm0wspyy.lambda-url.us-east-2.on.aws/api",
+  "TimeoutInSeconds": 20
+}
