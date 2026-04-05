@@ -1,54 +1,104 @@
 <mat-toolbar color="primary">
   <h1><a routerLink="home" class="hide-link">Kid Problem</a></h1>
-  <span><a mat-button color="accent" routerLink="home"><i class="material-icons" md-light> home </i></a></span>
-  <span *ngIf="menuGuard.enableExam">
-    <button mat-button [matMenuTriggerFor]="exam">Exam Runs</button>
-    <mat-menu #exam="matMenu">
-      <a *ngIf="menuGuard.enableBrowseExam" mat-menu-item routerLink="examruns">Browse Latest</a>
-      <a *ngIf="menuGuard.enableBrowseExam" mat-menu-item routerLink="examruns/all">Browse All</a>
-      <mat-divider></mat-divider>
-      <a *ngIf="menuGuard.enableBrowseExam" mat-menu-item routerLink="summary/exam">Exam Summary</a>
-      <a *ngIf="menuGuard.enableBrowseExam" mat-menu-item routerLink="summary/problem">Problem Summary</a>
-    </mat-menu>
-  </span>
-  
-  <span *ngIf="menuGuard.enableExam">
-    <button mat-button [matMenuTriggerFor]="assignment">Assignments</button>
-    <mat-menu #assignment="matMenu">
-      <a *ngIf="menuGuard.enableBrowseExam" mat-menu-item routerLink="assignments">Browse Latest</a>
-      <a *ngIf="menuGuard.enableBrowseExam" mat-menu-item routerLink="assignments/all">Browse All</a>
-    </mat-menu>
-  </span>
-  
-  <span *ngIf="menuGuard.enableExam">
-    <button mat-button [matMenuTriggerFor]="examdef">Exam Definitions</button>
-    <mat-menu #examdef="matMenu">
-      <a *ngIf="menuGuard.enableBrowseExam" mat-menu-item routerLink="examdefs">Browse Active</a>
-      <a *ngIf="menuGuard.enableBrowseExam" mat-menu-item routerLink="examdefs/all">Browse All</a>
-      <a *ngIf="menuGuard.enableBrowseExam" mat-menu-item routerLink="examdef/create">Create Exam Definition</a>
-    </mat-menu>
-  </span>
-  
-  <span *ngIf="menuGuard.enableExam">
-    <button mat-button [matMenuTriggerFor]="adm">Problems</button>
-    <mat-menu #adm="matMenu">
-      <a *ngIf="menuGuard.enableProblem" mat-menu-item routerLink="problems/r">Browse Problems</a>
-      <mat-divider></mat-divider>
-      <a *ngIf="menuGuard.enableAdm" mat-menu-item routerLink="problem/create">Create Problem</a>
-      <a *ngIf="menuGuard.enableAdm" mat-menu-item routerLink="problems/s">Browse Staging Problems</a>
-      <a *ngIf="menuGuard.enableAdm" mat-menu-item routerLink="problem/scrap">Crawl Problems</a>
-      <a *ngIf="menuGuard.enableAdm" mat-menu-item routerLink="problem/answers">Upload Answers</a>
-      <a *ngIf="menuGuard.enableAdm" mat-menu-item routerLink="problem/bulkupdate">Bulk Update</a>
-      <a *ngIf="menuGuard.enableAdm" mat-menu-item routerLink="problem/bulkcreate">Bulk Create</a>
-    </mat-menu>
-  </span>
+  <span><a mat-button color="accent" routerLink="home" data-testid="menuHome"><i class="material-icons" md-light> home </i></a></span>
+  @if (menuGuard.enableExam) {
+    <span>
+      <button mat-button [matMenuTriggerFor]="exam" data-testid="menuExamRuns">Exam Runs</button>
+      <mat-menu #exam="matMenu">
+        @if (menuGuard.enableBrowseExam) {
+          <a mat-menu-item routerLink="examruns" data-testid="menuBrowseLatestExam">Browse Latest</a>
+        }
+        @if (menuGuard.enableBrowseExam) {
+          <a mat-menu-item routerLink="examruns/all" data-testid="menuBrowseAllExam">Browse All</a>
+        }
+        <mat-divider></mat-divider>
+        @if (menuGuard.enableBrowseExam) {
+          <a mat-menu-item routerLink="summary/exam" data-testid="menuBrowseExamSummary">Exam Summary</a>
+        }
+        @if (menuGuard.enableBrowseExam) {
+          <a mat-menu-item routerLink="summary/problem" data-testid="menuBrowseProblemSummary">Problem Summary</a>
+        }
+      </mat-menu>
+    </span>
+  }
+
+  @if (menuGuard.enableExam) {
+    <span>
+      <button mat-button [matMenuTriggerFor]="assignment" data-testid="menuAssignments">Assignments</button>
+      <mat-menu #assignment="matMenu">
+        @if (menuGuard.enableBrowseExam) {
+          <a mat-menu-item routerLink="assignments" data-testid="menuBrowseLatestAssignment">Browse Latest</a>
+        }
+        @if (menuGuard.enableBrowseExam) {
+          <a mat-menu-item routerLink="assignments/all" data-testid="menuBrowseAllAssignment">Browse All</a>
+        }
+      </mat-menu>
+    </span>
+  }
+
+  @if (menuGuard.enableExam) {
+    <span>
+      <button mat-button [matMenuTriggerFor]="examdef" data-testid="menuExamDefinitions">Exam Definitions</button>
+      <mat-menu #examdef="matMenu">
+        @if (menuGuard.enableBrowseExam) {
+          <a mat-menu-item routerLink="examdefs" data-testid="menuBrowseActiveExamDefinitions">Browse Active</a>
+        }
+        @if (menuGuard.enableBrowseExam) {
+          <a mat-menu-item routerLink="examdefs/all" data-testid="menuBrowseAllExamDefinitions">Browse All</a>
+        }
+        @if (menuGuard.enableBrowseExam) {
+          <a mat-menu-item routerLink="examdef/create" data-testid="menuCreateExamDefinitions">Create Exam Definition</a>
+        }
+      </mat-menu>
+    </span>
+  }
+
+  @if (menuGuard.enableExam) {
+    <span>
+      <button mat-button [matMenuTriggerFor]="adm" data-testid="menuProblems">Problems</button>
+      <mat-menu #adm="matMenu">
+        @if (menuGuard.enableProblem) {
+          <a mat-menu-item routerLink="problems/r" data-testid="menuBrowseProblems">Browse Problems</a>
+        }
+        <mat-divider></mat-divider>
+        @if (menuGuard.enableAdm) {
+          <a mat-menu-item routerLink="problem/create" data-testid="menuCreateProblem">Create Problem</a>
+        }
+        @if (menuGuard.enableAdm) {
+          <a mat-menu-item routerLink="problems/s" data-testid="menuBrowseStagingProblems">Browse Staging Problems</a>
+        }
+        @if (menuGuard.enableAdm) {
+          <a mat-menu-item routerLink="problem/scrap" data-testid="menuCrawlProblems">Crawl Problems</a>
+        }
+        @if (menuGuard.enableAdm) {
+          <a mat-menu-item routerLink="problem/answers" data-testid="menuUploadAnswers">Upload Answers</a>
+        }
+        @if (menuGuard.enableAdm) {
+          <a mat-menu-item routerLink="problem/bulkupdate" data-testid="menuBulkUpdate">Bulk Update</a>
+        }
+        @if (menuGuard.enableAdm) {
+          <a mat-menu-item routerLink="problem/bulkcreate" data-testid="menuBulkCreate">Bulk Create</a>
+        }
+      </mat-menu>
+    </span>
+  }
   <span class="spacer"></span>
-  <button *ngIf="username" mat-button [matMenuTriggerFor]="userAction">{{username}}</button>
+  @if (username) {
+    <button mat-button [matMenuTriggerFor]="userAction" data-testid="menuUserAction">{{username}}</button>
+  }
   <mat-menu #userAction="matMenu">
-    <a *ngIf="username" mat-menu-item routerLink="password">{{constants.auth.ChangePassword}}</a>
-    <a *ngIf="username" mat-menu-item routerLink="" (click)="signOut()" style="color:red">{{constants.auth.Logout}}</a>
+    @if (username) {
+      <a mat-menu-item routerLink="password" data-testid="menuPassword">{{constants.auth.ChangePassword}}</a>
+    }
+    @if (username) {
+      <a mat-menu-item routerLink="" (click)="signOut()" style="color:red" data-testid="menuLogout">{{constants.auth.Logout}}</a>
+    }
   </mat-menu>
-  <mat-icon *ngIf="username" aria-hidden="false" aria-label="user verified icon">verified_user</mat-icon>
-  <mat-icon *ngIf="username && menuGuard.enableAdm" aria-hidden="false" aria-label="user verified icon">face</mat-icon>
+  @if (username) {
+    <mat-icon aria-hidden="false" aria-label="user verified icon">verified_user</mat-icon>
+  }
+  @if (username && menuGuard.enableAdm) {
+    <mat-icon aria-hidden="false" aria-label="user verified icon">face</mat-icon>
+  }
   <span class="w3-tiny">{{version}}</span>
 </mat-toolbar>

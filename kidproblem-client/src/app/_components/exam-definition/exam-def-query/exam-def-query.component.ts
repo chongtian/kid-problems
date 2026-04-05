@@ -6,7 +6,6 @@ import { ExamDefListViewComponent } from '../exam-def-list-view/exam-def-list-vi
     selector: 'app-exam-def-query',
     templateUrl: './exam-def-query.component.html',
     styleUrls: ['./exam-def-query.component.css'],
-    standalone: true,
     imports: [ExamDefListViewComponent]
 })
 export class ExamDefQueryComponent implements OnInit {

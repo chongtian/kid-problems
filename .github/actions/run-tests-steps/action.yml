@@ -1,0 +1,41 @@
+name: 'Run Tests'
+description: 'Run Tests for KidProblem'
+
+inputs:
+  admin-username:
+    required: true
+  admin-password:
+    required: true
+  child-username:
+    required: true
+  child-password:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+  - name: Build solution
+    shell: bash
+    run: dotnet build --configuration Release 
+    working-directory: ./kid-problem-ui-test-selenium
+
+  - name: Run xUnit Tests
+    shell: bash
+    run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test_results.trx"
+    working-directory: ./kid-problem-ui-test-selenium
+    env:
+      KPUITEST_ADMIN_USERNAME: ${{ inputs.admin-username }}
+      KPUITEST_ADMIN_PASSWORD: ${{ inputs.admin-password }}
+      KPUITEST_CHILD_USERNAME: ${{ inputs.child-username }}
+      KPUITEST_CHILD_PASSWORD: ${{ inputs.child-password }}
+
+  - name: Upload Test Results
+    uses: actions/upload-artifact@v4
+    if: failure()
+    with:
+      name: xunit-test-results
+      path: |
+        kid-problem-ui-test-selenium/KpUiTestxUnit/TestResults/test_results.trx
+        kid-problem-ui-test-selenium/KpUiTestxUnit/**/Screenshots/
+      retention-days: 30

@@ -9,7 +9,6 @@ import { MatCardModule } from '@angular/material/card';
     selector: 'app-problem-summary-search-dialog',
     templateUrl: './problem-summary-search-dialog.component.html',
     styleUrls: ['./problem-summary-search-dialog.component.css'],
-    standalone: true,
     imports: [MatCardModule, ProblemSummaryListViewComponent, MatButtonModule, MatTooltipModule]
 })
 export class ProblemSummarySearchDialogComponent {

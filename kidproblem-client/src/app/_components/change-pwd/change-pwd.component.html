@@ -1,48 +1,59 @@
 <div class="w3-cell-row">
   <div class="w3-container w3-cell w3-cell-middle">
 
-      <mat-card>
-          <mat-card-subtitle>Change Password</mat-card-subtitle>
-          <form [formGroup]="passwordForm" (ngSubmit)="onSubmit()">
-              <mat-card-content>
-                  <div class="form-group">
-                      <p><label for="oldPassword">Old Password</label></p>
-                      <input type="password" formControlName="oldPassword" class="form-control"
-                          [ngClass]="{ 'is-invalid': submitted && f.oldPassword.errors }" />
-                      <div *ngIf="submitted && f.oldPassword.errors" class="invalid-feedback">
-                          <div *ngIf="f.oldPassword.errors.required">
-                              Old Password is required</div>
-                      </div>
-                  </div>
+    <mat-card>
+      <mat-card-subtitle class="page-title">Change Password</mat-card-subtitle>
+      <form [formGroup]="passwordForm" (ngSubmit)="onSubmit()">
+        <mat-card-content>
+          <div class="form-group">
+            <p><label for="oldPassword">Old Password</label></p>
+            <input type="password" formControlName="oldPassword" class="form-control" data-testid="oldPassword"
+              [ngClass]="{ 'is-invalid': submitted && f.oldPassword.errors }" />
+            @if (submitted && f.oldPassword.errors) {
+            <div class="invalid-feedback">
+              @if (f.oldPassword.errors.required) {
+              <div>
+                Old Password is required</div>
+              }
+            </div>
+            }
+          </div>
 
-                  <div class="form-group">
-                    <p><label for="newPassword1">New Password</label></p>
-                    <input type="password" formControlName="newPassword1" class="form-control"
-                        [ngClass]="{ 'is-invalid': submitted && f.newPassword1.errors }" />
-                    <div *ngIf="submitted && f.newPassword1.errors" class="invalid-feedback">
-                        <div *ngIf="f.newPassword1.errors.required">
-                            New Password is required</div>
-                    </div>
-                </div>
+          <div class="form-group">
+            <p><label for="newPassword1">New Password</label></p>
+            <input type="password" formControlName="newPassword1" class="form-control" data-testid="newPassword"
+              [ngClass]="{ 'is-invalid': submitted && f.newPassword1.errors }" />
+            @if (submitted && f.newPassword1.errors) {
+            <div class="invalid-feedback">
+              @if (f.newPassword1.errors.required) {
+              <div>
+                New Password is required</div>
+              }
+            </div>
+            }
+          </div>
 
-                <div class="form-group">
-                  <p><label for="newPassword2">Repeat New Password</label></p>
-                  <input type="password" formControlName="newPassword2" class="form-control"
-                      [ngClass]="{ 'is-invalid': submitted && f.newPassword2.errors }" />
-                  <div *ngIf="submitted && f.newPassword2.errors" class="invalid-feedback">
-                      <div *ngIf="f.newPassword2.errors.required">
-                          Require to repeat new password</div>
-                  </div>
-              </div>
-              </mat-card-content>
-              <mat-card-actions>
-                  <div class="form-group">
-                      <button mat-raised-button>Update</button>
-                      <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
-                  </div>
-              </mat-card-actions>
-          </form>
-      </mat-card>
+          <div class="form-group">
+            <p><label for="newPassword2">Repeat New Password</label></p>
+            <input type="password" formControlName="newPassword2" class="form-control" data-testid="newPassword2"
+              [ngClass]="{ 'is-invalid': submitted && f.newPassword2.errors }" />
+            @if (submitted && f.newPassword2.errors) {
+            <div class="invalid-feedback">
+              @if (f.newPassword2.errors.required) {
+              <div>
+                Require to repeat new password</div>
+              }
+            </div>
+            }
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <div class="form-group">
+            <button mat-raised-button data-testid="btnUpdate">Update</button>
+          </div>
+        </mat-card-actions>
+      </form>
+    </mat-card>
 
   </div>
 </div>

@@ -36,20 +36,51 @@ stages:
   condition: |
       in(variables['Build.Reason'], 'PullRequest')
   jobs:
-    - template: jobs/kidproblem-build.yml
-      parameters:
-        deploy: false
+    - job: staging
+      steps:
+      - template: steps/build-steps.yml
+        parameters:
+          deploy: false
+          runTest: false
+          production: false
 
 - stage: Build
-  displayName: 'Build and Deploy'
+  displayName: 'Staging'
   dependsOn: []
   condition: |
     ne(variables['Build.Reason'], 'PullRequest')
   jobs:
-    - ${{ if eq(parameters.run_test, false) }}:
-        - template: jobs/kidproblem-build.yml
-          parameters:
-            deploy: ${{parameters.deploy}}
-    - ${{ else }}:
-        - template: jobs/kidproblem-test.yml
+    - job: Staging
+      steps:
+      - template: steps/build-steps.yml
+        parameters:
+          deploy: ${{parameters.deploy}}
+          runTest: ${{parameters.run_test}}
+          production: false
+          lambdaFunctionName: kidproblemdev
+          s3BucketName: kidproblemdev.nowsuncorp.com
+
+- ${{ if eq(parameters.deploy,true) }}:
+  - stage: Production
+    displayName: 'Production'
+    dependsOn: 
+      - Build
+    condition: |
+      ne(variables['Build.Reason'], 'PullRequest')
+    jobs:
+      - deployment: Production
+        environment: kidproblem-prod
+        strategy:
+          runOnce:
+            deploy:
+              steps:          
+              - download: none
+              - checkout: self
+              - template: steps/build-steps.yml
+                parameters:
+                  deploy: true
+                  runTest: false
+                  production: true
+                  lambdaFunctionName: kidproblem
+                  s3BucketName: kidproblem.nowsuncorp.com        
 

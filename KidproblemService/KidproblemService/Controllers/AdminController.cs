@@ -12,19 +12,21 @@ namespace KidproblemService.Controllers
     {
         protected readonly IAuthenticateService _authService;
         protected readonly ICodeService _codeService;
-        private readonly string? _tableSuufix;
+        private readonly string? _tableSuffix;
+        private readonly string? _serviceVersion;
 
         public AdminController(IAuthenticateService authService, ICodeService codeService, IOptions<AwsConfiguration> awsConfiguration)
         {
             _authService = authService;
             _codeService = codeService;
-            _tableSuufix = awsConfiguration.Value.DynamoDbTableNamePrefix;
+            _tableSuffix = awsConfiguration.Value.DynamoDbTableNamePrefix;
+            _serviceVersion = awsConfiguration.Value.LambdaFunctionServiceVersion ?? "dev";
         }
 
         [HttpGet("ping")]
         public IActionResult Ping()
         {
-            return Ok(new { Message= "Service is online.", DynamoDbTableNamePrefix= _tableSuufix });
+            return Ok(new { Message = "Service is online.", DynamoDbTableNamePrefix = _tableSuffix, ServiceVersion = _serviceVersion });
         }
 
         [HttpGet("test")]

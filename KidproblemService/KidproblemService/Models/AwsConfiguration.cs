@@ -6,5 +6,6 @@
         public string? UserPoolId { get; set; }
         public string? S3BucketName { get; set; }
         public string? DynamoDbTableNamePrefix { get; set; }
+        public string? LambdaFunctionServiceVersion { get; set;}
     }
 }

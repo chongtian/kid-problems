@@ -1,23 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CognitoService, MessageService } from '@app/_services/';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { CognitoService, LoadingBusService, MessageService } from '@app/_services/';
 import { MatButtonModule } from '@angular/material/button';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({
-    selector: 'app-change-pwd',
-    templateUrl: './change-pwd.component.html',
-    styleUrls: ['./change-pwd.component.css'],
-    standalone: true,
-    imports: [MatCardModule, ReactiveFormsModule, NgClass, NgIf, MatButtonModule, MatProgressBarModule]
+  selector: 'app-change-pwd',
+  templateUrl: './change-pwd.component.html',
+  styleUrls: ['./change-pwd.component.css'],
+  imports: [MatCardModule, ReactiveFormsModule, NgClass, MatButtonModule]
 })
 export class ChangePwdComponent implements OnInit {
 
   passwordForm: UntypedFormGroup;
   isValid = true;
-  isLoading = false;
+  private loading = inject(LoadingBusService);
   submitted = false;
 
   constructor(
@@ -55,34 +53,32 @@ export class ChangePwdComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+    this.loading.start();
+    this.cognitoService.getCurrentAuthenticatedUser()
+      .then(
+        user => {
+          const cognitoUser = user;
 
-    this.cognitoService.getCurrentAuthenticatedUser().then(
-      user => {
-        const cognitoUser = user;
-
-        this.cognitoService.changePassword(cognitoUser, this.f.oldPassword.value, this.f.newPassword1.value)
-          .then(
-            result => {
-              // console.log(result);
-              if (result === 'SUCCESS') {
-                this.messageService.openSnackBar('Successfully updated password');
-              } else {
-                this.messageService.openSnackBar('Failed to update password');
-                this.messageService.add(`Failed to update password: ${result}`);
+          this.cognitoService.changePassword(cognitoUser, this.f.oldPassword.value, this.f.newPassword1.value)
+            .then(
+              result => {
+                // console.log(result);
+                if (result === 'SUCCESS') {
+                  this.messageService.openSnackBar('Successfully updated password');
+                } else {
+                  this.messageService.openSnackBar('Failed to update password');
+                  this.messageService.add(`Failed to update password: ${result}`);
+                }
               }
-              this.isLoading = false;
-            }
-          )
-          .catch((err) => {
-            // console.log(err);
-            this.messageService.openSnackBar('Failed to update password');
-            this.messageService.add(`Failed to update password: ${err.message}`);
-            this.isLoading = false;
-          });
-
-      }
-    );
+            )
+            .catch((err) => {
+              // console.log(err);
+              this.messageService.openSnackBar('Failed to update password');
+              this.messageService.add(`Failed to update password: ${err.message}`);
+            })
+            .finally(() => { this.loading.stop(); });
+        }
+      );
 
   }
 

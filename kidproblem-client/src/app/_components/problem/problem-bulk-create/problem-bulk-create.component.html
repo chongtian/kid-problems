@@ -1,65 +1,64 @@
-<h3 mat-h3>Get Problems from AoPS Community area</h3>
-<h4 mat-h4>This function is still under development!</h4>
+<h3 class="page-title">Get Problems from AoPS Community area</h3>
+<h4>This function is still under development!</h4>
 
-<ng-container *ngIf="!isSubmitted">
-  <div class="w3-row">
-
-    <div class="w3-col s6 m4 l2">
-      <mat-form-field floatLabel="auto">
-        <mat-label>Problem Category</mat-label>
-        <input matInput [(ngModel)]="problemCategory">
-      </mat-form-field>
-    </div>
-
-    <div class="w3-col s6 m4 l2">
-      <mat-form-field floatLabel="auto">
-        <mat-label>Problem Year</mat-label>
-        <input matInput [(ngModel)]="problemYear">
-      </mat-form-field>
-    </div>
-
-    <div class="w3-col s6 m4 l2">
-      <mat-form-field floatLabel="auto">
-        <mat-label>Answer Options</mat-label>
-        <input matInput [(ngModel)]="answerOptions">
-      </mat-form-field>
-    </div>
-  </div>
-
-  <div class="w3-cell-row">
-    <mat-form-field floatLabel="auto" class="full-width">
-      <mat-label>Raw Json Text</mat-label>
-      <textarea matInput [(ngModel)]="rawText"></textarea>
+@if (!isSubmitted) {
+<div class="w3-row">
+  <div class="w3-col s6 m4 l2" data-testid="problemCategory">
+    <mat-form-field floatLabel="auto">
+      <mat-label>Problem Category</mat-label>
+      <input matInput [(ngModel)]="problemCategory">
     </mat-form-field>
   </div>
-
-  <div class="w3-cell-row">
-    <button mat-raised-button color="primary" (click)="parse()">Parse</button>
-    <p>{{message}}</p>
+  <div class="w3-col s6 m4 l2" data-testid="problemYear">
+    <mat-form-field floatLabel="auto">
+      <mat-label>Problem Year</mat-label>
+      <input matInput [(ngModel)]="problemYear">
+    </mat-form-field>
   </div>
-</ng-container>
+  <div class="w3-col s6 m4 l2" data-testid="answerOptions">
+    <mat-form-field floatLabel="auto">
+      <mat-label>Answer Options</mat-label>
+      <input matInput [(ngModel)]="answerOptions">
+    </mat-form-field>
+  </div>
+</div>
+<div class="w3-cell-row" data-testid="rawText">
+  <mat-form-field floatLabel="auto" class="full-width">
+    <mat-label>Raw Json Text</mat-label>
+    <textarea matInput [(ngModel)]="rawText"></textarea>
+  </mat-form-field>
+</div>
+<div class="w3-cell-row">
+  <button mat-raised-button color="primary" (click)="parse()" data-testid="btnParse">Parse</button>
+  <p>{{message}}</p>
+</div>
+}
 
-
-<mat-spinner *ngIf="isLoading"></mat-spinner>
-<div *ngIf="!problems && !isLoading && isSubmitted">
+@if (!problems && isSubmitted) {
+<div data-testid="result">
   <span>No record is returned</span>
 </div>
+}
 
-<div *ngIf="problems && !isLoading && isSubmitted">
-  <h3 mat-h3>Count of Problems: {{problems.length}}</h3>
-  <button mat-raised-button color="primary" (click)="reset()">Reset</button>
-  <ng-container *ngFor="let problem of problems">
-    <mat-card>
-      <mat-card-title> {{problem.ProblemTitle}} </mat-card-title>
-      <mat-card-subtitle *ngIf="problem.IsSuccessful"><a routerLink="/problem/s/{{problem.ProblemKey}}">View</a>
-      </mat-card-subtitle>
-      <mat-card-content>
-        <h4 class="label">Problem Text</h4>
-        <span [appMath]="problem.ProblemText"></span>
-        <h4 class="label">Message</h4>
-        <span>{{problem.ReturnResult}}</span>
-      </mat-card-content>
-    </mat-card>
-    <mat-divider></mat-divider>
-  </ng-container>
+@if (problems && isSubmitted) {
+<div>
+  <h3>Count of Problems: {{problems.length}}</h3>
+  <button mat-raised-button color="primary" (click)="reset()" data-testid="btnReset">Reset</button>
+  @for (problem of problems; track problem) {
+  <mat-card>
+    <mat-card-title data-testid="problemTitle"> {{problem.ProblemTitle}} </mat-card-title>
+    @if (problem.IsSuccessful) {
+    <mat-card-subtitle><a routerLink="/problem/s/{{problem.ProblemKey}}" data-testid="problemLink">View</a>
+    </mat-card-subtitle>
+    }
+    <mat-card-content>
+      <h4 class="label">Problem Text</h4>
+      <span [appMath]="problem.ProblemText" data-testid="problemText"></span>
+      <h4 class="label">Message</h4>
+      <span data-testid="returnResult">{{problem.ReturnResult}}</span>
+    </mat-card-content>
+  </mat-card>
+  <mat-divider></mat-divider>
+  }
 </div>
+}

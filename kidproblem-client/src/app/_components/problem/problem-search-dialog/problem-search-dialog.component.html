@@ -1,13 +1,14 @@
 <mat-card>
-    <mat-card-title>Query Problems</mat-card-title>
+    <mat-card-title class="query-page-title">Query Problems</mat-card-title>
     <mat-card-actions>
         <div class="w3-cell">
-            <button mat-raised-button color="primary" matTooltip="Select and Close" (click)="select()">
+            <button mat-raised-button color="primary" matTooltip="Select and Close" (click)="select()"
+                data-testid="btnSelect">
                 <span class="material-icons"> check_circle </span></button>
         </div>
         <span class="spacer"></span>
         <div class="w3-cell">
-            <button mat-raised-button color="primary" matTooltip="Cancel" (click)="close()">
+            <button mat-raised-button color="primary" matTooltip="Cancel" (click)="close()" data-testid="btnClose">
                 <span class="material-icons"> cancel </span></button>
         </div>
     </mat-card-actions>

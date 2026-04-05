@@ -37,10 +37,10 @@ namespace KidproblemService.Services
         public async Task<ExamDefinition?> GetExamDefinitionAsync(string category, string title)
         {
             ExamDefinition? entity = _cacheService.Get<ExamDefinition>(category, title);
-            if(entity != null)
-            {
-                return entity;
-            }
+            // if(entity != null)
+            // {
+            //     return entity;
+            // }
 
             QueryOperationConfig queryConfig = new QueryOperationConfig
             {

@@ -1,14 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, booleanAttribute } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, booleanAttribute, inject } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { DisplayMessages, PaginationIndicator } from '@app/_constants';
 import { Assignment } from '@app/_models';
-import { AssignmentService, CognitoService, ExamRunService, MessageService } from '@app/_services';
+import { AssignmentService, CognitoService, ExamRunService, LoadingBusService, MessageService } from '@app/_services';
 import { BooleanLikeToTextPipe } from '@app/_pipes';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { NgIf, NgClass, DatePipe } from '@angular/common';
+import { NgClass, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,11 +17,10 @@ import { Access } from '@app/_guards';
 const PageSize = 25;
 
 @Component({
-    selector: 'app-assignment-list-view',
-    templateUrl: './assignment-list-view.component.html',
-    styleUrls: ['./assignment-list-view.component.css'],
-    standalone: true,
-    imports: [ReactiveFormsModule, FormsModule, MatFormFieldModule, MatDatepickerModule, MatButtonModule, NgIf, MatProgressBarModule, MatTableModule, RouterLink, MatPaginatorModule, NgClass, MatTooltipModule, DatePipe, BooleanLikeToTextPipe]
+  selector: 'app-assignment-list-view',
+  templateUrl: './assignment-list-view.component.html',
+  styleUrls: ['./assignment-list-view.component.css'],
+  imports: [ReactiveFormsModule, FormsModule, MatFormFieldModule, MatDatepickerModule, MatButtonModule, MatPaginatorModule, MatTableModule, RouterLink, NgClass, MatTooltipModule, DatePipe, BooleanLikeToTextPipe]
 })
 export class AssignmentListViewComponent implements OnInit {
   @Input('start-time') startTime: Date;
@@ -34,7 +32,7 @@ export class AssignmentListViewComponent implements OnInit {
   dataSource = new MatTableDataSource<Assignment>();
   displayedColumns = ['action', 'createTime', 'category', 'title', 'complete', 'memo'];
   loadMoreData = false;
-  isLoading = false;
+  private loading = inject(LoadingBusService);
   private paginationToken = PaginationIndicator;
   private currentStartTime: Date;
   private currentEndTime: Date;
@@ -55,9 +53,11 @@ export class AssignmentListViewComponent implements OnInit {
       this.search();
     }
 
+    this.loading.start();
     this.cognitoService.getUserAccess().then(a => {
       this.parentUser = ((a | Access.parent) === a);
-    });
+    }).catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   search() {
@@ -70,23 +70,25 @@ export class AssignmentListViewComponent implements OnInit {
     }
 
     this.paginationToken = this.pagination === true ? PaginationIndicator : '';
-    this.isLoading = true;
-    this.service.queryAssignments(this.startTime, this.endTime, this.paginationToken, PageSize).then(d => {
-      d.data.sort((a, b) => { return (b.CreateTime > a.CreateTime) ? 1 : -1; });
-      this.dataSource.data = d.data;
-      this.dataSource.paginator = this.paginator;
-      if (d.data.length > 0) {
-        this.paginationToken = d.pagination;
-        if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
-          this.loadMoreData = true;
+    this.loading.start();
+    this.service.queryAssignments(this.startTime, this.endTime, this.paginationToken, PageSize)
+      .then(d => {
+        d.data.sort((a, b) => { return (b.CreateTime > a.CreateTime) ? 1 : -1; });
+        this.dataSource.data = d.data;
+        this.dataSource.paginator = this.paginator;
+        if (d.data.length > 0) {
+          this.paginationToken = d.pagination;
+          if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
+            this.loadMoreData = true;
+          } else {
+            this.loadMoreData = false;
+          }
         } else {
-          this.loadMoreData = false;
+          // this.messageService.openSnackBar("No record is found.", 250);
         }
-      } else {
-        this.messageService.openSnackBar("No record is found.");
-      }
-      this.isLoading = false;
-    });
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   more(): void {
@@ -95,37 +97,43 @@ export class AssignmentListViewComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
-    this.service.queryAssignments(this.startTime, this.endTime, this.paginationToken, PageSize).then(d => {
-      d.data.sort((a, b) => { return (b.CreateTime > a.CreateTime) ? 1 : -1; });
-      this.dataSource.data.push(...d.data);
-      this.paginationToken = d.pagination;
-      if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
-        this.loadMoreData = true;
-      } else {
-        this.loadMoreData = false;
-      }
-      this.isLoading = false;
-    });
+    this.loading.start();
+    this.service.queryAssignments(this.startTime, this.endTime, this.paginationToken, PageSize)
+      .then(d => {
+        d.data.sort((a, b) => { return (b.CreateTime > a.CreateTime) ? 1 : -1; });
+        this.dataSource.data.push(...d.data);
+        this.paginationToken = d.pagination;
+        if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
+          this.loadMoreData = true;
+        } else {
+          this.loadMoreData = false;
+        }
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   createRunFromAssignment(e: Assignment) {
-    if (this.parentUser === true){
+    if (this.parentUser === true) {
       this.messageService.openSnackBar(`${this.messageTexts.onlyForChild}`);
       this.messageService.add(`${this.messageTexts.onlyForChild}`);
     } else {
-      this.examRunService.createExamRunFromAssignment(e.Id).then(
-        data => {
-          if (data && data.IsSuccessful) {
-            this.run.emit(data.Id);
-          } else {
-            this.messageService.openSnackBar(`${this.messageTexts.saveFailed}`);
-            this.messageService.add(`${this.messageTexts.saveFailed}: ${data.ReturnResult}`);
+      this.loading.start();
+      this.examRunService.createExamRunFromAssignment(e.Id)
+        .then(
+          data => {
+            if (data && data.IsSuccessful) {
+              this.run.emit(data.Id);
+            } else {
+              this.messageService.openSnackBar(`${this.messageTexts.saveFailed}`);
+              this.messageService.add(`${this.messageTexts.saveFailed}: ${data.ReturnResult}`);
+            }
           }
-        }
-      );
+        )
+        .catch(err => { console.log(err); })
+        .finally(() => { this.loading.stop(); });
     }
-    
+
   }
 
 }

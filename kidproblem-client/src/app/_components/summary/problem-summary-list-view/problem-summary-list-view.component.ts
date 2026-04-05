@@ -1,30 +1,28 @@
-import { Component, Input, OnInit, ViewChild, booleanAttribute } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, booleanAttribute, inject } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PaginationIndicator } from '@app/_constants';
 import { ExamSummary, InfoCentralCodeDetail, Problem, ProblemSummary } from '@app/_models';
-import { AdminService, MessageService, SummaryService } from '@app/_services';
+import { AdminService, LoadingBusService, MessageService, SummaryService } from '@app/_services';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { NgIf, NgFor, NgClass, DecimalPipe } from '@angular/common';
+import { NgClass, DecimalPipe } from '@angular/common';
 
 const PageSize = 50;
 
 @Component({
-    selector: 'app-problem-summary-list-view',
-    templateUrl: './problem-summary-list-view.component.html',
-    styleUrls: ['./problem-summary-list-view.component.css'],
-    standalone: true,
-    imports: [NgIf, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatSelectModule, NgFor, MatOptionModule, MatInputModule, MatButtonModule, MatProgressBarModule, MatTableModule, MatCheckboxModule, RouterLink, MatPaginatorModule, NgClass, MatTooltipModule, MatSlideToggleModule, DecimalPipe]
+  selector: 'app-problem-summary-list-view',
+  templateUrl: './problem-summary-list-view.component.html',
+  styleUrls: ['./problem-summary-list-view.component.css'],
+  imports: [ReactiveFormsModule, FormsModule, MatFormFieldModule, MatSelectModule, MatOptionModule, MatInputModule, MatButtonModule, MatTableModule, MatCheckboxModule, RouterLink, MatPaginatorModule, NgClass, MatTooltipModule, MatSlideToggleModule, DecimalPipe]
 })
 export class ProblemSummaryListViewComponent implements OnInit {
   @Input('category') category = '';
@@ -49,7 +47,7 @@ export class ProblemSummaryListViewComponent implements OnInit {
   private currentAnswerBy = '';
   private currentTrueCorrectRateRng = '0.0-1.0';
   loadMoreData = false;
-  isLoading = false;
+  private loading = inject(LoadingBusService);
   private selectedAll = false;
 
   constructor(
@@ -66,17 +64,24 @@ export class ProblemSummaryListViewComponent implements OnInit {
       this.search();
     }
 
-    this.adminService.getCategoryCodes().then(
-      data => {
-        this.categories = data.filter(d => { return d.Active; });
-      }
-    );
+    this.loading.start();
+    this.adminService.getCategoryCodes()
+      .then(
+        data => {
+          this.categories = data.filter(d => { return d.Active; });
+        }
+      )
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
 
-    this.adminService.getChildren().then(
-      data => {
-        this.children = data;
-      }
-    );
+    this.loading.start();
+    this.adminService.getChildren()
+      .then(
+        data => {
+          this.children = data;
+        }
+      ).catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
 
     if (!this.isSelectable) {
       this.displayedColumns.splice(0, 1);
@@ -95,26 +100,28 @@ export class ProblemSummaryListViewComponent implements OnInit {
     }
 
     this.paginationToken = this.pagination === true ? PaginationIndicator : '';
-    this.isLoading = true;
-    this.service.queryProblemSummaries(this.category, this.answerBy, this.keyword, this.trueCorrectRateRng, this.paginationToken, PageSize).then(d => {
-      this.data = d.data;
-      if (!this.pagination) {
-        this.data.sort((x, y) => { return y.TotalCount - x.TotalCount });
-      }
-      this.dataSource.data = this.data;
-      this.dataSource.paginator = this.paginator;
-      if (d.data.length > 0) {
-        this.paginationToken = d.pagination;
-        if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
-          this.loadMoreData = true;
-        } else {
-          this.loadMoreData = false;
+    this.loading.start();
+    this.service.queryProblemSummaries(this.category, this.answerBy, this.keyword, this.trueCorrectRateRng, this.paginationToken, PageSize)
+      .then(d => {
+        this.data = d.data;
+        if (!this.pagination) {
+          this.data.sort((x, y) => { return y.TotalCount - x.TotalCount });
         }
-      } else {
-        this.messageService.openSnackBar("No record is found.");
-      }
-      this.isLoading = false;
-    });
+        this.dataSource.data = this.data;
+        this.dataSource.paginator = this.paginator;
+        if (d.data.length > 0) {
+          this.paginationToken = d.pagination;
+          if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
+            this.loadMoreData = true;
+          } else {
+            this.loadMoreData = false;
+          }
+        } else {
+          this.messageService.openSnackBar("No record is found.");
+        }
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   more(): void {
@@ -124,18 +131,20 @@ export class ProblemSummaryListViewComponent implements OnInit {
       || this.currentTrueCorrectRateRng != this.trueCorrectRateRng) {
       this.search();
     }
-    this.isLoading = true;
-    this.service.queryProblemSummaries(this.category, this.answerBy, this.keyword, this.trueCorrectRateRng, this.paginationToken, PageSize).then(d => {
-      this.data.push(...d.data);
-      this.dataSource.data = this.data;
-      this.paginationToken = d.pagination;
-      if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
-        this.loadMoreData = true;
-      } else {
-        this.loadMoreData = false;
-      }
-      this.isLoading = false;
-    });
+    this.loading.start();
+    this.service.queryProblemSummaries(this.category, this.answerBy, this.keyword, this.trueCorrectRateRng, this.paginationToken, PageSize)
+      .then(d => {
+        this.data.push(...d.data);
+        this.dataSource.data = this.data;
+        this.paginationToken = d.pagination;
+        if (this.pagination === true && this.paginationToken && this.paginationToken !== '{}') {
+          this.loadMoreData = true;
+        } else {
+          this.loadMoreData = false;
+        }
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   toggle(element: any): void {

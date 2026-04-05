@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { Validators, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Problem } from '@app/_models';
-import { ProblemService } from '@app/_services';
+import { LoadingBusService, ProblemService } from '@app/_services';
 import { MessageService } from '@app/_services/message.service';
 import { DisplayMessages } from '@app/_constants';
 import { BehaviorSubject } from 'rxjs';
@@ -12,15 +12,13 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { NgIf } from '@angular/common';
+
 
 @Component({
   selector: 'app-problem-editor',
   templateUrl: './problem-editor.component.html',
   styleUrls: ['./problem-editor.component.css'],
-  standalone: true,
-  imports: [NgIf, MatProgressBarModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatCheckboxModule, MatDividerModule, MathDirective, MatButtonModule]
+  imports: [ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatCheckboxModule, MatDividerModule, MathDirective, MatButtonModule]
 })
 export class ProblemEditorComponent implements OnInit {
 
@@ -29,7 +27,7 @@ export class ProblemEditorComponent implements OnInit {
   @Output() deleted = new EventEmitter<boolean>();
   @Output() changed = new EventEmitter<boolean>();
 
-  isLoading: boolean;
+  private loading = inject(LoadingBusService);
   problem: Problem;
   messageTexts = DisplayMessages;
   problemEditorForm: FormGroup;
@@ -46,7 +44,6 @@ export class ProblemEditorComponent implements OnInit {
   ngOnInit() {
     this.problemTitle$.subscribe(
       problemTitle => {
-        this.isLoading = true;
         this.getProblem(problemTitle);
       }
     );
@@ -55,18 +52,21 @@ export class ProblemEditorComponent implements OnInit {
   private getProblem(id: string) {
     if (id) {
       this.isNew = false;
-      this.problemService.getProblem(id).then(
-        data => {
-          if (data != null) {
-            this.problem = data;
-            this.createFormGroup();
-          } else {
-            this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id}.`);
-            this.problem = null;
+      this.loading.start();
+      this.problemService.getProblem(id)
+        .then(
+          data => {
+            if (data != null) {
+              this.problem = data;
+              this.createFormGroup();
+            } else {
+              this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id}.`);
+              this.problem = null;
+            }
           }
-          this.isLoading = false;
-        }
-      );
+        )
+        .catch(err => { console.log(err); })
+        .finally(() => { this.loading.stop(); });
 
     } else {
       // get a new Problem
@@ -143,11 +143,18 @@ export class ProblemEditorComponent implements OnInit {
       return;
     }
 
+    this.loading.start();
     const problem = this.getValuesFromForm();
     if (this.isNew) {
-      this.problemService.createProblem(problem).then(data => this.handleSaveResponse(data));
+      this.problemService.createProblem(problem)
+        .then(data => this.handleSaveResponse(data))
+        .catch(err => { console.log(err); })
+        .finally(() => { this.loading.stop(); });
     } else {
-      this.problemService.updateProblem(problem).then(data => this.handleSaveResponse(data));
+      this.problemService.updateProblem(problem)
+        .then(data => this.handleSaveResponse(data))
+        .catch(err => { console.log(err); })
+        .finally(() => { this.loading.stop(); });
     }
 
   }
@@ -156,17 +163,22 @@ export class ProblemEditorComponent implements OnInit {
     if (this.isNew || !window.confirm(this.messageTexts.confirmDelete)) {
       return;
     }
-    this.problemService.deleteProblem(this.problem.ProblemTitle).then(
-      data => {
-        if (data != null && data.IsSuccessful) {
-          this.messageService.openSnackBar('Record is deleted');
-          this.deleted.emit(true);
-        } else {
-          this.messageService.openSnackBar(`${this.messageTexts.deleteFailed}.`);
-          this.messageService.add(`${this.messageTexts.deleteFailed}.`);
+
+    this.loading.start();
+    this.problemService.deleteProblem(this.problem.ProblemTitle)
+      .then(
+        data => {
+          if (data != null && data.IsSuccessful) {
+            this.messageService.openSnackBar('Record is deleted');
+            this.deleted.emit(true);
+          } else {
+            this.messageService.openSnackBar(`${this.messageTexts.deleteFailed}.`);
+            this.messageService.add(`${this.messageTexts.deleteFailed}.`);
+          }
         }
-      }
-    );
+      )
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   previewText() {
@@ -176,10 +188,10 @@ export class ProblemEditorComponent implements OnInit {
 
   onSolutionTextBlur(event: Event) {
     const textValue = (event.target as HTMLTextAreaElement).value;
-    if(!textValue){
+    if (!textValue) {
       return;
     }
-    
+
     const lines = textValue.split(/\r?\n/);
     let valueChanged = false;
     lines.forEach((text, i) => {
@@ -204,14 +216,14 @@ export class ProblemEditorComponent implements OnInit {
         lines[i] = line;
         valueChanged = true;
       }
-      
+
     });
 
-    if (valueChanged){
+    if (valueChanged) {
       const newValue = lines.join('\r\n');
       this.problemEditorForm.get('solutionText').patchValue(newValue);
     }
-    
+
   }
 
   private handleSaveResponse(data: Problem) {

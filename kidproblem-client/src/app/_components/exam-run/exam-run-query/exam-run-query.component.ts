@@ -1,22 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Access } from '@app/_guards';
-import { CognitoService } from '@app/_services';
+import { CognitoService, LoadingBusService } from '@app/_services';
 import { BehaviorSubject } from 'rxjs';
 import { ExamRunListViewComponent } from '../exam-run-list-view/exam-run-list-view.component';
 
 @Component({
-    selector: 'app-exam-run-query',
-    templateUrl: './exam-run-query.component.html',
-    styleUrls: ['./exam-run-query.component.css'],
-    standalone: true,
-    imports: [ExamRunListViewComponent]
+  selector: 'app-exam-run-query',
+  templateUrl: './exam-run-query.component.html',
+  styleUrls: ['./exam-run-query.component.css'],
+  imports: [ExamRunListViewComponent]
 })
 export class ExamRunQueryComponent {
   startTime: Date;
   endTime: Date;
   queryFamily$ = new BehaviorSubject<boolean>(undefined);
   latest = true;
+  private loading = inject(LoadingBusService);
 
   constructor(
     private route: ActivatedRoute,
@@ -39,9 +39,13 @@ export class ExamRunQueryComponent {
       }
     });
 
-    this.cognitoService.getUserAccess().then(a => {
-      this.queryFamily$.next(((a | Access.parent) === a));
-    });
+    this.loading.start();
+    this.cognitoService.getUserAccess()
+      .then(a => {
+        this.queryFamily$.next(((a | Access.parent) === a));
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
 }

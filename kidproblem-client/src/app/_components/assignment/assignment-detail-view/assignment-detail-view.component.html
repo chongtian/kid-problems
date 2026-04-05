@@ -1,61 +1,68 @@
-<h3><span>{{isEdit?'Edit ':'View '}}</span>Assignment</h3>
-<mat-progress-bar *ngIf="!editorForm && isLoading" mode="indeterminate"></mat-progress-bar>
+<h3 class="page-title">{{isEdit?'Edit Assignment':'View Assignment'}}</h3>
 
-<form *ngIf="editorForm" [formGroup]="editorForm">
-
-    <mat-card>
-        <mat-card-content>
-
-            <mat-list>
-                <mat-list-item>
-                    <span class="label">Exam Category: </span> <span>{{editorForm.get('ExamCategory').value}}</span>
-                </mat-list-item>
-                <mat-list-item>
-                    <span class="label">Exam Title: </span> <span>{{editorForm.get('ExamTitle').value}}</span>
-                </mat-list-item>
-                <mat-list-item>
-                    <span class="label">Create Time: </span> <span>{{editorForm.get('CreateTime').value |
-                        date:'long'}}</span>
-                </mat-list-item>
-
-                <ng-container *ngIf="isEdit">
-                    <mat-list-item>
-                        <mat-form-field class="w3-container w3-cell">
-                            <mat-label>Memo</mat-label>
-                            <input matInput formControlName="Memo">
-                        </mat-form-field>
-                    </mat-list-item>
-                    <mat-list-item>
-                        <mat-checkbox formControlName="IsComplete">Completed?</mat-checkbox>
-                    </mat-list-item>
-                </ng-container>
-                <ng-container *ngIf="!isEdit">
-                    <mat-list-item>
-                        <span class="label">Memo: </span> <span>{{editorForm.get('Memo').value }}</span>
-                    </mat-list-item>
-                    <mat-list-item>
-                        <span class="label">Completed: </span> <span>{{editorForm.get('IsComplete').value |
-                            booleanLikeToText}}</span>
-                    </mat-list-item>
-                </ng-container>
-            </mat-list>
-            <mat-divider></mat-divider>
-            <h4>Runs</h4>
-            <mat-list>
-                <mat-list-item *ngFor="let runId of editorForm.get('ExamRunIds').value;let i = index;">
-                    <span><a routerLink="{{runId}}">Run {{i+1}}</a></span>
-                </mat-list-item>
-            </mat-list>
-
-        </mat-card-content>
-        <mat-card-actions *ngIf="isEdit">
-            <button type="submit" [disabled]="editorForm.pristine" mat-raised-button color="primary"
-                (click)="save()" matTooltip="Save"><i class="material-icons"> save </i></button>
-            <span class="spacer"></span>
-            <span class="spacer"></span>
-            <button *ngIf="!isNew" mat-raised-button color="warn" (click)="delete()" matTooltip="Delete">
-                <i class="material-icons"> delete </i></button>
-        </mat-card-actions>
-    </mat-card>
-
+@if (editorForm) {
+<form [formGroup]="editorForm">
+  <mat-card>
+    <mat-card-content>
+      <mat-list>
+        <mat-list-item>
+          <span class="label">Exam Category: </span>
+          <span  data-testid="examCategory">{{editorForm.get('ExamCategory').value}}</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span class="label">Exam Title: </span>
+          <span data-testid="examTitle">{{editorForm.get('ExamTitle').value}}</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span class="label">Create Time: </span>
+          <span data-testid="createTime">{{editorForm.get('CreateTime').value |
+            date:'long'}}</span>
+        </mat-list-item>
+        @if (isEdit) {
+        <mat-list-item>
+          <mat-form-field class="w3-container w3-cell">
+            <mat-label>Memo</mat-label>
+            <input matInput formControlName="Memo" data-testid="memo">
+          </mat-form-field>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-checkbox formControlName="IsComplete" data-testid="isComplete">Completed?</mat-checkbox>
+        </mat-list-item>
+        }
+        @if (!isEdit) {
+        <mat-list-item>
+          <span class="label">Memo: </span>
+          <span data-testid="memo">{{editorForm.get('Memo').value }}</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span class="label">Completed: </span>
+          <span data-testid="isComplete">{{editorForm.get('IsComplete').value |
+            booleanLikeToText}}</span>
+        </mat-list-item>
+        }
+      </mat-list>
+      <mat-divider></mat-divider>
+      <h4>Runs</h4>
+      <mat-list>
+        @for (runId of editorForm.get('ExamRunIds').value; track runId; let i = $index) {
+        <mat-list-item>
+          <span data-testid="examRuns"><a routerLink="{{runId}}">Run {{i+1}}</a></span>
+        </mat-list-item>
+        }
+      </mat-list>
+    </mat-card-content>
+    @if (isEdit) {
+    <mat-card-actions>
+      <button type="submit" [disabled]="editorForm.pristine" mat-raised-button color="primary" (click)="save()"
+        matTooltip="Save" data-testid="btnSave"><i class="material-icons"> save </i></button>
+      <span class="spacer"></span>
+      <span class="spacer"></span>
+      @if (!isNew) {
+      <button mat-raised-button color="warn" (click)="delete()" matTooltip="Delete" data-testid="btnDelete">
+        <i class="material-icons"> delete </i></button>
+      }
+    </mat-card-actions>
+    }
+  </mat-card>
 </form>
+}

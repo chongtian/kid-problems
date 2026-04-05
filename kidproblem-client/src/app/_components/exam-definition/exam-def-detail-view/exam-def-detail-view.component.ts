@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output, booleanAttribute } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, booleanAttribute, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ProblemSummarySearchDialogComponent } from '@app/_components';
 import { ProblemSearchDialogComponent } from '@app/_components/problem';
 import { DisplayMessages } from '@app/_constants';
 import { ExamDefinition, ExamDefinitionId, ExamDetail, InfoCentralCodeDetail, Problem, ProblemSummary } from '@app/_models';
-import { AdminService, ExamDefinitionService, MessageService } from '@app/_services';
+import { AdminService, ExamDefinitionService, LoadingBusService, MessageService } from '@app/_services';
 import { BehaviorSubject } from 'rxjs';
 import { BooleanLikeToTextPipe } from '@app/_pipes';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -18,15 +18,13 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { NgIf, NgFor, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
-    selector: 'app-exam-def-detail-view',
-    templateUrl: './exam-def-detail-view.component.html',
-    styleUrls: ['./exam-def-detail-view.component.css'],
-    standalone: true,
-    imports: [NgIf, MatProgressBarModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatSelectModule, NgFor, MatOptionModule, MatInputModule, MatCheckboxModule, MatDividerModule, NgClass, RouterLink, MatButtonModule, MatTooltipModule, BooleanLikeToTextPipe]
+  selector: 'app-exam-def-detail-view',
+  templateUrl: './exam-def-detail-view.component.html',
+  styleUrls: ['./exam-def-detail-view.component.css'],
+  imports: [ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatOptionModule, MatInputModule, MatCheckboxModule, MatDividerModule, NgClass, RouterLink, MatButtonModule, MatTooltipModule, BooleanLikeToTextPipe]
 })
 export class ExamDefDetailViewComponent implements OnInit {
 
@@ -39,7 +37,7 @@ export class ExamDefDetailViewComponent implements OnInit {
   categories: InfoCentralCodeDetail[] = [];
   private examDef: ExamDefinition;
   messageTexts = DisplayMessages;
-  isLoading: boolean;
+  private loading = inject(LoadingBusService);
   isEdit = false;
   examEditorForm: FormGroup;
   isNew = false;
@@ -53,13 +51,16 @@ export class ExamDefDetailViewComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.adminService.getCategoryCodes().then(codes => {
-      this.categories = codes.filter(c => { return c.Active; })
-    });
+    this.loading.start();
+    this.adminService.getCategoryCodes()
+      .then(codes => {
+        this.categories = codes.filter(c => { return c.Active; })
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
 
     this.examDefId$.subscribe(
       id => {
-        this.isLoading = true;
         this.getExamDefinition(id);
       }
     );
@@ -73,18 +74,21 @@ export class ExamDefDetailViewComponent implements OnInit {
   private getExamDefinition(id: ExamDefinitionId) {
     if (id) {
       this.isNew = false;
-      this.service.getExamDefinition(id.ExamCategory, id.ExamTitle).then(
-        data => {
-          if (data != null) {
-            this.examDef = data;
-            this.createFormGroup();
-          } else {
-            this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id.ExamCategory}, ${id.ExamTitle}.`);
-            this.examDef = null;
+      this.loading.start();
+      this.service.getExamDefinition(id.ExamCategory, id.ExamTitle)
+        .then(
+          data => {
+            if (data != null) {
+              this.examDef = data;
+              this.createFormGroup();
+            } else {
+              this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id.ExamCategory}, ${id.ExamTitle}.`);
+              this.examDef = null;
+            }
           }
-          this.isLoading = false;
-        }
-      );
+        )
+        .catch(err => { console.log(err); })
+        .finally(() => { this.loading.stop(); });
 
     } else {
       this.isNew = true;
@@ -185,10 +189,18 @@ export class ExamDefDetailViewComponent implements OnInit {
     }
 
     const entity = this.examEditorForm.value as ExamDefinition;
+
+    this.loading.start();
     if (this.isNew) {
-      this.service.createExamDefinition(entity).then(data => this.handleSaveResponse(data));
+      this.service.createExamDefinition(entity)
+        .then(data => this.handleSaveResponse(data))
+        .catch(err => { console.log(err); })
+        .finally(() => { this.loading.stop(); });
     } else {
-      this.service.updateExamDefinition(entity).then(data => this.handleSaveResponse(data));
+      this.service.updateExamDefinition(entity)
+        .then(data => this.handleSaveResponse(data))
+        .catch(err => { console.log(err); })
+        .finally(() => { this.loading.stop(); });
     }
   }
 
@@ -220,18 +232,22 @@ export class ExamDefDetailViewComponent implements OnInit {
     if (this.isNew || !window.confirm(this.messageTexts.confirmDelete)) {
       return;
     }
-    this.service.deleteExamDefinition(this.examDef.ExamCategory, this.examDef.ExamTitle).then(
-      data => {
-        if (data != null && data.IsSuccessful) {
-          this.messageService.openSnackBar('Record is deleted');
-          this.deleted.emit(true);
-        } else {
-          this.messageService.openSnackBar(`${this.messageTexts.deleteFailed}.`);
-          this.messageService.add(`${this.messageTexts.deleteFailed}.`);
-        }
-      }
-    );
-  }
 
+    this.loading.start();
+    this.service.deleteExamDefinition(this.examDef.ExamCategory, this.examDef.ExamTitle)
+      .then(
+        data => {
+          if (data != null && data.IsSuccessful) {
+            this.messageService.openSnackBar('Record is deleted');
+            this.deleted.emit(true);
+          } else {
+            this.messageService.openSnackBar(`${this.messageTexts.deleteFailed}.`);
+            this.messageService.add(`${this.messageTexts.deleteFailed}.`);
+          }
+        }
+      )
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
+  }
 
 }

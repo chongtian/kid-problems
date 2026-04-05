@@ -23,7 +23,7 @@ export class MessageService {
     this.messages.push(message);
   }
 
-  openSnackBar(message: string) {
-    this.snackBar.open(message, 'Dismiss', { duration: 5000, });
+  openSnackBar(message: string, duration = 5000) {
+    this.snackBar.open(message, 'Dismiss', { duration: duration, });
   }
 }

@@ -14,7 +14,6 @@ import { MatCardModule } from '@angular/material/card';
     selector: 'app-exam-def-search-dialog',
     templateUrl: './exam-def-search-dialog.component.html',
     styleUrls: ['./exam-def-search-dialog.component.css'],
-    standalone: true,
     imports: [MatCardModule, ExamDefListViewComponent, MatButtonModule, MatTooltipModule]
 })
 export class ExamDefSearchDialogComponent {

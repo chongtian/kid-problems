@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { CognitoService } from '@app/_services';
+import { CognitoService, LoadingBusService } from '@app/_services';
 import { Access } from '@app/_guards';
 import { Router } from '@angular/router';
 import { ExamRunListViewComponent } from '../exam-run/exam-run-list-view/exam-run-list-view.component';
@@ -8,22 +8,21 @@ import { AssignmentListViewComponent } from '../assignment/assignment-list-view/
 import { MatDividerModule } from '@angular/material/divider';
 import { ExamSummaryListViewComponent } from '../summary/exam-summary-list-view/exam-summary-list-view.component';
 import { ExamSummaryViewComponent } from '../summary/exam-summary-view/exam-summary-view.component';
-import { NgIf } from '@angular/common';
+
 
 @Component({
-    selector: 'app-home',
-    templateUrl: './home.component.html',
-    styleUrls: ['./home.component.css'],
-    standalone: true,
-    imports: [NgIf, ExamSummaryViewComponent, ExamSummaryListViewComponent, MatDividerModule, AssignmentListViewComponent, ExamRunListViewComponent]
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css'],
+  imports: [ExamSummaryViewComponent, ExamSummaryListViewComponent, MatDividerModule, AssignmentListViewComponent, ExamRunListViewComponent]
 })
 export class HomeComponent implements OnInit {
 
   startTime: Date;
   endTime: Date;
-  isLoading = true;
   parentUser = false;
   queryFamily$ = new BehaviorSubject<boolean>(undefined);
+  private loading = inject(LoadingBusService);
 
   constructor(
     private cognitoService: CognitoService,
@@ -35,12 +34,14 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isLoading = true;
-    this.cognitoService.getUserAccess().then(a => {
-      this.parentUser = ((a | Access.parent) === a);
-      this.queryFamily$.next(this.parentUser);
-    });
-
+    this.loading.start();
+    this.cognitoService.getUserAccess()
+      .then(a => {
+        this.parentUser = ((a | Access.parent) === a);
+        this.queryFamily$.next(this.parentUser);
+      })
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
   onRun(event: string) {

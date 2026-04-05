@@ -45,7 +45,7 @@ namespace KidproblemService.Services
 
         public async Task<Assignment> DeleteAsync(Assignment entity)
         {
-            if (entity.IsComplete.GetValueOrDefault() || entity.ExamRunIds != null || entity.ExamRunIds!.Count > 0)
+            if (entity.IsComplete.GetValueOrDefault() || (entity.ExamRunIds != null && entity.ExamRunIds!.Count > 0))
             {
                 entity.ReturnResult = "Cannot delete an assignment that has been completed or executed.";
                 entity.IsSuccessful = false;
@@ -58,7 +58,7 @@ namespace KidproblemService.Services
 
         public async Task<Assignment?> GetAssignmentAsync(string id)
         {
-            //Assignment? entity = _cacheService.Get<Assignment>(id);
+            // Assignment? entity = _cacheService.Get<Assignment>(id);
             //if(entity != null)
             //{
             //    return entity;

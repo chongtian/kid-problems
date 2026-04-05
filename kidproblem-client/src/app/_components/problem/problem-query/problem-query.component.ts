@@ -8,14 +8,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProblemListViewComponent } from '../problem-list-view/problem-list-view.component';
-import { NgIf } from '@angular/common';
+
 
 @Component({
     selector: 'app-problem-query',
     templateUrl: './problem-query.component.html',
     styleUrls: ['./problem-query.component.css'],
-    standalone: true,
-    imports: [NgIf, ProblemListViewComponent]
+    imports: [ProblemListViewComponent]
 })
 export class ProblemQueryComponent implements OnInit {
 

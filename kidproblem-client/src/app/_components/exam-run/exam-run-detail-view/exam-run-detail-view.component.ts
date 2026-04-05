@@ -1,22 +1,20 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { DisplayMessages } from '@app/_constants';
 import { ExamRun } from '@app/_models';
-import { ExamRunService, MessageService } from '@app/_services';
+import { ExamRunService, LoadingBusService, MessageService } from '@app/_services';
 import { BehaviorSubject } from 'rxjs';
 import { BooleanLikeToTextPipe } from '@app/_pipes';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { NgIf, NgClass, DecimalPipe, DatePipe } from '@angular/common';
+import { NgClass, DecimalPipe, DatePipe } from '@angular/common';
 
 @Component({
-    selector: 'app-exam-run-detail-view',
-    templateUrl: './exam-run-detail-view.component.html',
-    styleUrls: ['./exam-run-detail-view.component.css'],
-    standalone: true,
-    imports: [NgIf, MatProgressBarModule, RouterLink, MatButtonModule, MatTooltipModule, MatTableModule, NgClass, DecimalPipe, DatePipe, BooleanLikeToTextPipe]
+  selector: 'app-exam-run-detail-view',
+  templateUrl: './exam-run-detail-view.component.html',
+  styleUrls: ['./exam-run-detail-view.component.css'],
+  imports: [RouterLink, MatButtonModule, MatTooltipModule, MatTableModule, NgClass, DecimalPipe, DatePipe, BooleanLikeToTextPipe]
 })
 export class ExamRunDetailViewComponent {
   @Input({ alias: 'entity-id' }) examRunId$ = new BehaviorSubject<string>(null);
@@ -24,7 +22,7 @@ export class ExamRunDetailViewComponent {
 
   data: ExamRun;
   messageTexts = DisplayMessages;
-  isLoading: boolean;
+  private loading = inject(LoadingBusService);
   displayedColumns: string[] = ['problemTitle', 'answer', 'isCorrect', 'isGuess', 'duration'];
   canDelete = true;
 
@@ -36,7 +34,6 @@ export class ExamRunDetailViewComponent {
   ngOnInit() {
     this.examRunId$.subscribe(
       id => {
-        this.isLoading = true;
         this.getExamRun(id);
       }
     );
@@ -44,24 +41,27 @@ export class ExamRunDetailViewComponent {
 
   private getExamRun(id: string) {
     if (id) {
-      this.service.getExamRun(id).then(
-        data => {
-          if (data != null) {
-            this.data = data;
-            this.data.ExamRunDetails.forEach(d => {
-              if (d.Duration > 0 || d.UserAnswer) {
-                this.canDelete = false;
-                return;
-              }
-            });
+      this.loading.start();
+      this.service.getExamRun(id)
+        .then(
+          data => {
+            if (data != null) {
+              this.data = data;
+              this.data.ExamRunDetails.forEach(d => {
+                if (d.Duration > 0 || d.UserAnswer) {
+                  this.canDelete = false;
+                  return;
+                }
+              });
 
-          } else {
-            this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id}.`);
-            this.data = null;
+            } else {
+              this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id}.`);
+              this.data = null;
+            }
           }
-          this.isLoading = false;
-        }
-      );
+        )
+        .catch(err => { console.log(err); })
+        .finally(() => { this.loading.stop(); });
     }
   }
 
@@ -69,17 +69,22 @@ export class ExamRunDetailViewComponent {
     if (!this.canDelete || !window.confirm(this.messageTexts.confirmDelete)) {
       return;
     }
-    this.service.deleteExamRun(this.data.Id).then(
-      data => {
-        if (data != null && data.IsSuccessful) {
-          this.messageService.openSnackBar('Record is deleted');
-          this.deleted.emit(true);
-        } else {
-          this.messageService.openSnackBar(`${this.messageTexts.deleteFailed}.`);
-          this.messageService.add(`${this.messageTexts.deleteFailed}. ${data.ReturnResult}`);
+
+    this.loading.start();
+    this.service.deleteExamRun(this.data.Id)
+      .then(
+        data => {
+          if (data != null && data.IsSuccessful) {
+            this.messageService.openSnackBar('Record is deleted');
+            this.deleted.emit(true);
+          } else {
+            this.messageService.openSnackBar(`${this.messageTexts.deleteFailed}.`);
+            this.messageService.add(`${this.messageTexts.deleteFailed}. ${data.ReturnResult}`);
+          }
         }
-      }
-    );
+      )
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
 }

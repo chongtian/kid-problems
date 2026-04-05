@@ -1,24 +1,24 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, inject } from '@angular/core';
 import { ExamDefinitionId } from '@app/_models';
-import { ExamDefinitionService } from '@app/_services';
+import { ExamDefinitionService, LoadingBusService } from '@app/_services';
 import { BehaviorSubject } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { ProblemDetailViewComponent } from '../../problem/problem-detail-view/problem-detail-view.component';
-import { NgIf, NgFor } from '@angular/common';
+
 
 @Component({
-    selector: 'app-exam-print',
-    templateUrl: './exam-print.component.html',
-    styleUrls: ['./exam-print.component.css'],
-    standalone: true,
-    imports: [NgIf, NgFor, ProblemDetailViewComponent, MatButtonModule, MatTooltipModule]
+  selector: 'app-exam-print',
+  templateUrl: './exam-print.component.html',
+  styleUrls: ['./exam-print.component.css'],
+  imports: [ProblemDetailViewComponent, MatButtonModule, MatTooltipModule]
 })
 export class ExamPrintComponent implements OnInit {
 
   problemTitles$: BehaviorSubject<string>[] = [];
   @Input({ alias: 'entity-id' }) examDefId$ = new BehaviorSubject<ExamDefinitionId>(null);
   readyToRender = false;
+  private loading = inject(LoadingBusService);
 
   constructor(
     private examDefService: ExamDefinitionService
@@ -28,15 +28,18 @@ export class ExamPrintComponent implements OnInit {
   ngOnInit(): void {
     this.examDefId$.subscribe(
       examDefId => {
-        this.examDefService.getExamDefinition(examDefId.ExamCategory, examDefId.ExamTitle).then(data => {
-          data.ExamDetails.forEach(
-            detail => {
-              const problemTitle$ = new BehaviorSubject<string>(detail.ProblemTitle);
-              this.problemTitles$.push(problemTitle$);
-            }
-          );
-          this.readyToRender = true;
-        });
+        this.loading.start();
+        this.examDefService.getExamDefinition(examDefId.ExamCategory, examDefId.ExamTitle)
+          .then(data => {
+            data.ExamDetails.forEach(
+              detail => {
+                const problemTitle$ = new BehaviorSubject<string>(detail.ProblemTitle);
+                this.problemTitles$.push(problemTitle$);
+              }
+            );
+            this.readyToRender = true;
+          }).catch(err => { console.log(err); })
+          .finally(() => { this.loading.stop(); });
       }
     );
   }

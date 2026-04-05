@@ -1,20 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { ProblemService, MessageService } from '@app/_services';
+import { Component, inject, OnInit } from '@angular/core';
+import { ProblemService, MessageService, LoadingBusService } from '@app/_services';
 import { Problem } from '@app/_models';
 import { MatButtonModule } from '@angular/material/button';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { NgIf } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({
-    selector: 'app-update-answer',
-    templateUrl: './update-answer.component.html',
-    styleUrls: ['./update-answer.component.css'],
-    standalone: true,
-    imports: [MatCardModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, NgIf, MatProgressBarModule, MatButtonModule]
+  selector: 'app-update-answer',
+  templateUrl: './update-answer.component.html',
+  styleUrls: ['./update-answer.component.css'],
+  imports: [MatCardModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule]
 })
 export class UpdateAnswerComponent implements OnInit {
 
@@ -23,7 +20,7 @@ export class UpdateAnswerComponent implements OnInit {
   problemYear = '';
   problemAnswersText = '';
   problemAnswers: Problem[];
-  isLoading = false;
+  private loading = inject(LoadingBusService);
   cannotSave = true;
 
   constructor(
@@ -83,32 +80,32 @@ export class UpdateAnswerComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
-    this.problemService.updateAnswers(this.problemAnswers).then(
-      data => {
-        let isSuccessful = true;
-        if (data != null) {
-          this.problemAnswers = data as Problem[];
-          let t = '';
-          this.problemAnswers.forEach(p => {
-            t += p.ProblemTitle + ' ' + p.ProblemAnswer + ' ' + p.ReturnResult + '\n';
-            isSuccessful = isSuccessful && p.IsSuccessful;
-          });
-          this.problemAnswersText = t.trim();
-          this.cannotSave = true;
+    this.loading.start();
+    this.problemService.updateAnswers(this.problemAnswers)
+      .then(
+        data => {
+          let isSuccessful = true;
+          if (data != null) {
+            this.problemAnswers = data as Problem[];
+            let t = '';
+            this.problemAnswers.forEach(p => {
+              t += p.ProblemTitle + ' ' + p.ProblemAnswer + ' ' + p.ReturnResult + '\n';
+              isSuccessful = isSuccessful && p.IsSuccessful;
+            });
+            this.problemAnswersText = t.trim();
+            this.cannotSave = true;
+          }
+
+          if (isSuccessful) {
+            this.messageService.openSnackBar('Update successfully');
+          } else {
+            this.messageService.openSnackBar('Error occurred during update Problem Answers');
+            this.messageService.add('Error occurred during update Problem Answers');
+          }
         }
-
-        if (isSuccessful) {
-          this.messageService.openSnackBar('Update successfully');
-        } else {
-          this.messageService.openSnackBar('Error occurred during update Problem Answers');
-          this.messageService.add('Error occurred during update Problem Answers');
-        }
-
-        this.isLoading = false;
-
-      }
-    );
+      )
+      .catch(err => { console.log(err); })
+      .finally(() => { this.loading.stop(); });
   }
 
 }

@@ -1,0 +1,149 @@
+parameters:
+ - name: deploy
+   type: boolean
+   default: false
+ - name: production
+   type: boolean
+   default: false 
+ - name: runTest
+   type: boolean
+   default: false     
+ - name: lambdaFunctionName
+   type: string
+   default: 'nkidproblemdev'   
+ - name: s3BucketName
+   type: string
+   default: 'kidproblemdev.nowsuncorp.com'    
+
+steps:
+    - ${{ if eq(parameters.deploy,true) }}:
+      - ${{ if eq(parameters.production, false) }}:  
+        - task: PowerShell@2
+          displayName: Update Environment Variable
+          inputs:
+            targetType: "inline"
+            script: |
+              $TARGETDIR = "$(Build.SourcesDirectory)/KidproblemService/KidproblemService/aws-lambda-tools-defaults.json"
+              (Get-Content $TARGETDIR).replace('ASPNETCORE_ENVIRONMENT=Production', "ASPNETCORE_ENVIRONMENT=Development") | Set-Content $TARGETDIR
+            errorActionPreference: "continue"      
+
+      - task: LambdaNETCoreDeploy@1
+        displayName: Deploy Lamdba Function              
+        inputs:
+          awsCredentials: 'AWS Personal'
+          regionName: 'us-east-2'
+          command: 'deployFunction'
+          packageOnly: false
+          lambdaProjectPath: '$(Build.SourcesDirectory)/KidproblemService/KidproblemService/KidproblemService.csproj'
+          functionName: ${{parameters.lambdaFunctionName}}
+          functionRole: 'inforcentralrole'
+          functionHandler: 'KidproblemService'
+          functionMemory: 256
+          functionTimeout: 300
+
+      - ${{ if eq(parameters.production, false) }}:            
+        - task: CopyFiles@2
+          displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+          inputs:
+            Contents: |
+              $(Build.SourcesDirectory)/KidproblemService/KidproblemService/bin/Release/**/KidproblemService.zip
+            TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+    - ${{else}}:
+      - task: DotNetCoreCLI@2
+        displayName: "Publish services"
+        inputs:
+          command: "publish"
+          publishWebProjects: false
+          projects: "$(Build.SourcesDirectory)/KidproblemService/KidproblemService/KidproblemService.csproj"
+          arguments: "--configuration Release --output $(Build.BinariesDirectory)"
+          zipAfterPublish: false
+          workingDirectory: "$(Build.SourcesDirectory)/KidproblemService/KidproblemService"
+      - task: ArchiveFiles@2
+        displayName: "Archive service files"
+        inputs:
+          rootFolderOrFile: "$(Build.BinariesDirectory)"
+          includeRootFolder: false
+          archiveType: "zip"
+          archiveFile: "$(Build.ArtifactStagingDirectory)/Services.zip"
+          replaceExistingArchive: true
+
+    - task: Npm@1
+      displayName: Install Angular packages
+      inputs:
+        command: "ci"
+        workingDir: "$(Build.SourcesDirectory)/kidproblem-client"
+
+    - task: PowerShell@2
+      displayName: Modify Build Number
+      inputs:
+        targetType: "inline"
+        script: |
+          $BUILDNUM = "$env:BUILD_BUILDNUMBER"
+          $TARGETDIR = "$(Build.SourcesDirectory)/kidproblem-client/src/environments/environment.prod.ts"
+          (Get-Content $TARGETDIR).replace('#BuildNumber#', "$BUILDNUM") | Set-Content $TARGETDIR
+          $TARGETDIR = "$(Build.SourcesDirectory)/kidproblem-client/src/environments/environment.development.ts"
+          (Get-Content $TARGETDIR).replace('#BuildNumber#', "$BUILDNUM") | Set-Content $TARGETDIR            
+        errorActionPreference: "continue"
+
+    - ${{ if eq(parameters.production, true) }}: 
+      - task: Npm@1
+        displayName: "Build Angular UI"
+        inputs:
+          command: "custom"
+          workingDir: "$(Build.SourcesDirectory)/kidproblem-client"
+          customCommand: "run-script build:prod"
+    - ${{else}}:
+      - task: Npm@1
+        displayName: "Build Angular UI"
+        inputs:
+          command: "custom"
+          workingDir: "$(Build.SourcesDirectory)/kidproblem-client"
+          customCommand: "run-script build:dev"                    
+
+    - ${{ if eq(parameters.deploy,true) }}:
+      - task: S3Upload@1
+        displayName: Upload Angular App to S3
+        continueOnError: true
+        inputs:
+          awsCredentials: 'AWS Personal'
+          regionName: 'us-east-2'
+          bucketName: ${{parameters.s3BucketName}}
+          sourceFolder: '$(Build.SourcesDirectory)/kidproblem-client/dist/browser'
+          globExpressions: '**'                       
+
+    - ${{ if eq(parameters.production, false) }}:    
+      - task: ArchiveFiles@2
+        displayName: Archive client files
+        inputs:
+          rootFolderOrFile: $(Build.SourcesDirectory)/kidproblem-client
+          includeRootFolder: false
+          archiveType: "zip"
+          archiveFile: "$(Build.ArtifactStagingDirectory)/Client.zip"
+          replaceExistingArchive: true
+      - task: PublishBuildArtifacts@1
+        displayName: "Publish services and client files"
+        inputs:
+          PathtoPublish: "$(Build.ArtifactStagingDirectory)"
+          ArtifactName: "ReleaseFiles"
+          publishLocation: "Container"
+
+
+    - ${{ if eq(parameters.runTest,true) }}:
+        - task: Npm@1
+          displayName: Install Angular packages
+          inputs:
+            command: "ci"
+            workingDir: "$(Build.SourcesDirectory)/kidproblem-client"
+
+        - task: Npm@1
+          displayName: "Test Angular UI"
+          inputs:
+            command: "custom"
+            workingDir: "$(Build.SourcesDirectory)/kidproblem-client"
+            customCommand: "run-script devops-test"
+
+        - task: PublishTestResults@2
+          inputs:
+            testResultsFormat: 'JUnit'
+            testResultsFiles: '$(Build.SourcesDirectory)/kidproblem-client/TESTS-*.xml' 
