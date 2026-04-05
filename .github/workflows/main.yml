@@ -61,6 +61,11 @@ jobs:
       - name: Run Tests
         if: github.event.inputs.run_test == 'true'
         uses: ./.github/actions/run-tests-steps
+        with:
+          admin-username: ${{ secrets.TEST_USER_USERNAME }}
+          admin-password: ${{ secrets.TEST_USER_PASSWORD }}
+          child-username: ${{ secrets.TEST_CHILD_USERNAME }}
+          child-password: ${{ secrets.TEST_CHILD_PASSWORD }}        
 
   production:
     needs: staging

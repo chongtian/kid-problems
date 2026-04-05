@@ -1,23 +1,34 @@
 name: 'Run Tests'
 description: 'Run Tests for KidProblem'
 
+inputs:
+  admin-username:
+    required: true
+  admin-password:
+    required: true
+  child-username:
+    required: true
+  child-password:
+    required: true
+
 runs:
   using: "composite"
   steps:
 
   - name: Build solution
+    shell: bash
     run: dotnet build --configuration Release 
     working-directory: ./kid-problem-ui-test-selenium
 
   - name: Run xUnit Tests
+    shell: bash
     run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test_results.trx"
     working-directory: ./kid-problem-ui-test-selenium
     env:
-      # BASE_URL: ${{ vars.BASE_URL }}
-      KPUITEST_ADMIN_USERNAME: ${{ secrets.TEST_USER_USERNAME }}
-      KPUITEST_ADMIN_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-      KPUITEST_CHILD_USERNAME: ${{ secrets.TEST_CHILD_USERNAME }}
-      KPUITEST_CHILD_PASSWORD: ${{ secrets.TEST_CHILD_PASSWORD }}
+      KPUITEST_ADMIN_USERNAME: ${{ inputs.admin-username }}
+      KPUITEST_ADMIN_PASSWORD: ${{ inputs.admin-password }}
+      KPUITEST_CHILD_USERNAME: ${{ inputs.child-username }}
+      KPUITEST_CHILD_PASSWORD: ${{ inputs.child-password }}
 
   - name: Upload Test Results
     uses: actions/upload-artifact@v4
