@@ -129,7 +129,7 @@ namespace KpUiTestxUnit.Tests
                 Assert.Equal("A,B,C,D,E", page.GetAnswerOptions());
                 Assert.Equal(false, page.GetIsStaging());
                 Assert.Equal("TEST PROBLEM TEXT LINE 1\nTEST PROBLEM TEXT LINE 2", (page.GetProblemText() ?? "").Replace("\r\n", "\n"));
-                Assert.Equal("TEST SOLUTION TEXT LINE 1<br/>\r\nTEST SOLUTION TEXT LINE 2<br/>", page.GetSolutionText());
+                Assert.Equal("TEST SOLUTION TEXT LINE 1<br/>\nTEST SOLUTION TEXT LINE 2<br/>", (page.GetSolutionText() ?? "").Replace("\r\n", "\n"));
                 Assert.Equal("TEST PROBLEM TEXT LINE 1 TEST PROBLEM TEXT LINE 2", page.GetProblemTextBase64());
 
             });
