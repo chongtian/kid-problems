@@ -36,6 +36,6 @@ runs:
     with:
       name: xunit-test-results
       path: |
-        'kid-problem-ui-test-selenium/KpUiTestxUnit/**/test_results.trx'
-        'kid-problem-ui-test-selenium/KpUiTestxUnit/**/Screenshots/*.png'
+        kid-problem-ui-test-selenium/KpUiTestxUnit/TestResults/test_results.trx
+        kid-problem-ui-test-selenium/KpUiTestxUnit/**/Screenshots/
       retention-days: 30

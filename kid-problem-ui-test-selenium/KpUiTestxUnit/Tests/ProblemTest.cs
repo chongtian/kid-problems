@@ -129,7 +129,7 @@ namespace KpUiTestxUnit.Tests
                 Assert.Equal("TEST PROBLEM TEXT LINE 1 TEST PROBLEM TEXT LINE 2", page.GetProblemTextBase64());
 
                 // rollback
-                await DeleteCall($"problem/{problemTitle}");
+                await DeleteCall($"/problem/{problemTitle}");
 
             });
         }

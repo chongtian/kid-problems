@@ -38,7 +38,7 @@ namespace KpUiTestxUnit.Tests
                         page.EnterExamTitle(testData.ExamTitle);
                         page.EnterExamYear(testData.ExamYear!);
                         page.EnterMemo(testData.Memo!);
-                        page.SelectExamType(testData.ExamType);
+                        page.SelectExamType(testData.ExamType); // To Do: for unknown reason, the exam type selection is not working sometimes.
                         page.ClickAddProblemButton();
                         page.QueryPage.ClickProblemCheckboxes(testData.ProblemTitleSelectIndexes!);
                         page.QueryPage.ClickSelectButton();
