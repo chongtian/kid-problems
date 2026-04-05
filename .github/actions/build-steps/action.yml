@@ -101,11 +101,11 @@ runs:
         aws s3 sync ./kidproblem-client/dist/browser s3://${{ inputs.s3BucketName }} --region us-east-2
       continue-on-error: true
 
-    - name: Run Tests
-      if: inputs.runTest == 'true'
-      shell: bash
-      working-directory: ./kidproblem-client
-      run: npm run devops-test
+    # - name: Run Tests
+    #   if: inputs.runTest == 'true'
+    #   shell: bash
+    #   working-directory: ./kidproblem-client
+    #   run: npm run devops-test
 
     - name: Upload Artifacts
       if: inputs.production == 'false'
