@@ -24,7 +24,7 @@ declare global {
 export class MathService {
     private signal: Subject<boolean>;
     private mathJax: MathJaxConfig = {
-        source: 'https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/startup.js',
+        source: 'https://cdn.jsdelivr.net/npm/mathjax@4/startup.js',
         id: 'MathJaxScript',
         customConfiguration: `
         MathJax = {
@@ -34,7 +34,7 @@ export class MathService {
               "tex": {
                 inlineMath: [["$", "$"],  ["\\\\[", "\\\\]"]],
                 displayMath: [["$$", "$$"]],
-                "packages": ["base", "require", "ams", "physics"]
+                "packages": ["base", "require", "ams"] 
               },
               "svg": { "fontCache": "global" }
           };
