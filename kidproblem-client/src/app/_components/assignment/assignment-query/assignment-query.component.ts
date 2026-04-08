@@ -19,12 +19,13 @@ export class AssignmentQueryComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe(d => {
       if (d.latest) {
-        this.latest = d.latest;
+        this.latest = true;
         // show latest assignments
         this.endTime = new Date();
         this.startTime = new Date();
         this.startTime.setDate(this.endTime.getDate() - 14);
       } else {
+        this.latest = false;
         // show assignment in the past one year
         this.endTime = new Date();
         this.startTime = new Date();

@@ -4,7 +4,7 @@ using KpUiTestxUnit.Pages;
 
 namespace KpUiTestxUnit.Tests
 {
-    public class AssignmentTest : TestBase // to do: use POM
+    public class AssignmentTest : TestBase
     {
         public static IEnumerable<object?[]> DataForAssignment()
         {

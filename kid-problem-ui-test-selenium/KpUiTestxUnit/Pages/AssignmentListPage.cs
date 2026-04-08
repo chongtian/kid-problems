@@ -108,6 +108,27 @@ public sealed class AssignmentListPage : BasePage
         }
     }
 
+    public void ClickDoAssignmentButtonInQueryResults(int index)
+    {
+        IsNotLoading();
+        var selector = By.CssSelector($"{_rootCssSelector} tbody tr");
+        var hasResult = _wait.Until(d => d.FindElements(selector).Count > 0);
+        if (hasResult)
+        {
+            var rows = _wait.Until(d => d.FindElements(selector));
+            var row = rows.ElementAtOrDefault(index);
+            if (row != null)
+            {
+                var button = row.FindElement(By.CssSelector("button[data-testid=\"btnDoAssignment\"]"));
+                if (button != null && button.Enabled && button.Displayed)
+                {
+                    button.Click();
+                    IsNotLoading();
+                }
+            }
+        }
+    }
+
     public string? GetCountOfQueryResults()
     {
         IsNotLoading();
