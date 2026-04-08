@@ -50,8 +50,8 @@ public sealed class ExamRunQueryPage : BasePage
         if (button != null && button.Enabled && button.Displayed)
         {
             button.Click();
-        }
-        IsNotLoading();
+            IsNotLoading();
+        }        
     }
 
     public ExamRun[] GetExamRunsFromQueryResults()
