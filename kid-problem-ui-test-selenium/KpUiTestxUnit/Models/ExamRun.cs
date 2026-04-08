@@ -14,7 +14,7 @@ public class ExamRun
     public int? GuessCount { get; set; }
     public int? GuessCorrectCount { get; set; }
 
-    public ExamRunDetails[]? ExamDetails { get; set; }
+    public ExamRunDetail[]? ExamDetails { get; set; }
 
 }
 

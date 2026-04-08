@@ -65,7 +65,7 @@ public sealed class ExamRunViewPage : BasePage
         return GetViewOnlyTextFieldValue("guessCorrectCount");
     }
 
-    public ExamRunDetails[] GetExamRunDetails()
+    public ExamRunDetail[] GetExamRunDetails()
     {
         IsNotLoading();
         var selector = By.CssSelector($"{_rootCssSelector} tbody tr");
@@ -73,7 +73,7 @@ public sealed class ExamRunViewPage : BasePage
         if (hasResult)
         {
             var rows = _wait.Until(d => d.FindElements(selector));
-            var ret = new ExamRunDetails[rows.Count];
+            var ret = new ExamRunDetail[rows.Count];
             for (int i = 0; i < rows.Count; i++)
             {
                 var problemTitle = rows[i].FindElement(By.CssSelector("td[data-testid=\"problemTitle\"]")).Text.Trim();
@@ -82,7 +82,7 @@ public sealed class ExamRunViewPage : BasePage
                 var isGuess = rows[i].FindElement(By.CssSelector("td[data-testid=\"isGuess\"]")).Text.Trim();
                 var duration = rows[i].FindElement(By.CssSelector("td[data-testid=\"duration\"]")).Text.Trim();
 
-                ret[i] = new ExamRunDetails
+                ret[i] = new ExamRunDetail
                 {
                     ProblemTitle = problemTitle,
                     UserAnswer = userAnswer,

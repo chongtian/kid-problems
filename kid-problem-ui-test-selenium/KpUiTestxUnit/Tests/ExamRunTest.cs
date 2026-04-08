@@ -4,7 +4,7 @@ using KpUiTestxUnit.Pages;
 
 namespace KpUiTestxUnit.Tests
 {
-    public class ExamRunTest : TestBase // to do: use POM
+    public class ExamRunTest : TestBase
     {
         public static IEnumerable<object?[]> DataForExamRun()
         {
@@ -88,13 +88,16 @@ namespace KpUiTestxUnit.Tests
         [InlineData("5b717440-6871-40bb-a2a9-80b471d0de29", "0b583da7-8886-45c3-bba5-b78aee36580b", "August 7, 2023, 9:56:26 AM GMT-5")]
         public void User_Click_Assignment_Link_From_Exam_Run(string examRunUid, string assignmentUid, string assignmentCreateTime)
         {
-            var page = new ExamRunViewPage(_driver);
-            page.GoTo(examRunUid);
-            page.ClickGoToAssignment();
-            var destPage = new AssignmentViewPage(_driver);
+            RunTest(() =>
+                    {
+                        var page = new ExamRunViewPage(_driver);
+                        page.GoTo(examRunUid);
+                        page.ClickGoToAssignment();
+                        var destPage = new AssignmentViewPage(_driver);
 
-            Assert.True(_wait.Until(d => d.Url.Contains($"{Constants.BASE_URL}/assignment/view/{assignmentUid}")));
-            Assert.Equal(assignmentCreateTime, destPage.GetCreateTime());
+                        Assert.True(_wait.Until(d => d.Url.Contains($"{Constants.BASE_URL}/assignment/view/{assignmentUid}")));
+                        Assert.Equal(assignmentCreateTime, destPage.GetCreateTime());
+                    });
         }
     }
 }
