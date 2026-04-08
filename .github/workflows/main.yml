@@ -59,7 +59,7 @@ jobs:
           s3BucketName: 'kidproblemdev.nowsuncorp.com'
 
       - name: Run Tests
-        if: github.event.inputs.run_test == 'true'
+        if: github.event.inputs.run_test == 'true' || github.event_name != 'pull_request'
         uses: ./.github/actions/run-tests-steps
         with:
           admin-username: ${{ secrets.TEST_USER_USERNAME }}
@@ -70,7 +70,7 @@ jobs:
   production:
     needs: staging
     if: |
-      github.event_name != 'pull_request' && 
+      github.event_name != 'pull_request' || 
       (github.event.inputs.deploy_production == 'true')
     runs-on: ubuntu-latest
     environment: aws-kidproblem

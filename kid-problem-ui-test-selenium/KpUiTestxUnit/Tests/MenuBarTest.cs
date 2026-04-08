@@ -72,7 +72,7 @@ namespace KpUiTestxUnit.Tests
                 var destPage = new AssignmentListPage(_driver);
                 page.ClickBrowseAllAssignments();
                 Assert.True(_wait.Until(d => d.Url.Contains("/assignments/all")));
-                Assert.Equal("List Latest Assignments", page.GetPageTitle());
+                Assert.Equal("List All Assignments", page.GetPageTitle());
             });
         }
 
@@ -84,7 +84,7 @@ namespace KpUiTestxUnit.Tests
                 _driver.Navigate().GoToUrl($"{Constants.HOME_URL}");
                 var page = new MenuBarComponentPage(_driver);
                 var destPage = new AssignmentListPage(_driver);
-                page.ClickBrowseAllAssignments();
+                page.ClickBrowseLatestAssignments();
                 Assert.True(_wait.Until(d => d.Url.Contains("/assignments")));
                 Assert.Equal("List Latest Assignments", page.GetPageTitle());
             });
