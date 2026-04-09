@@ -88,4 +88,12 @@ public abstract class BasePage
         return null;
     }
 
+    protected string TakeSnapshot(IWebElement element, string? name = null)
+    {
+        var screenshot = ((ITakesScreenshot)element).GetScreenshot();
+        var fileName = Path.Combine(Directory.GetCurrentDirectory(), $"{name}{DateTime.Now:yyyyMMdd_HHmmss}.png");
+        screenshot.SaveAsFile(fileName);
+        return fileName;
+    }
+
 }

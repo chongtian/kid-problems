@@ -2,6 +2,7 @@ using System.Text.Json;
 using KpUiTestxUnit.Data;
 using KpUiTestxUnit.Models;
 using KpUiTestxUnit.Pages;
+using KpUiTestxUnit.Utilties;
 
 namespace KpUiTestxUnit.Tests
 {
@@ -192,6 +193,22 @@ namespace KpUiTestxUnit.Tests
 
                 page.ClickEditButton();
                 Assert.True(_wait.Until(d => d.Url.Contains($"/problem/edit/{problemTitle}")));
+            });
+        }
+
+        [Fact]
+        public void User_Sees_Math_Problem()
+        {
+            RunTest(() =>
+            {
+                string problemTitle = "AMC10-2015A-019";
+                var page = new ProblemViewPage(_driver);
+                page.GoTo(problemTitle);
+
+                var screenshotFile = page.TakeSnapshotOfProblemText();
+                Assert.NotNull(screenshotFile);
+                var result = CommonHelper.ComparePictureWithTolerance("problem_view_AMC10-2015A-019", screenshotFile);
+                Assert.True(result);
             });
         }
 
