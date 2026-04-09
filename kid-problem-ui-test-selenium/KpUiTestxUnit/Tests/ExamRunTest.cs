@@ -23,7 +23,7 @@ namespace KpUiTestxUnit.Tests
         {
             RunTest(() =>
             {
-                var page = new ExamRunQueryPage(_driver);
+                var page = new ExamRunListPage(_driver);
                 page.GoTo();
 
                 page.SetQueryDateRange(startTime, endTime);
@@ -42,7 +42,7 @@ namespace KpUiTestxUnit.Tests
         {
             RunTest(() =>
             {
-                var page = new ExamRunQueryPage(_driver);
+                var page = new ExamRunListPage(_driver);
                 page.GoTo();
 
                 page.SetQueryDateRange(startTime, endTime);
@@ -99,5 +99,66 @@ namespace KpUiTestxUnit.Tests
                         Assert.Equal(assignmentCreateTime, destPage.GetCreateTime());
                     });
         }
+
+[Fact]
+        public void User_Navigates_Pages_Of_ExamRun()
+        {
+            RunTest(() =>
+            {
+                var page = new ExamRunListPage(_driver);
+                page.GoTo();
+
+                page.SetQueryDateRange("4/1/2023", "4/30/2023");
+                page.ClickSearchButton();
+                Assert.Equal("25", page.GetCountOfQueryResults());
+
+                page.Paginator.ClickNextPageButton();
+                var records = page.GetExamRunsFromQueryResults();
+                Assert.Equal(10, records.Length);
+                Assert.Contains("AMC10 Review 069 435", records[9].ExamTitle);
+
+                page.Paginator.ClickLastPageButton();
+                records = page.GetExamRunsFromQueryResults();
+                Assert.Equal(5, records.Length);
+                Assert.Contains("AMC10 Review 068 434", records[0].ExamTitle);
+
+                page.Paginator.ClickPreviousPageButton();
+                records = page.GetExamRunsFromQueryResults();
+                Assert.Equal(10, records.Length);
+                Assert.Contains("AMC10 Review 069 435", records[9].ExamTitle);
+
+                page.Paginator.ClickFirstPageButton();
+                records = page.GetExamRunsFromQueryResults();
+                Assert.Equal(10, records.Length);
+                Assert.Contains("AMC10 Review 088 454", records[0].ExamTitle);
+            });
+        }
+
+        [Fact]
+        public void User_Load_More_ExamRun()
+        {
+            RunTest(() =>
+            {
+                var page = new ExamRunListPage(_driver);
+                page.GoTo();
+
+                page.SetQueryDateRange("4/1/2023", "4/30/2023");
+                page.ClickSearchButton();
+                Assert.Equal("25", page.GetCountOfQueryResults());
+                Assert.True(page.IsLoadMoreButtonShown());
+
+                page.ClickMoreButton();
+                Assert.Equal("28", page.GetCountOfQueryResults());
+                Assert.True(page.IsLoadMoreButtonHidden());
+
+                page.Paginator.ClickLastPageButton();
+                var records = page.GetExamRunsFromQueryResults();
+                Assert.Equal(8, records.Length);
+                Assert.Contains("AMC10 Review 089 455", records[7].ExamTitle);
+                
+            });
+        }
+
+
     }
 }

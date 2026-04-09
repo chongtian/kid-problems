@@ -5,8 +5,12 @@ namespace KpUiTestxUnit.Pages;
 
 public sealed class AssignmentListPage : BasePage
 {
+    public readonly PaginatorComponentPage Paginator;
+
     public AssignmentListPage(IWebDriver driver) : base(driver, "app-assignment-query")
-    { }
+    {
+        Paginator = new PaginatorComponentPage(driver);
+    }
 
     public void GoTo(bool all = true)
     {
@@ -144,6 +148,29 @@ public sealed class AssignmentListPage : BasePage
         }
 
         return null; ;
+    }
+
+    public bool IsLoadMoreButtonShown()
+    {
+        IsNotLoading();
+        return _wait.Until(d => d.FindElements(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")).Count > 0);
+    }
+
+    public bool IsLoadMoreButtonHidden()
+    {
+        IsNotLoading();
+        return _wait.Until(d => d.FindElements(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")).Count == 0);
+    }
+
+    public void ClickMoreButton()
+    {
+        IsNotLoading();
+        var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")));
+        if (button != null && button.Displayed && button.Enabled)
+        {
+            button.Click();
+            IsNotLoading();
+        }
     }
 
 }

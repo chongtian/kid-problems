@@ -125,7 +125,7 @@ namespace KpUiTestxUnit.Tests
                 string testExamDefTitle = "AMC10/TestData20260210002";
                 var page = new ExamDefEditPage(_driver);
                 page.GoTo(testExamDefTitle);
-                
+
                 var currStatus = page.GetExamStatus();
                 Assert.NotNull(currStatus);
 
@@ -138,5 +138,88 @@ namespace KpUiTestxUnit.Tests
                 Assert.True(active == !currStatus.Value);
             });
         }
+
+        [Fact]
+        public void User_Queries_Exam_Definitions()
+        {
+            RunTest(() =>
+            {
+                var page = new ExamDefinitionListPage(_driver);
+                page.GoTo();
+
+                page.SelectExamCategory("AMC8");
+                page.EnterKeyword("AMC8-201");
+                page.ClickSearchButton();
+
+                Assert.Equal("25", page.GetCountOfQueryResults());
+
+                page.Paginator.ClickNextPageButton();
+                var records = page.GetExamDefinitionsFromQueryResults();
+                Assert.Equal(10, records.Length);
+                Assert.Contains("AMC8-2013 Half 1 138", records[9].ExamTitle);
+
+                page.Paginator.ClickLastPageButton();
+                records = page.GetExamDefinitionsFromQueryResults();
+                Assert.Equal(5, records.Length);
+                Assert.Contains("AMC8-2013 Half 2 139", records[0].ExamTitle);
+
+                page.Paginator.ClickPreviousPageButton();
+                records = page.GetExamDefinitionsFromQueryResults();
+                Assert.Equal(10, records.Length);
+                Assert.Contains("AMC8-2013 Half 1 138", records[9].ExamTitle);
+
+                page.Paginator.ClickFirstPageButton();
+                records = page.GetExamDefinitionsFromQueryResults();
+                Assert.Equal(10, records.Length);
+                Assert.Contains("AMC8-2010 27", records[0].ExamTitle);
+            });
+        }
+
+        [Fact]
+        public void User_Load_More_ExamDefinitions()
+        {
+            RunTest(() =>
+            {
+                var page = new ExamDefinitionListPage(_driver);
+                page.GoTo();
+
+                page.SelectExamCategory("AMC8");
+                page.EnterKeyword("AMC8-201");
+                page.ClickSearchButton();
+
+                Assert.Equal("25", page.GetCountOfQueryResults());
+                Assert.True(page.IsLoadMoreButtonShown());
+
+                page.ClickMoreButton();
+                Assert.Equal("50", page.GetCountOfQueryResults());
+                Assert.True(page.IsLoadMoreButtonShown());
+
+                page.Paginator.ClickLastPageButton();
+                var records = page.GetExamDefinitionsFromQueryResults();
+                Assert.Equal(10, records.Length);
+                Assert.Contains("AMC8-2016-Part 3 90", records[9].ExamTitle);
+
+            });
+        }
+
+        [Fact]
+        public void User_Navigate_To_Detail_From_List_ExamDefinitions()
+        {
+            RunTest(() =>
+            {
+                var page = new ExamDefinitionListPage(_driver);
+                page.GoTo();
+
+                page.SelectExamCategory("AMC8");
+                page.EnterKeyword("AMC8-201");
+                page.ClickSearchButton();
+
+                page.ClickExamTitleInQueryResults(0);
+                Assert.True(_wait.Until(d => d.Url.Contains($"{Constants.BASE_URL}/examdef/view/AMC8/AMC8-2010%2027")));
+                var destPage = new ExamDefViewPage(_driver);
+                Assert.Equal("AMC8-2010 27", destPage.GetExamTitle());
+            });
+        }
+
     }
 }
