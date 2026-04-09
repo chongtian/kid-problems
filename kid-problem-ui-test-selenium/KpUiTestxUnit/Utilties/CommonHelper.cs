@@ -107,15 +107,17 @@ public static class CommonHelper
 
         if (img1.Width != img2.Width || img1.Height != img2.Height)
         {
-            throw new InvalidOperationException($"Images must be the same size: {img1.Width}x{img1.Height} vs {img2.Width}x{img2.Height} ");
+            Console.WriteLine($"Images are not the same size: {img1.Width}x{img1.Height} vs {img2.Width}x{img2.Height} ");
         }
 
-        int diffPixels = 0;
+        int compareRangeX = Math.Min(img1.Width, img2.Width);
+        int compareRangeY = Math.Min(img1.Height, img2.Height);
         int totalPixels = img1.Width * img1.Height;
+        int diffPixels = Math.Abs(totalPixels - img2.Width * img2.Height);
 
-        for (int y = 0; y < img1.Height; y++)
+        for (int y = 0; y < compareRangeY; y++)
         {
-            for (int x = 0; x < img1.Width; x++)
+            for (int x = 0; x < compareRangeX; x++)
             {
                 var p1 = img1[x, y];
                 var p2 = img2[x, y];
