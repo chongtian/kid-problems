@@ -5,9 +5,7 @@ namespace KpUiTestxUnit.Pages;
 public sealed class ProblemListPage : BasePage
 {
 
-    private readonly string rootCssSelector = "app-problem-query";
-
-    public ProblemListPage(IWebDriver driver) : base(driver)
+    public ProblemListPage(IWebDriver driver) : base(driver, "app-problem-query")
     { }
 
     public void GoTo(bool isStaging = false)
@@ -27,7 +25,7 @@ public sealed class ProblemListPage : BasePage
     public void EnterKeyword(string keyword)
     {
         IsNotLoading();
-        var textbox = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} input[data-testid=\"keyword\"]")));
+        var textbox = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} input[data-testid=\"keyword\"]")));
         if (textbox != null && textbox.Enabled && textbox.Displayed)
         {
             textbox.SendKeys(Keys.Control + "a");
@@ -39,7 +37,7 @@ public sealed class ProblemListPage : BasePage
     public void ClickSearchButton()
     {
         IsNotLoading();
-        var button = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} button[data-testid=\"btnSearch\"]")));
+        var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnSearch\"]")));
         if (button != null && button.Enabled && button.Displayed)
         {
             button.Click();
@@ -53,7 +51,7 @@ public sealed class ProblemListPage : BasePage
         var shortWait = WebDriverUtility.GetShortWait(_driver, 500);
         try
         {
-            var button = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} button[data-testid=\"btnMore\"]")));
+            var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")));
             return button != null;
         }
         catch (NoSuchElementException)
@@ -69,7 +67,7 @@ public sealed class ProblemListPage : BasePage
     public void ClickLoadMoreButton()
     {
         IsNotLoading();
-        var button = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} button[data-testid=\"btnMore\"]")));
+        var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")));
         if (button != null && button.Enabled && button.Displayed)
         {
             button.Click();
@@ -80,7 +78,7 @@ public sealed class ProblemListPage : BasePage
     public string[] GetProblemTitle()
     {
         IsNotLoading();
-        var returnedProblems = _wait.Until(d => d.FindElements(By.CssSelector($"{rootCssSelector} span[data-testid=\"problemTitle\"]")));
+        var returnedProblems = _wait.Until(d => d.FindElements(By.CssSelector($"{_rootCssSelector} span[data-testid=\"problemTitle\"]")));
         if (returnedProblems != null && returnedProblems.Count > 0)
         {
             string[] ret = new string[returnedProblems.Count];

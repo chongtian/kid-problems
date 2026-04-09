@@ -4,11 +4,11 @@ using OpenQA.Selenium;
 
 namespace KpUiTestxUnit.Pages;
 
-public sealed class ExamRunListPage : BasePage
+public sealed class ExamDefinitionListPage : BasePage
 {
     public readonly PaginatorComponentPage Paginator;
 
-    public ExamRunListPage(IWebDriver driver) : base(driver, "app-exam-run-query")
+    public ExamDefinitionListPage(IWebDriver driver) : base(driver, "app-exam-def-query")
     {
         Paginator = new PaginatorComponentPage(driver);
     }
@@ -17,33 +17,24 @@ public sealed class ExamRunListPage : BasePage
     {
         if (all)
         {
-            _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/examruns/all");
+            _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/examdefs/all");
         }
         else
         {
-            _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/examruns");
+            _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/examdefs");
         }
         IsNotLoading();
     }
 
-    public void SetQueryDateRange(string startTimeText, string endTimeText)
+    public void EnterKeyword(string keyword)
     {
         IsNotLoading();
-
-        var startTimeElement = _wait.Until(d => d.FindElement(By.Name("startTime")));
-        if (startTimeElement != null)
+        var textbox = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} input[data-testid=\"keyword\"]")));
+        if (textbox != null && textbox.Enabled && textbox.Displayed)
         {
-            startTimeElement.SendKeys(Keys.Control + "a");
-            startTimeElement.SendKeys(Keys.Backspace);
-            startTimeElement.SendKeys(startTimeText);
-        }
-
-        var endTimeElement = _wait.Until(d => d.FindElement(By.Name("endTime")));
-        if (endTimeElement != null)
-        {
-            endTimeElement.SendKeys(Keys.Control + "a");
-            endTimeElement.SendKeys(Keys.Backspace);
-            endTimeElement.SendKeys(endTimeText);
+            textbox.SendKeys(Keys.Control + "a");
+            textbox.SendKeys(Keys.Backspace);
+            textbox.SendKeys(keyword);
         }
     }
 
@@ -58,7 +49,24 @@ public sealed class ExamRunListPage : BasePage
         }
     }
 
-    public ExamRun[] GetExamRunsFromQueryResults()
+    public void SelectExamCategory(string value)
+    {
+        IsNotLoading();
+        var select = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} mat-select[data-testid=\"category\"]")));
+        if (select != null && select.Displayed && select.Enabled)
+        {
+            MatSelectHelper.SelectOptionByLabelValue(_driver, _wait, select, value);
+        }
+    }
+
+    public string GetExamCategory()
+    {
+        IsNotLoading();
+        var select = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} mat-select[data-testid=\"category\"]")));
+        return select.Text;
+    }
+
+    public ExamDefinition[] GetExamDefinitionsFromQueryResults()
     {
         IsNotLoading();
         var selector = By.CssSelector($"{_rootCssSelector} tbody tr");
@@ -66,30 +74,26 @@ public sealed class ExamRunListPage : BasePage
         if (hasResult)
         {
             var rows = _wait.Until(d => d.FindElements(selector));
-            var ret = new ExamRun[rows.Count];
+            var ret = new ExamDefinition[rows.Count];
             for (int i = 0; i < rows.Count; i++)
             {
-                var id = rows[i].FindElement(By.CssSelector("td[data-testid=\"examTitle\"] a")).GetAttribute("href")?.Split('/').LastOrDefault() ?? "";
                 var examCategory = rows[i].FindElement(By.CssSelector("td[data-testid=\"examCategory\"]")).Text.Trim();
+                var examYear = rows[i].FindElement(By.CssSelector("td[data-testid=\"examYear\"]")).Text.Trim();
                 var examTitle = rows[i].FindElement(By.CssSelector("td[data-testid=\"examTitle\"]")).Text.Trim();
-                var totalCount = CommonHelper.ConvertToInt(rows[i].FindElement(By.CssSelector("td[data-testid=\"totalCount\"]")).Text);
-                var correctCount = CommonHelper.ConvertToInt(rows[i].FindElement(By.CssSelector("td[data-testid=\"correctCount\"]")).Text);
-                var startTime = rows[i].FindElement(By.CssSelector("td[data-testid=\"startTime\"]")).Text.Trim();
-                var completeTime = rows[i].FindElement(By.CssSelector("td[data-testid=\"completeTime\"]")).Text.Trim();
-                var totalDuration = rows[i].FindElement(By.CssSelector("td[data-testid=\"totalDuration\"]")).Text.Trim();
-                var answerBy = rows[i].FindElement(By.CssSelector("td[data-testid=\"answerBy\"]")).Text.Trim();
+                var examType = rows[i].FindElement(By.CssSelector("td[data-testid=\"examType\"]")).Text.Trim();
+                var countOfExpectedProblems = CommonHelper.ConvertToInt(rows[i].FindElement(By.CssSelector("td[data-testid=\"countOfProblems\"]")).Text);
+                var examStatus = rows[i].FindElement(By.CssSelector("td[data-testid=\"examStatus\"]")).Text.Trim();
+                var memo = rows[i].FindElement(By.CssSelector("td[data-testid=\"memo\"]")).Text.Trim();
 
-                ret[i] = new ExamRun
+                ret[i] = new ExamDefinition
                 {
-                    UID = id,
                     ExamTitle = examTitle,
                     ExamCategory = examCategory,
-                    TotalCount = totalCount,
-                    CorrectCount = correctCount,
-                    StartTime = startTime,
-                    CompleteTime = completeTime,
-                    TotalDuration = totalDuration,
-                    AnsweredBy = answerBy
+                    ExamYear = examYear,
+                    ExamType = examType,
+                    CountOfExpectedProblems = countOfExpectedProblems,
+                    ActiveStatusText = examStatus,
+                    Memo = memo
                 };
             }
             return ret;
