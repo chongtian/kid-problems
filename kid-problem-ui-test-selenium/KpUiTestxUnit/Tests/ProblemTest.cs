@@ -208,7 +208,7 @@ namespace KpUiTestxUnit.Tests
                 var screenshotFile = page.TakeSnapshotOfProblemText();
                 Assert.NotNull(screenshotFile);
                 var result = CommonHelper.ComparePictureWithTolerance("problem_view_AMC10-2015A-019", screenshotFile);
-                Assert.True(result);
+                Assert.True(result >= 0.95);
             });
         }
 

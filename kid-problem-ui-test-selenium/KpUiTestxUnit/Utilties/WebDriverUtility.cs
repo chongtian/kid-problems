@@ -9,8 +9,10 @@ public class WebDriverUtility
     public static IWebDriver GetChromeDriver()
     {
         ChromeOptions options = new ChromeOptions();
-        options.AddArgument("--headless");  // Run the browser in headless mode for CI environments
-        // options.AddArgument("--timezone=America/Chicago"); // Test data are sensitive to timezone; This did not work.
+
+        options.AddArgument("--headless=new");
+        options.AddArgument("--window-size=1920,1080");
+
         IWebDriver driver = new ChromeDriver(options);
         driver.Manage().Window.Size = new System.Drawing.Size(1920, 1080);
         try

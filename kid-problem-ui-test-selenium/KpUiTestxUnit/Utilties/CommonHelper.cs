@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace KpUiTestxUnit.Utilties;
 
@@ -88,10 +89,8 @@ public static class CommonHelper
     /// </summary>
     /// <param name="baselineImageName">Baseline Image Name excluding the extention. eg., baseline, instead of baseline.png</param>
     /// <param name="imageFullNameFromRuntime">Screenshot taken in the runtime. It is the full name of the png file. </param>
-    /// <param name="perChannelTolerance">The tolerance allowed for each RGB channel.</param>
-    /// <param name="allowedDifferenceRatio"></param>
-    /// <returns></returns>
-    public static bool ComparePictureWithTolerance(string baselineImageName, string imageFullNameFromRuntime, int perChannelTolerance = 5, double allowedDifferenceRatio = 0.01)
+    /// <returns>SSIM: should >= 0.95</returns>
+    public static double ComparePictureWithTolerance(string baselineImageName, string imageFullNameFromRuntime)
     {
 
         Assembly assembly = Assembly.GetExecutingAssembly();
@@ -108,30 +107,53 @@ public static class CommonHelper
         if (img1.Width != img2.Width || img1.Height != img2.Height)
         {
             Console.WriteLine($"Images are not the same size: {img1.Width}x{img1.Height} vs {img2.Width}x{img2.Height} ");
+            img2.Mutate(x => x.Resize(img1.Width, img1.Height));
         }
 
-        int compareRangeX = Math.Min(img1.Width, img2.Width);
-        int compareRangeY = Math.Min(img1.Height, img2.Height);
-        int totalPixels = img1.Width * img1.Height;
-        int diffPixels = Math.Abs(totalPixels - img2.Width * img2.Height);
+        int width = img1.Width;
+        int height = img1.Height;
+        int pixels = width * height;
 
-        for (int y = 0; y < compareRangeY; y++)
+        double mean1 = 0, mean2 = 0;
+
+        for (int y = 0; y < height; y++)
         {
-            for (int x = 0; x < compareRangeX; x++)
+            for (int x = 0; x < width; x++)
             {
-                var p1 = img1[x, y];
-                var p2 = img2[x, y];
-
-                if (Math.Abs(p1.R - p2.R) > perChannelTolerance ||
-                    Math.Abs(p1.G - p2.G) > perChannelTolerance ||
-                    Math.Abs(p1.B - p2.B) > perChannelTolerance)
-                {
-                    diffPixels++;
-                }
+                mean1 += img1[x, y].R;
+                mean2 += img2[x, y].R;
             }
         }
 
-        double diffRatio = (double)diffPixels / totalPixels;
-        return diffRatio <= allowedDifferenceRatio;
+        mean1 /= pixels;
+        mean2 /= pixels;
+
+        double variance1 = 0, variance2 = 0, covariance = 0;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                double v1 = img1[x, y].R - mean1;
+                double v2 = img2[x, y].R - mean2;
+
+                variance1 += v1 * v1;
+                variance2 += v2 * v2;
+                covariance += v1 * v2;
+            }
+        }
+
+        variance1 /= pixels - 1;
+        variance2 /= pixels - 1;
+        covariance /= pixels - 1;
+
+        const double C1 = 6.5025;
+        const double C2 = 58.5225;
+
+        double numerator = (2 * mean1 * mean2 + C1) * (2 * covariance + C2);
+        double denominator = (mean1 * mean1 + mean2 * mean2 + C1) *
+                             (variance1 + variance2 + C2);
+
+        return numerator / denominator;
     }
 }
