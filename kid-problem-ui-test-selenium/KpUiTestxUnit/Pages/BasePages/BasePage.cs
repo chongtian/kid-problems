@@ -91,7 +91,9 @@ public abstract class BasePage
     protected string TakeSnapshot(IWebElement element, string? name = null)
     {
         var screenshot = ((ITakesScreenshot)element).GetScreenshot();
-        var fileName = Path.Combine(Directory.GetCurrentDirectory(), $"{name}{DateTime.Now:yyyyMMdd_HHmmss}.png");
+        var folder = Path.Combine(Directory.GetCurrentDirectory(), "Screenshots");
+        Directory.CreateDirectory(folder);
+        var fileName = Path.Combine(folder, $"{name}{DateTime.Now:yyyyMMdd_HHmmss}.png");
         screenshot.SaveAsFile(fileName);
         return fileName;
     }
