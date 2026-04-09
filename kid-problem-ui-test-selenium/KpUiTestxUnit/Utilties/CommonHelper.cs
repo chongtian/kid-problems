@@ -99,8 +99,7 @@ public static class CommonHelper
 
         if (stream == null)
         {
-            Console.WriteLine($"Failed to load KpUiTestxUnit.Data.{baselineImageName}.png");
-            return false;
+            throw new InvalidOperationException($"Failed to load KpUiTestxUnit.Data.{baselineImageName}.png");
         }
 
         using var img1 = Image.Load<Rgba32>(stream);
@@ -108,8 +107,7 @@ public static class CommonHelper
 
         if (img1.Width != img2.Width || img1.Height != img2.Height)
         {
-            Console.WriteLine("Images must be the same size.");
-            return false;
+            throw new InvalidOperationException("Images must be the same size.");
         }
 
         int diffPixels = 0;

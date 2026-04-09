@@ -16,11 +16,11 @@ on:
       deploy_production:
         description: 'Deploy Production'
         type: boolean
-        default: false
+        default: true
       run_test:
         description: 'Run Tests'
         type: boolean
-        default: false
+        default: true
 
 jobs:
   ci:
@@ -60,7 +60,7 @@ jobs:
 
   testing:        
     needs: staging
-    if: github.event.inputs.run_test == 'true' || github.event_name != 'pull_request'
+    if: github.event.inputs.run_test == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment: aws-kidproblem-staging   
     steps:  
@@ -76,7 +76,7 @@ jobs:
   production:
     needs: [staging, testing]
     if: |
-      github.event_name != 'pull_request' || 
+      github.event_name != 'pull_request' && 
       (github.event.inputs.deploy_production == 'true')
     runs-on: ubuntu-latest
     environment: aws-kidproblem
