@@ -107,7 +107,7 @@ public static class CommonHelper
 
         if (img1.Width != img2.Width || img1.Height != img2.Height)
         {
-            throw new InvalidOperationException("Images must be the same size.");
+            throw new InvalidOperationException($"Images must be the same size: {img1.Width}x{img1.Height} vs {img2.Width}x{img2.Height} ");
         }
 
         int diffPixels = 0;
