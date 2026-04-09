@@ -65,8 +65,7 @@ jobs:
   testing:        
     needs: staging
     if: |
-      (github.event.inputs.run_test == 'true' && github.event_name != 'pull_request') || 
-      github.event.inputs.test_only == 'true'
+      github.event.inputs.run_test == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment: aws-kidproblem-staging   
     steps:  
@@ -105,3 +104,19 @@ jobs:
           production: 'true'
           lambdaFunctionName: 'kidproblem'
           s3BucketName: 'kidproblem.nowsuncorp.com'
+
+  test-only:        
+    if: |
+      github.event_name != 'pull_request' &&
+      github.event.inputs.test_only == 'true'
+    runs-on: ubuntu-latest
+    environment: aws-kidproblem-staging   
+    steps:  
+      - uses: actions/checkout@v4       
+      - name: Run Tests
+        uses: ./.github/actions/run-tests-steps
+        with:
+          admin-username: ${{ secrets.TEST_USER_USERNAME }}
+          admin-password: ${{ secrets.TEST_USER_PASSWORD }}
+          child-username: ${{ secrets.TEST_CHILD_USERNAME }}
+          child-password: ${{ secrets.TEST_CHILD_PASSWORD }}            
