@@ -170,4 +170,17 @@ public sealed class ProblemViewPage : BasePage
         return null;
     }
 
+    public string? TakeSnapshotOfProblemText()
+    {
+        IsNotLoading();
+        _wait.Until(d => d.FindElements(By.CssSelector($"{_rootCssSelector} div[data-testid=\"problemRichText\"] mjx-container")).Count > 0);
+        var container = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} div[data-testid=\"problemRichText\"]")));
+        if (container != null && container.Displayed)
+        {
+            var filename = TakeSnapshot(container, "problem_view_");
+            return filename;
+        }
+        return null;
+    }
+
 }
