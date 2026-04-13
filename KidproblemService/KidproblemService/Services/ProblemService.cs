@@ -1,10 +1,18 @@
 ﻿using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.S3;
+using Amazon.S3.Model;
 using KidproblemService.Interfaces;
 using KidproblemService.Models;
 using Microsoft.Extensions.Options;
+using System;
+using System.Data.SqlTypes;
+using System.IO;
+using System.Net.Http;
+using System.Text;
 using System.Text.RegularExpressions;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KidproblemService.Services
 {
@@ -15,15 +23,23 @@ namespace KidproblemService.Services
         private readonly string _s3BucketName;
         private readonly IScrapService _scrapService;
         private readonly ICacheService _cacheService;
+        private readonly ILogger<ProblemService> _logger;
         public const string PaginationTokenNonRecordReturned = "{}";
 
-        public ProblemService(IDynamoDBContext context, IAmazonS3 s3Client, IOptions<AwsConfiguration> awsConfiguration, IScrapService scrapService, ICacheService cacheService)
+        public ProblemService(IDynamoDBContext context,
+        IAmazonS3 s3Client,
+        IOptions<AwsConfiguration> awsConfiguration,
+        IScrapService scrapService,
+        ICacheService cacheService,
+        ILogger<ProblemService> logger
+        )
         {
             _context = context;
             _s3Client = s3Client;
             _s3BucketName = awsConfiguration.Value.S3BucketName!;
             _scrapService = scrapService;
             _cacheService = cacheService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -63,7 +79,7 @@ namespace KidproblemService.Services
                 await ReplaceImageWithBase64String(entity);
                 _cacheService.Set(entity);
             }
-            
+
             return entity;
         }
 
@@ -74,19 +90,32 @@ namespace KidproblemService.Services
         /// <returns></returns>
         private async Task ReplaceImageWithBase64String(Problem entity)
         {
-            List<string> filenames = new List<string>();
-            string regMatchImgTag = "<img src=\"(.*?)\".*?\\/>";
-            string regMatchFileName = @"(.+?\/)*(.*)";
+            Dictionary<string, string> images = new Dictionary<string, string>();
+            string regMatchImgTag = "<img.+?\\/>";
+            string regMatchSrcTag = "src.*?=['\"](.+?)['\"]";
+            string regMatchAlt = "alt.*?=['\"]\\[asy\\](.+?)\\[\\/asy\\]['\"]";
             string problemText = entity.ProblemText!;
             var matches = Regex.Matches(problemText, regMatchImgTag, RegexOptions.Multiline);
             foreach (Match match in matches)
             {
-                string filename = match.Groups[1].Value;
-                filenames.Add(filename);
+                string image = match.Groups[0].Value;
+                var matchSrc = Regex.Match(image, regMatchSrcTag, RegexOptions.Multiline);
+                if (matchSrc.Success)
+                {
+                    var filename = matchSrc.Groups[1].Value;
+                    images.Add(filename, "");
+
+                    var matchAlt = Regex.Match(image, regMatchAlt, RegexOptions.Multiline);
+                    if (matchAlt.Success)
+                    {
+                        images[filename] = matchAlt.Groups[1].Value.Trim();
+                    }
+                }
             }
-            foreach (var filename in filenames)
+
+            foreach (var img in images)
             {
-                string assetName = Regex.Match(filename, regMatchFileName).Groups[2].Value;
+                string assetName = img.Key.Split('/').Last();
                 var ext = Path.GetExtension(assetName);
                 if (!string.IsNullOrEmpty(ext))
                 {
@@ -112,6 +141,7 @@ namespace KidproblemService.Services
 
                     try
                     {
+                        _logger.LogInformation($"Retrieving asset {assetName} from S3.");
                         var s3Object = await _s3Client.GetObjectAsync(_s3BucketName, assetName);
                         if (s3Object.ResponseStream != null)
                         {
@@ -119,12 +149,23 @@ namespace KidproblemService.Services
                             {
                                 s3Object.ResponseStream.CopyTo(memoryStream);
                                 string base64ImageRepresentation = Convert.ToBase64String(memoryStream.ToArray());
-                                problemText = problemText.Replace(filename, $"data:image/{image_ext};base64," + base64ImageRepresentation);
+                                problemText = problemText.Replace(img.Key, $"data:image/{image_ext};base64," + base64ImageRepresentation);
                             }
                         }
                     }
                     catch (AmazonS3Exception ex)
                     {
+                        _logger.LogInformation($"Asset {img.Key} does not exist in S3.");
+                        if (!string.IsNullOrEmpty(img.Value))
+                        {
+                            var asyPng = await ProcessAsymptoteCode(assetName, img.Value);
+                            if (!string.IsNullOrEmpty(asyPng))
+                            {
+                                problemText = problemText.Replace(img.Key, asyPng);
+                                continue;
+                            }
+                        }
+
                         entity.ReturnResult += $"Failed to load resource {assetName} from S3: {ex.Message}";
                     }
                 }
@@ -203,12 +244,12 @@ namespace KidproblemService.Services
                 {
                     entities = await query.GetNextSetAsync();
                     paginationToken = query.PaginationToken;
-                    if(string.IsNullOrEmpty(paginationToken) || paginationToken.Trim() == PaginationTokenNonRecordReturned)
+                    if (string.IsNullOrEmpty(paginationToken) || paginationToken.Trim() == PaginationTokenNonRecordReturned)
                     {
                         break;
                     }
                 }
-                
+
             }
             else
             {
@@ -326,10 +367,11 @@ namespace KidproblemService.Services
                 }
 
                 var existing = await GetProblemAsync(problem.ProblemTitle);
-                if(existing == null)
+                if (existing == null)
                 {
                     await CreateAsync(problem);
-                } else
+                }
+                else
                 {
                     await UpdateAsync(problem, existing);
                 }
@@ -359,6 +401,60 @@ namespace KidproblemService.Services
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// The method ProcessAsymptoteCode() cleans up Asymptote code first, 
+        /// and then call http://asymptote.ualberta.ca:10007 to convert the code to a png file.
+        /// If the api call is successful, it uploads the png file to S3, 
+        /// and return base64 string of the png file.
+        /// </summary>
+        /// <param name="assetName"></param>
+        /// <param name="asyCode"></param>
+        /// <returns></returns>
+        private async Task<string?> ProcessAsymptoteCode(string assetName, string asyCode)
+        {
+            if (!string.IsNullOrEmpty(asyCode))
+            {
+                //clean up
+                asyCode = System.Net.WebUtility.HtmlDecode(asyCode);
+                asyCode = Regex.Replace(asyCode, @"\s+", " ");
+            }
+            _logger.LogDebug($"Cleaned code: {asyCode}");
+
+            // The endpoint with the format parameter set to png
+            string url = "http://asymptote.ualberta.ca:10007?f=png";
+            byte[] codeBytes = Encoding.UTF8.GetBytes(asyCode);
+            using var content = new ByteArrayContent(codeBytes);
+            // Force the header to be exactly "text/plain"
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/plain");
+
+            _logger.LogInformation("Call asymptote API ...");
+            using var client = new HttpClient();
+            var response = await client.PostAsync(url, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
+
+                string base64ImageRepresentation = Convert.ToBase64String(imageBytes);
+                if (imageBytes.Length == 0 || string.IsNullOrEmpty(base64ImageRepresentation))
+                {
+                    _logger.LogInformation("Failed to receive image from asymptote API");
+                    return null;
+                }
+                _logger.LogInformation("Successful received image from asymptote API");
+                
+                await _s3Client.UploadObjectFromStreamAsync(_s3BucketName, assetName, new MemoryStream(imageBytes), null);
+                _logger.LogInformation($"Successful uploaded image {assetName} to S3.");
+                return "data:image/png;base64," + base64ImageRepresentation;
+            }
+            else
+            {
+                _logger.LogInformation($"Failed to convert Asymptote code to image. Status code: {response.StatusCode}");
+            }
+
+            return null;
         }
     }
 }
