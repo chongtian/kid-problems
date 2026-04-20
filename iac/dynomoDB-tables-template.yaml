@@ -1,0 +1,671 @@
+---
+Metadata:
+  AWSToolsMetrics:
+    IaC_Generator: "arn:aws:cloudformation:us-east-2:456373242672:generatedTemplate/c78a0ded-6959-46f6-82fe-9148106edd4d"
+Resources:
+  DynamoDBTableDevkpexamsummaries:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "dev_kp_exam_summaries"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "answer_by"
+      - AttributeType: "S"
+        AttributeName: "category"
+      - AttributeType: "S"
+        AttributeName: "family_id"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      GlobalSecondaryIndexes:
+      - IndexName: "family_id-answer_by-index"
+        Projection:
+          ProjectionType: "ALL"
+          NonKeyAttributes: []
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "family_id"
+        - KeyType: "RANGE"
+          AttributeName: "answer_by"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "category"
+      - KeyType: "RANGE"
+        AttributeName: "answer_by"
+      DeletionProtectionEnabled: false
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableDevkpexamassignments:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "dev_kp_exam_assignments"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "create_time"
+      - AttributeType: "S"
+        AttributeName: "family_id"
+      - AttributeType: "S"
+        AttributeName: "id"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      GlobalSecondaryIndexes:
+      - IndexName: "family_id-create_time-index"
+        Projection:
+          ProjectionType: "KEYS_ONLY"
+          NonKeyAttributes: []
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "family_id"
+        - KeyType: "RANGE"
+          AttributeName: "create_time"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "id"
+      DeletionProtectionEnabled: false
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableKpcodes:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "kp_codes"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "code_name"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "code_name"
+      DeletionProtectionEnabled: false
+      TableClass: "STANDARD"
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableKpexamassignments:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "kp_exam_assignments"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "create_time"
+      - AttributeType: "S"
+        AttributeName: "family_id"
+      - AttributeType: "S"
+        AttributeName: "id"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      GlobalSecondaryIndexes:
+      - IndexName: "family_id-create_time-index"
+        Projection:
+          ProjectionType: "KEYS_ONLY"
+          NonKeyAttributes: []
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "family_id"
+        - KeyType: "RANGE"
+          AttributeName: "create_time"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "id"
+      DeletionProtectionEnabled: false
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableDevkpcodes:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "dev_kp_codes"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "code_name"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "code_name"
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      DeletionProtectionEnabled: false
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableDevkpexamrundetails:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "dev_kp_exam_run_details"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "id"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "id"
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      DeletionProtectionEnabled: false
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableKpexamdef:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "kp_exam_def"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "category"
+      - AttributeType: "S"
+        AttributeName: "title"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "category"
+      - KeyType: "RANGE"
+        AttributeName: "title"
+      DeletionProtectionEnabled: false
+      TableClass: "STANDARD"
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableKpproblems:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      ContributorInsightsSpecification:
+        Enabled: false
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      TableName: "kp_problems"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "category"
+      - AttributeType: "S"
+        AttributeName: "problem_title"
+      - AttributeType: "S"
+        AttributeName: "year"
+      BillingMode: "PAY_PER_REQUEST"
+      GlobalSecondaryIndexes:
+      - IndexName: "category-year-index"
+        Projection:
+          ProjectionType: "INCLUDE"
+          NonKeyAttributes:
+          - "staging"
+          - "answer_options"
+          - "answer"
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "category"
+        - KeyType: "RANGE"
+          AttributeName: "year"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "problem_title"
+      DeletionProtectionEnabled: false
+      TableClass: "STANDARD"
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableKpexamrundetails:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "kp_exam_run_details"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "id"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "id"
+      DeletionProtectionEnabled: false
+      TableClass: "STANDARD"
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableDevkpexamdef:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "dev_kp_exam_def"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "category"
+      - AttributeType: "S"
+        AttributeName: "title"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "category"
+      - KeyType: "RANGE"
+        AttributeName: "title"
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      DeletionProtectionEnabled: false
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableKpexamruns:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "kp_exam_runs"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "answer_by"
+      - AttributeType: "S"
+        AttributeName: "create_time"
+      - AttributeType: "S"
+        AttributeName: "family_id"
+      - AttributeType: "S"
+        AttributeName: "id"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      GlobalSecondaryIndexes:
+      - IndexName: "family_id-create_time-index"
+        Projection:
+          ProjectionType: "KEYS_ONLY"
+          NonKeyAttributes: []
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "family_id"
+        - KeyType: "RANGE"
+          AttributeName: "create_time"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      - IndexName: "answer_by-create_time-index"
+        Projection:
+          ProjectionType: "KEYS_ONLY"
+          NonKeyAttributes: []
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "answer_by"
+        - KeyType: "RANGE"
+          AttributeName: "create_time"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "id"
+      DeletionProtectionEnabled: false
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableKpexamsummaries:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      ContributorInsightsSpecification:
+        Enabled: false
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      TableName: "kp_exam_summaries"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "answer_by"
+      - AttributeType: "S"
+        AttributeName: "category"
+      - AttributeType: "S"
+        AttributeName: "family_id"
+      BillingMode: "PAY_PER_REQUEST"
+      GlobalSecondaryIndexes:
+      - IndexName: "family_id-answer_by-index"
+        Projection:
+          ProjectionType: "ALL"
+          NonKeyAttributes: []
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "family_id"
+        - KeyType: "RANGE"
+          AttributeName: "answer_by"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "category"
+      - KeyType: "RANGE"
+        AttributeName: "answer_by"
+      DeletionProtectionEnabled: false
+      TableClass: "STANDARD"
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableKpproblemsummaries:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      ContributorInsightsSpecification:
+        Enabled: false
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      TableName: "kp_problem_summaries"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "answer_by"
+      - AttributeType: "S"
+        AttributeName: "category"
+      - AttributeType: "S"
+        AttributeName: "problem_title"
+      BillingMode: "PAY_PER_REQUEST"
+      GlobalSecondaryIndexes:
+      - IndexName: "category-answer_by-index"
+        Projection:
+          ProjectionType: "ALL"
+          NonKeyAttributes: []
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "category"
+        - KeyType: "RANGE"
+          AttributeName: "answer_by"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "problem_title"
+      - KeyType: "RANGE"
+        AttributeName: "answer_by"
+      DeletionProtectionEnabled: false
+      TableClass: "STANDARD"
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableDevkpproblems:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "dev_kp_problems"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "category"
+      - AttributeType: "S"
+        AttributeName: "problem_title"
+      - AttributeType: "S"
+        AttributeName: "year"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      GlobalSecondaryIndexes:
+      - IndexName: "category-year-index"
+        Projection:
+          ProjectionType: "INCLUDE"
+          NonKeyAttributes:
+          - "staging"
+          - "answer_options"
+          - "answer"
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "category"
+        - KeyType: "RANGE"
+          AttributeName: "year"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "problem_title"
+      DeletionProtectionEnabled: false
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableDevkpproblemsummaries:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "dev_kp_problem_summaries"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "answer_by"
+      - AttributeType: "S"
+        AttributeName: "category"
+      - AttributeType: "S"
+        AttributeName: "problem_title"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      GlobalSecondaryIndexes:
+      - IndexName: "category-answer_by-index"
+        Projection:
+          ProjectionType: "ALL"
+          NonKeyAttributes: []
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "category"
+        - KeyType: "RANGE"
+          AttributeName: "answer_by"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "problem_title"
+      - KeyType: "RANGE"
+        AttributeName: "answer_by"
+      DeletionProtectionEnabled: false
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
+  DynamoDBTableDevkpexamruns:
+    UpdateReplacePolicy: "Retain"
+    Type: "AWS::DynamoDB::Table"
+    DeletionPolicy: "Retain"
+    Properties:
+      SSESpecification:
+        SSEEnabled: false
+      TableName: "dev_kp_exam_runs"
+      AttributeDefinitions:
+      - AttributeType: "S"
+        AttributeName: "answer_by"
+      - AttributeType: "S"
+        AttributeName: "create_time"
+      - AttributeType: "S"
+        AttributeName: "family_id"
+      - AttributeType: "S"
+        AttributeName: "id"
+      ContributorInsightsSpecification:
+        Enabled: false
+      BillingMode: "PAY_PER_REQUEST"
+      GlobalSecondaryIndexes:
+      - IndexName: "family_id-create_time-index"
+        Projection:
+          ProjectionType: "KEYS_ONLY"
+          NonKeyAttributes: []
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "family_id"
+        - KeyType: "RANGE"
+          AttributeName: "create_time"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      - IndexName: "answer_by-create_time-index"
+        Projection:
+          ProjectionType: "KEYS_ONLY"
+          NonKeyAttributes: []
+        KeySchema:
+        - KeyType: "HASH"
+          AttributeName: "answer_by"
+        - KeyType: "RANGE"
+          AttributeName: "create_time"
+        WarmThroughput:
+          ReadUnitsPerSecond: 12000
+          WriteUnitsPerSecond: 4000
+        ContributorInsightsSpecification:
+          Enabled: false
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      WarmThroughput:
+        ReadUnitsPerSecond: 12000
+        WriteUnitsPerSecond: 4000
+      KeySchema:
+      - KeyType: "HASH"
+        AttributeName: "id"
+      DeletionProtectionEnabled: false
+      Tags: []
+      TimeToLiveSpecification:
+        Enabled: false
