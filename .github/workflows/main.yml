@@ -8,9 +8,14 @@ on:
       - 'README.md'
       - '.github/**'
       - '.azure-pipelines/**'
+      - 'iac/**'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'README.md'
+      - '.azure-pipelines/**'
+      - 'iac/**'      
   workflow_dispatch:
     inputs:
       deploy_production:
