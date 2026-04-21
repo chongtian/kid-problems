@@ -18,14 +18,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule, MatCardModule, RouterLink, MathDirective, MatDividerModule]
 })
 export class ProblemBulkCreateComponent implements OnInit {
-  startUrl: string;
-  problemCategory: string;
-  problemYear: string;
-  answerOptions = 'A,B,C,D,E';
-  rawText: string;
-  message: string;
-  isSubmitted: boolean;
-  problems: Problem[];
+  problemCategory = 'HOME';
+  problemYear = `C${((new Date()).getMonth()+1).toString().padStart(2,'0')}${(new Date()).getDate().toString().padStart(2,'0')}`;
+  startProblemNumber = 1;
+  answerOptions = 'A,B,C,D';
+  rawText = '';
+  message = '';
+  isSubmitted = false;
+  problems: Problem[] = [];
   private loading = inject(LoadingBusService);
 
   constructor(
@@ -35,74 +35,90 @@ export class ProblemBulkCreateComponent implements OnInit {
     this.isSubmitted = false;
   }
 
-  parse(): void {
+  validate(): void {
+    this.message = '';
+
     if (this.rawText == null || this.problemCategory == null || this.problemYear == null) {
+      this.message = 'Problem Category, Problem Year, and Raw Json Text are required.';
+    }
+
+    this.problems = this.parseProblems(this.rawText);
+  }
+
+  save(): void {
+    if (!this.problems) {
       return;
     }
+
     if (!window.confirm('Are you sure to continue?')) {
       return;
     }
 
-    const problems = this.parseProblems(this.rawText);
-    if (!problems) {
-      this.message = "Failed to parse the json text.";
-    } else {
-      this.loading.start();
-      this.service.bulkCreate(problems)
-        .then(data => {
-          if (data != null) {
-            this.problems = data;
-          } else {
-            this.problems = [];
-          }
+    this.isSubmitted = false;
+    this.loading.start();
+    this.service.bulkCreate(this.problems)
+      .then(data => {
+        if (data != null) {
+          this.problems = data;
           this.isSubmitted = true;
-        })
-        .catch(err => { console.log(err); })
-        .finally(() => { this.loading.stop(); });
-    }
+        } else {
+          this.problems = [];
+          this.message = 'The problems are not saved by API service.';
+        }
+
+      })
+      .catch(err => {
+        console.log(err);
+        this.message = 'The problems are not saved by API service.';
+      })
+      .finally(() => { this.loading.stop(); });
   }
 
   private parseProblems(text: string): Problem[] {
     try {
-      let obj = JSON.parse(text);
-      const items = obj.response.category.items;
-      const problems = [];
-      let count = 1;
-      items.forEach(item => {
-        const categoryId = +item.post_data.category_id;
-        const problemNumber: string = item.item_text;
-        if (problemNumber && categoryId !== 75) {
-          // category id 75 is "Global Announcements" of AoPS. 
-          const problemText: string = item.post_data.post_rendered.replace('\"', '"');
-          const problemYear = problemNumber == count.toString() ? this.problemYear : (this.problemYear + 'B');
+      let rawProblems = JSON.parse(text);
+
+      if (!Array.isArray(rawProblems)) {
+        this.message = 'Raw Json Text must be a JSON array.';
+        return [];
+      }
+
+      const problems: Problem[] = [];
+      let count = 0;
+      rawProblems.forEach(item => {
+        if (item.ProblemText) {
+          const problemNumber = (this.startProblemNumber + count).toString().padStart(3, '0');
           const problem: Problem = {
             ProblemCategory: this.problemCategory,
-            ProblemYear: problemYear,
-            ProblemTitle: `${this.problemCategory}-${problemYear}-${problemNumber.padStart(3, '0')}`,
+            ProblemYear: this.problemYear,
+            ProblemTitle: `${this.problemCategory}-${this.problemYear}-${problemNumber}`,
             ProblemNumber: problemNumber,
-            ProblemText: problemText,
-            ProblemAnswer: null,
-            ProblemTags: null,
+            ProblemText: item.ProblemText,
+            ProblemAnswer: item.ProblemAnswer,
+            ProblemTags: [],
             IsStaging: true,
-            SolutionText: null,
-            AnswerOptions: this.answerOptions
+            SolutionText: '',
+            AnswerOptions: item.AnswerOptions ?? this.answerOptions
           };
           count++;
           problems.push(problem);
         }
       });
+
       return problems;
+
     } catch (err) {
       console.log(err);
-      return null;
+      this.message = 'Raw Json Text is invalid.';
+      return [];
     }
   }
 
   reset(): void {
     this.isSubmitted = false;
     this.problems = [];
-    this.rawText = null;
-    this.message = null;
+    this.rawText = '';
+    this.message = '';
   }
 
 }
