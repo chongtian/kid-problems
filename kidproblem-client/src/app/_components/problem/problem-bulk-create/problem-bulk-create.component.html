@@ -1,24 +1,29 @@
-<h3 class="page-title">Get Problems from AoPS Community area</h3>
-<h4>This function is still under development!</h4>
+<h3 class="page-title">Create Problems from JSON</h3>
 
 @if (!isSubmitted) {
 <div class="w3-row">
-  <div class="w3-col s6 m4 l2" data-testid="problemCategory">
+  <div class="w3-col s6 m4 l2">
     <mat-form-field floatLabel="auto">
       <mat-label>Problem Category</mat-label>
-      <input matInput [(ngModel)]="problemCategory">
+      <input matInput [(ngModel)]="problemCategory" data-testid="problemCategory">
     </mat-form-field>
   </div>
-  <div class="w3-col s6 m4 l2" data-testid="problemYear">
+  <div class="w3-col s6 m4 l2">
     <mat-form-field floatLabel="auto">
       <mat-label>Problem Year</mat-label>
-      <input matInput [(ngModel)]="problemYear">
+      <input matInput [(ngModel)]="problemYear" data-testid="problemYear">
     </mat-form-field>
   </div>
-  <div class="w3-col s6 m4 l2" data-testid="answerOptions">
+  <div class="w3-col s6 m4 l2">
+    <mat-form-field floatLabel="auto">
+      <mat-label>Start Problem Number</mat-label>
+      <input matInput type="number" [(ngModel)]="startProblemNumber" data-testid="startProblemNumber">
+    </mat-form-field>
+  </div>
+  <div class="w3-col s6 m4 l2">
     <mat-form-field floatLabel="auto">
       <mat-label>Answer Options</mat-label>
-      <input matInput [(ngModel)]="answerOptions">
+      <input matInput [(ngModel)]="answerOptions" data-testid="answerOptions">
     </mat-form-field>
   </div>
 </div>
@@ -28,34 +33,46 @@
     <textarea matInput [(ngModel)]="rawText"></textarea>
   </mat-form-field>
 </div>
-<div class="w3-cell-row">
-  <button mat-raised-button color="primary" (click)="parse()" data-testid="btnParse">Parse</button>
-  <p>{{message}}</p>
+<div class="w3-row">
+  <div class="w3-col s6 m4 l2">
+    <button mat-raised-button color="primary" (click)="validate()" data-testid="btnValidate">Validate</button>
+  </div>
+  <div class="w3-col s6 m4 l2">
+    <button mat-raised-button color="primary" (click)="save()" data-testid="btnSave"
+      [disabled]="!problems || problems.length == 0">Save</button>
+  </div>
+  @if (problems && problems.length > 0) {
+  <div class="w3-col s6 m4 l2">
+    <button mat-raised-button color="primary" (click)="reset()" data-testid="btnReset">Reset</button>
+  </div>
+  }
+  <div class="w3-col s6 m4 l2">
+    <span data-testid="result">{{message}}</span>
+  </div>
 </div>
 }
 
-@if (!problems && isSubmitted) {
-<div data-testid="result">
-  <span>No record is returned</span>
-</div>
-}
-
-@if (problems && isSubmitted) {
-<div>
-  <h3>Count of Problems: {{problems.length}}</h3>
-  <button mat-raised-button color="primary" (click)="reset()" data-testid="btnReset">Reset</button>
+@if (problems && problems.length > 0) {
+<div data-testid="generatedProblems">
+  <h3 data-testid="countOfRecord">Count of Problems: {{problems.length}}</h3>
   @for (problem of problems; track problem) {
   <mat-card>
+    @if (!problem.IsSuccessful) {
     <mat-card-title data-testid="problemTitle"> {{problem.ProblemTitle}} </mat-card-title>
+    }
     @if (problem.IsSuccessful) {
-    <mat-card-subtitle><a routerLink="/problem/s/{{problem.ProblemKey}}" data-testid="problemLink">View</a>
-    </mat-card-subtitle>
+    <mat-card-title data-testid="problemTitle"> <a
+        routerLink="/problem/view/{{problem.ProblemTitle}}">{{problem.ProblemTitle}}</a> </mat-card-title>
     }
     <mat-card-content>
       <h4 class="label">Problem Text</h4>
       <span [appMath]="problem.ProblemText" data-testid="problemText"></span>
+      <br />
+      <span><b>Problem Answer:</b></span><span data-testid="problemAnswer">{{problem.ProblemAnswer}}</span>
+      @if (isSubmitted) {
       <h4 class="label">Message</h4>
       <span data-testid="returnResult">{{problem.ReturnResult}}</span>
+      }
     </mat-card-content>
   </mat-card>
   <mat-divider></mat-divider>

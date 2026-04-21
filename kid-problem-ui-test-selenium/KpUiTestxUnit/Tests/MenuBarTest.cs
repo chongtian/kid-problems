@@ -216,7 +216,7 @@ namespace KpUiTestxUnit.Tests
                 var page = new MenuBarComponentPage(_driver);
                 page.ClickBulkCreate();
                 Assert.True(_wait.Until(d => d.Url.Contains("/problem/bulkcreate")));
-                Assert.Equal("Get Problems from AoPS Community area", page.GetPageTitle());
+                Assert.Equal("Create Problems from JSON", page.GetPageTitle());
             });
         }
 
