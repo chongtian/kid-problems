@@ -9,13 +9,16 @@ on:
       - '.github/**'
       - '.azure-pipelines/**'
       - 'iac/**'
+      - 'ai-math-problems/**'
   pull_request:
     branches:
       - main
     paths-ignore:
       - 'README.md'
+      - '.github/**'      
       - '.azure-pipelines/**'
-      - 'iac/**'      
+      - 'iac/**'
+      - 'ai-math-problems/**'            
   workflow_dispatch:
     inputs:
       deploy_production:

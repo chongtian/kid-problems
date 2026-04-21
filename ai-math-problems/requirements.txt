@@ -1,0 +1,6 @@
+boto3==1.42.83
+pydantic==2.12.5
+langchain==1.2.12
+langchain_ollama==1.0.1
+langchain_openai==1.1.12
+gradio==6.9.0
