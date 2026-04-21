@@ -1,0 +1,25 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "ProblemText": {
+                "type": "string"
+            },
+            "ProblemAnswer": {
+                "type": "string"
+            },
+            "AnswerOptions": {
+                "type": "string"
+            }
+        },
+        "required": [
+            "ProblemText",
+            "ProblemAnswer",
+            "AnswerOptions"
+        ],
+        "additionalProperties": false
+    },
+    "minItems": 1
+}

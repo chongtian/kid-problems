@@ -1,0 +1,52 @@
+[
+    {
+        "ProblemText": "What is the sum of the angles in a triangle? <br/> A) 90 degrees <br/> B) 180 degrees <br/> C) 270 degrees <br/> D) 360 degrees",
+        "ProblemAnswer": "B",
+        "AnswerOptions": "A,B,C,D"
+    },
+    {
+        "ProblemText": "A triangle has angles measuring $30^{\\circ}$ and $60^{\\circ}$. What is the measure of the third angle? <br/> A) $30^{\\circ}$ <br/> B) $60^{\\circ}$ <br/> C) $90^{\\circ}$ <br/> D) $120^{\\circ}$",
+        "ProblemAnswer": "C",
+        "AnswerOptions": "A,B,C,D"
+    },
+    {
+        "ProblemText": "A rectangle has a length of 8 cm and a width of 5 cm. What is its area? <br/> A) 20 cm² <br/> B) 30 cm² <br/> C) 40 cm² <br/> D) 50 cm²",
+        "ProblemAnswer": "C",
+        "AnswerOptions": "A,B,C,D"
+    },
+    {
+        "ProblemText": "A parallelogram has a base of 10 m and a height of 4 m. What is its area? <br/> A) 20 m² <br/> B) 30 m² <br/> C) 40 m² <br/> D) 50 m²",
+        "ProblemAnswer": "C",
+        "AnswerOptions": "A,B,C,D"
+    },
+    {
+        "ProblemText": "A trapezoid has bases of lengths 6 m and 10 m, and a height of 5 m. What is its area? <br/> A) 30 m² <br/> B) 40 m² <br/> C) 50 m² <br/> D) 60 m²",
+        "ProblemAnswer": "B",
+        "AnswerOptions": "A,B,C,D"
+    },
+    {
+        "ProblemText": "A right rectangular prism has a length of 4 cm, a width of 3 cm, and a height of 5 cm. What is its volume? <br/> A) 60 cm³ <br/> B) 50 cm³ <br/> C) 40 cm³ <br/> D) 30 cm³",
+        "ProblemAnswer": "B",
+        "AnswerOptions": "A,B,C,D"
+    },
+    {
+        "ProblemText": "If the area of a triangle is given by the formula $A = \\frac{1}{2} \\times base \\times height$, what is the area of a triangle with a base of 12 cm and a height of 5 cm? <br/> A) 30 cm² <br/> B) 40 cm² <br/> C) 60 cm² <br/> D) 70 cm²",     
+        "ProblemAnswer": "C",
+        "AnswerOptions": "A,B,C,D"
+    },
+    {
+        "ProblemText": "A triangle has sides measuring 7 cm, 10 cm, and 5 cm. Can these lengths form a triangle? <br/> A) Yes <br/> B) No <br/> C) Only if one side is longer <br/> D) Only if two sides are equal",
+        "ProblemAnswer": "A",
+        "AnswerOptions": "A,B,C,D"
+    },
+    {
+        "ProblemText": "Convert 1500 milliliters to liters. <br/> A) 0.15 L <br/> B) 1.5 L <br/> C) 15 L <br/> D) 150 L",
+        "ProblemAnswer": "B",
+        "AnswerOptions": "A,B,C,D"
+    },
+    {
+        "ProblemText": "A rectangular garden is 10 m long and 6 m wide. If you want to increase the width by 2 m, what will be the new area of the garden? <br/> A) 60 m² <br/> B) 80 m² <br/> C) 100 m² <br/> D) 120 m²",
+        "ProblemAnswer": "B",
+        "AnswerOptions": "A,B,C,D"
+    }
+]
