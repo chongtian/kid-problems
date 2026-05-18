@@ -159,11 +159,13 @@ public class ExamRunnerPage : BasePage
             var results = new ExamRunDetail[rows.Count];
             for (int i = 0; i < rows.Count; i++)
             {
-                var record = new ExamRunDetail();
-                record.ProblemTitle = rows[i].FindElement(By.CssSelector("td[data-testid=\"problem\"]")).Text.Trim();
-                record.UserAnswer = rows[i].FindElement(By.CssSelector("td[data-testid=\"answer\"]")).Text.Trim();
-                record.Guess = rows[i].FindElement(By.CssSelector("td[data-testid=\"guess\"]")).Text.Trim();
-                record.Duration = rows[i].FindElement(By.CssSelector("td[data-testid=\"duration\"]")).Text.Trim();
+                var record = new ExamRunDetail
+                {
+                    UserAnswer = rows[i].FindElement(By.CssSelector("td[data-testid=\"answer\"]")).Text.Trim(),
+                    Guess = rows[i].FindElement(By.CssSelector("td[data-testid=\"guess\"]")).Text.Trim(),
+                    Duration = rows[i].FindElement(By.CssSelector("td[data-testid=\"duration\"]")).Text.Trim(),
+                    ProblemTitle = rows[i].FindElement(By.CssSelector("td[data-testid=\"problem\"]")).Text.Trim()
+                };
                 results[i] = record;
             }
             return results;

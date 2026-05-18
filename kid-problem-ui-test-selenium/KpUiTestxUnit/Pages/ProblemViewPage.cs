@@ -60,6 +60,16 @@ public sealed class ProblemViewPage : BasePage
     public string? GetProblemText()
     {
         IsNotLoading();
+
+        string? previous = "";
+        _wait.Until(d =>
+        {
+            var current = d.FindElement(By.CssSelector($"{rootCssSelector} div[data-testid=\"problemRichText\"]")).GetAttribute("innerHTML");
+            bool stable = current == previous;
+            previous = current;
+            return stable && !string.IsNullOrEmpty(current);
+        });
+
         var textfield = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} div[data-testid=\"problemRichText\"]")));
         if (textfield != null && textfield.Enabled && textfield.Displayed)
         {
