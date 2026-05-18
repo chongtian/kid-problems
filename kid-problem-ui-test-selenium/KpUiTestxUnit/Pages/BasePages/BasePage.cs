@@ -46,7 +46,15 @@ public abstract class BasePage
             // no action is required
         }
 
-        notLoading = notLoading && wait.Until(d => d.FindElements(By.CssSelector("button[data-testid=\"btnClearMessages\"]")).Count == 0);
+        bool isPageFullyLoaded = wait.Until(d =>
+        {
+            var jsExecutor = (IJavaScriptExecutor)d;
+            // Check standard browser DOM loading state
+            bool domReady = jsExecutor!.ExecuteScript("return document.readyState")!.ToString() == "complete";
+            return domReady;
+        });
+
+        notLoading = isPageFullyLoaded && notLoading && wait.Until(d => d.FindElements(By.CssSelector("button[data-testid=\"btnClearMessages\"]")).Count == 0);
         return notLoading;
     }
 
