@@ -15,51 +15,43 @@ public static class MatSelectHelper
     /// <param name="rootCssSelector">(optiona) the root CSS selector for the select component</param>
     public static void SelectOptionByLabelValue(IWebDriver driver, WebDriverWait wait, IWebElement select, string value, string? rootCssSelector = null)
     {
-        bool optionSelected = false;
-        int MAX_ATTEMPTS = 3;
 
-        select.Click();
-        wait.Until(d => d.FindElements(By.CssSelector($"{rootCssSelector} div.cdk-overlay-pane mat-option")).Count > 0);
-        var options = wait.Until(d => d.FindElements(By.CssSelector($"{rootCssSelector} div.cdk-overlay-pane mat-option")));
-        if (options != null && options.Count > 0)
+        if (select != null && select.Enabled && select.Displayed)
         {
-            foreach (var option in options)
-            {
-                var label = option.FindElement(By.CssSelector("span"));
-                if (label != null && label.Text.Contains(value))
-                {
-                    if (!option.Displayed || !option.Enabled)
-                    {
-                        ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView({block: 'center'});", option);
-                        Console.WriteLine($"Option {value}: call javascript to scroll into view");
-                    }
-
-                    int attempt = 0;
-                    while (attempt < MAX_ATTEMPTS)
-                    {
-                        try
-                        {
-                            option.Click();
-                            wait.Until(d => d.FindElements(By.CssSelector($"{rootCssSelector} div.cdk-overlay-pane")).Count == 0);
-                            optionSelected = true;
-                            Console.WriteLine($"Option {value}: clicked, attempt {attempt + 1}");
-                            break;
-                        }
-                        catch (WebDriverTimeoutException)
-                        {
-                            attempt++;
-                        }
-                    }
-                    if(!optionSelected)
-                    {
-                        Console.WriteLine($"Option {value}: failed to click after {MAX_ATTEMPTS} attempts");
-                    }
-                    break;
-                }
-            }
+            select.Click();
         }
-        
+        else
+        {
+            throw new NotFoundException("Cannot find or click the given mat-select element.");
+        }
 
-        Console.WriteLine($"Option {value} selected: {optionSelected}");
+        var panel = wait.Until(d =>
+        {
+            var panels = d.FindElements(By.CssSelector($"{rootCssSelector} .cdk-overlay-pane .mat-mdc-select-panel"));
+            return panels.FirstOrDefault(p => p.Displayed);
+        });
+
+        wait.Until(d =>
+        {
+            var options = panel.FindElements(By.CssSelector("mat-option"));
+            return options.Count > 0;
+        });
+
+        var option = wait.Until(d =>
+        {
+            var options = panel.FindElements(By.CssSelector("mat-option"));
+            return options.FirstOrDefault(o =>
+                o.Text.Trim().Equals(value)
+            );
+        }) ?? throw new NoSuchElementException($"Option '{value}' not found.");
+
+        option.Click();
+
+        wait.Until(d =>
+        {
+            var panels = d.FindElements(By.CssSelector($"{rootCssSelector} .cdk-overlay-pane .mat-mdc-select-panel"));
+            return panels.Count == 0 || panels.All(p => !p.Displayed);
+        });
+
     }
 }
