@@ -4,14 +4,14 @@ import { AppInfo, IUser } from '@app/_models';
 import { environment } from '@environments/environment';
 import { Router, RouterOutlet } from '@angular/router';
 import { MessagesComponent } from './_components/messages/messages.component';
-
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { KpMenuComponent } from './_components';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  imports: [KpMenuComponent, RouterOutlet, MessagesComponent]
+  imports: [KpMenuComponent, RouterOutlet, MessagesComponent, MatProgressBarModule]
 })
 export class AppComponent {
 
