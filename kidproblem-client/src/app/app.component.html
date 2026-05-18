@@ -10,7 +10,9 @@
   <!-- The overlay -->
   @if (loading.isLoading()){
   <div class="global-overlay">
-    <div class="spinner"></div>
+    <div class="spinner">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
   </div>
   }
 
