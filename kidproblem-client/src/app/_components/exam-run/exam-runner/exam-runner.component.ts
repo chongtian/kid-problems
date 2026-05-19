@@ -25,15 +25,15 @@ import { NgClass, DecimalPipe } from '@angular/common';
 })
 export class ExamRunnerComponent implements OnInit {
 
-  @ViewChild(MatExpansionPanel) panel: MatExpansionPanel;
+  @ViewChild(MatExpansionPanel) panel: MatExpansionPanel | undefined;
   readyForComplete = false;
-  exam: ExamRun;
+  exam: ExamRun | undefined;
   private loading = inject(LoadingBusService);
-  problemTitle$ = new BehaviorSubject<string>(null);
+  problemTitle$ = new BehaviorSubject<string>('');
   currentDetailIndex = 0;
-  currentExamRunDetail: ExamRunDetail;
+  currentExamRunDetail: ExamRunDetail | undefined;
   messageTexts = DisplayMessages;
-  private startTime: Date;
+  private startTime: Date | undefined;
 
   constructor(
     private route: ActivatedRoute,
@@ -68,7 +68,7 @@ export class ExamRunnerComponent implements OnInit {
             this.startTime = new Date();
           } else {
             this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id}.`);
-            this.exam = null;
+            this.exam = undefined;
           }
         }
       )
@@ -81,14 +81,14 @@ export class ExamRunnerComponent implements OnInit {
       this.updateCurrentExamDetail();
 
       this.loading.start();
-      this.problemTitle$.next(this.exam.ExamRunDetails[index].ProblemTitle);
-      this.service.getExamRunDetail(this.exam.ExamRunDetails[index].Id)
+      this.problemTitle$.next(this.exam!.ExamRunDetails[index].ProblemTitle);
+      this.service.getExamRunDetail(this.exam!.ExamRunDetails[index].Id)
         .then(d => {
           if (d) {
             this.currentExamRunDetail = d;
-            this.exam.ExamRunDetails[index] = d;
+            this.exam!.ExamRunDetails[index] = d;
           } else {
-            this.currentExamRunDetail = this.exam.ExamRunDetails[index];
+            this.currentExamRunDetail = this.exam!.ExamRunDetails[index];
           }
           this.currentDetailIndex = index;
           this.startTime = new Date();
@@ -101,13 +101,13 @@ export class ExamRunnerComponent implements OnInit {
 
   private updateCurrentExamDetail() {
     this.loading.start();
-    const diff = (new Date().getTime() - this.startTime.getTime()) / 1000
-    this.currentExamRunDetail.Duration += diff;
+    const diff = (new Date().getTime() - this.startTime!.getTime()) / 1000
+    this.currentExamRunDetail!.Duration = (this.currentExamRunDetail!.Duration || 0) + diff;
     const prevIndex = this.currentDetailIndex;
-    this.service.updateExamRunDetail(this.currentExamRunDetail)
+    this.service.updateExamRunDetail(this.currentExamRunDetail!)
       .then(d => {
         if (d) {
-          this.exam.ExamRunDetails[prevIndex] = d;
+          this.exam!.ExamRunDetails[prevIndex] = d;
         } else {
           this.messageService.openSnackBar('Failed to update answer');
         }
@@ -117,24 +117,24 @@ export class ExamRunnerComponent implements OnInit {
   }
 
   answer(answer: string) {
-    this.currentExamRunDetail.UserAnswer = answer;
+    this.currentExamRunDetail!.UserAnswer = answer;
   }
 
   reset() {
     if (!window.confirm('Warning: This will delete your current answer.')) {
       return;
     }
-    this.currentExamRunDetail.UserAnswer = '';
+    this.currentExamRunDetail!.UserAnswer = '';
   }
 
   // this seems to be redundant
   submit() {
-    if (this.currentExamRunDetail.UserAnswer === '') {
+    if (this.currentExamRunDetail!.UserAnswer === '') {
       this.messageService.openSnackBar('You do not give any answer.');
     }
     let index = this.currentDetailIndex + 1;
-    if (index === this.exam.ExamRunDetails.length) {
-      index = this.exam.ExamRunDetails.length - 1;
+    if (index === this.exam!.ExamRunDetails.length) {
+      index = this.exam!.ExamRunDetails.length - 1;
     }
     this.viewDetail(index);
   }
@@ -144,7 +144,7 @@ export class ExamRunnerComponent implements OnInit {
       return;
     }
     this.updateCurrentExamDetail();
-    this.panel.open();
+    this.panel!.open();
     this.readyForComplete = true;
   }
 
@@ -153,16 +153,16 @@ export class ExamRunnerComponent implements OnInit {
       this.readyForComplete = false;
     } else {
       this.loading.start();
-      this.exam.CompleteTime = new Date(); // the service will ignore this value
-      this.service.completeExamRun(this.exam.Id)
+      this.exam!.CompleteTime = new Date(); // the service will ignore this value
+      this.service.completeExamRun(this.exam!.Id)
         .then(
           data => {
             if (data != null && data.IsSuccessful) {
               this.messageService.openSnackBar('You have completed exam');
-              this.router.navigate([`examrun/view/${this.exam.Id}`]);
+              this.router.navigate([`examrun/view/${this.exam!.Id}`]);
             } else {
               this.messageService.openSnackBar('Failed to complete exam');
-              this.messageService.add(`Failed to complete exam:${this.exam.ReturnResult}.`);
+              this.messageService.add(`Failed to complete exam:${this.exam!.ReturnResult}.`);
             }
           }
         )

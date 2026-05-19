@@ -12,13 +12,12 @@ import { NgClass, DecimalPipe } from '@angular/common';
   imports: [MatTableModule, MatPaginatorModule, NgClass, DecimalPipe]
 })
 export class ExamSummaryListViewComponent {
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
   dataSource = new MatTableDataSource<ExamSummary>();
   displayedColumns = ['examCategory', 'answerBy', 'cntAll', 'cntCorrect', 'cntGuess', 'cntGuessCorrect', 'averageDuration'];
   private loading = inject(LoadingBusService);
   messageTexts: any;
-  private children: string[] = [];
 
   constructor(
     private service: SummaryService,
@@ -28,31 +27,42 @@ export class ExamSummaryListViewComponent {
     this.dataSource.data = [];
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.loading.start();
-    this.adminService.getChildren()
-      .then(children => {
-        if (children) {
-          this.children = children;
-          this.children.forEach(child => {
-            this.service.queryExamSummaries(child, '', 25).then(
-              summary => {
-                if (summary) {
-                  this.dataSource.data = this.dataSource.data.concat([...summary.data]);
-                  this.dataSource.paginator = this.paginator;
-                } else {
-                  this.messageService.openSnackBar(`Failed to load exam summary for ${child}.`);
-                }
-              }
-            );
-          });
-        } else {
-          this.messageService.openSnackBar("API Error. No kid account is found.");
-        }
-      })
-      .catch(err => { console.log(err); })
-      .finally(() => { this.loading.stop(); });
 
+    try {
+      const children = await this.adminService.getChildren();
+
+      if (!children) {
+        throw new Error("No kid account is found.");
+      }
+
+      const results = await Promise.all(
+        children.map(async (child) => {
+          const summary = await this.service.queryExamSummaries(child, '', 25);
+          return { child, summary };
+        })
+      );
+
+      results.forEach(({ child, summary }) => {
+        if (summary) {
+          this.dataSource.data = this.dataSource.data.concat(summary.data);
+        } else {
+          this.messageService.openSnackBar(
+            `Failed to load exam summary for ${child}.`
+          );
+        }
+      });
+
+      this.dataSource.paginator = this.paginator;
+
+    } catch (err: any) {
+      console.log(err);
+      this.messageService.openSnackBar(err?.message || "Unexpected error");
+
+    } finally {
+      this.loading.stop();
+    }
   }
 
 }

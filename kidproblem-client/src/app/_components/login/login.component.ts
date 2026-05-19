@@ -41,7 +41,7 @@ export class LoginComponent {
     this.loading.start();
     this.cognitoService.signIn(this.user)
       .then((result) => {
-        console.log(result);
+        // console.log(result);
         this.cognitoUser = result;
         // this.cognitoService.getUserGroups().then(d=>{console.log(d);});
         const challengeName = result.challengeName;

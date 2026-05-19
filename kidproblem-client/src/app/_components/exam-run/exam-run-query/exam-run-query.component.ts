@@ -12,9 +12,9 @@ import { ExamRunListViewComponent } from '../exam-run-list-view/exam-run-list-vi
   imports: [ExamRunListViewComponent]
 })
 export class ExamRunQueryComponent {
-  startTime: Date;
-  endTime: Date;
-  queryFamily$ = new BehaviorSubject<boolean>(undefined);
+  startTime: Date | undefined;
+  endTime: Date | undefined;
+  queryFamily$ = new BehaviorSubject<boolean>(false);
   latest = true;
   private loading = inject(LoadingBusService);
 

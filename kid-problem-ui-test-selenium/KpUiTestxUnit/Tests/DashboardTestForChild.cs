@@ -16,6 +16,7 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new DashboardPage(_driver);
+                page.GoTo();
                 var items = page.GetChildExamStatistics();
                 Assert.NotEmpty(items);
                 Assert.True(items.Length > 1);

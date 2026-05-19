@@ -5,12 +5,12 @@ import { Access } from './auth.access';
 @Injectable({ providedIn: 'root' })
 export class AuthMenuGuard {
 
-    enableProblem: boolean;
-    enableUser: boolean;
-    enableLogout: boolean;
-    enableExam: boolean;
-    enableBrowseExam: boolean;
-    enableAdm: boolean;
+    enableProblem: boolean = false;
+    enableUser: boolean = false;
+    enableLogout: boolean = false;
+    enableExam: boolean = false;
+    enableBrowseExam: boolean = false;
+    enableAdm: boolean = false;
 
     constructor(
         private cognitoService: CognitoService,

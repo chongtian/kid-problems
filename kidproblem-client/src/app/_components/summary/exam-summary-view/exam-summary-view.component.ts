@@ -19,27 +19,26 @@ export class ExamSummaryViewComponent implements OnInit {
   constructor(
     private cognitoService: CognitoService,
     private service: SummaryService
-  ) {
+  ) { }
 
-  }
-
-  ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.loading.start();
-    this.cognitoService.getCurrentAuthenticatedUser()
-      .then(
-        user => {
-          this.username = user.username;
-          this.service.queryExamSummaries(this.username, '', 25).then(
-            data => {
-              if (data) {
-                this.summaries = data.data;
-              }
-            }
-          );
-        }
-      )
-      .catch(err => { console.log(err); })
-      .finally(() => { this.loading.stop(); });
+
+    try {
+      const user = await this.cognitoService.getCurrentAuthenticatedUser();
+      this.username = user.username;
+
+      const data = await this.service.queryExamSummaries(this.username, '', 25);
+
+      if (data) {
+        this.summaries = data.data;
+      }
+
+    } catch (err) {
+      console.log(err);
+    } finally {
+      this.loading.stop();
+    }
   }
 
 }

@@ -32,7 +32,7 @@ export class ExamDefListViewComponent implements OnInit {
   @Input({ alias: 'active-only', transform: booleanAttribute }) activeOnly = false;
   @Input({ alias: 'is-selectable', transform: booleanAttribute }) isSelectable = false;
   @Input({ alias: 'pagination', transform: booleanAttribute }) pagination = true;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
   categories: InfoCentralCodeDetail[] = [];
   dataSource = new MatTableDataSource<ExamDefinition>();

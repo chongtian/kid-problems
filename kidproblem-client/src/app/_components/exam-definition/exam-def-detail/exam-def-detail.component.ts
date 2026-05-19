@@ -21,7 +21,7 @@ import { ExamDefDetailViewComponent } from '../exam-def-detail-view/exam-def-det
 })
 export class ExamDefDetailComponent implements OnInit {
 
-  examDefId$ = new BehaviorSubject<ExamDefinitionId>(null);
+  examDefId$ = new BehaviorSubject<ExamDefinitionId>({} as ExamDefinitionId);
   isEdit$ = new BehaviorSubject<boolean>(false);
   messageTexts = DisplayMessages;
   isNew = false;
@@ -33,9 +33,7 @@ export class ExamDefDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private assignmentService: AssignmentService,
-    private messageService: MessageService,
-    private query: MatDialog
-  ) { }
+    private messageService: MessageService  ) { }
 
   ngOnInit() {
     this.route.url.subscribe(urls => {

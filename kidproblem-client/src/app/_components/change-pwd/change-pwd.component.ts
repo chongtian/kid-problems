@@ -13,7 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 })
 export class ChangePwdComponent implements OnInit {
 
-  passwordForm: UntypedFormGroup;
+  passwordForm: UntypedFormGroup | undefined;
   isValid = true;
   private loading = inject(LoadingBusService);
   submitted = false;
@@ -36,17 +36,17 @@ export class ChangePwdComponent implements OnInit {
     });
   }
 
-  get f() { return this.passwordForm.controls; }
+  get f() { return this.passwordForm?.controls; }
 
   onSubmit() {
     this.submitted = true;
 
     // stop here if form is invalid
-    if (this.passwordForm.invalid) {
+    if (this.passwordForm?.invalid) {
       return;
     }
 
-    if (this.f.newPassword1.value !== this.f.newPassword2.value) {
+    if (this.f?.newPassword1.value !== this.f?.newPassword2.value) {
       this.isValid = false;
       this.messageService.openSnackBar('You entered different new password');
       this.messageService.add('You entered different new password');
@@ -59,7 +59,7 @@ export class ChangePwdComponent implements OnInit {
         user => {
           const cognitoUser = user;
 
-          this.cognitoService.changePassword(cognitoUser, this.f.oldPassword.value, this.f.newPassword1.value)
+          this.cognitoService.changePassword(cognitoUser, this.f?.oldPassword.value, this.f?.newPassword1.value)
             .then(
               result => {
                 // console.log(result);

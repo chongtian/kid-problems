@@ -29,17 +29,17 @@ import { NgClass } from '@angular/common';
 export class ExamDefDetailViewComponent implements OnInit {
 
   @Input({ alias: 'edit' }) isEdit$ = new BehaviorSubject<boolean>(false);
-  @Input({ alias: 'entity-id' }) examDefId$ = new BehaviorSubject<ExamDefinitionId>(null);
+  @Input({ alias: 'entity-id' }) examDefId$ = new BehaviorSubject<ExamDefinitionId>({} as ExamDefinitionId);
   @Output() created = new EventEmitter<ExamDefinitionId>();
   @Output() deleted = new EventEmitter<boolean>();
   @Output() changed = new EventEmitter<boolean>();
 
   categories: InfoCentralCodeDetail[] = [];
-  private examDef: ExamDefinition;
+  private examDef: ExamDefinition | undefined;
   messageTexts = DisplayMessages;
   private loading = inject(LoadingBusService);
   isEdit = false;
-  examEditorForm: FormGroup;
+  examEditorForm: FormGroup | undefined;
   isNew = false;
 
   constructor(
@@ -68,7 +68,7 @@ export class ExamDefDetailViewComponent implements OnInit {
   }
 
   get details() {
-    return this.examEditorForm.get('ExamDetails') as FormArray;
+    return this.examEditorForm?.get('ExamDetails') as FormArray;
   }
 
   private getExamDefinition(id: ExamDefinitionId) {
@@ -83,7 +83,7 @@ export class ExamDefDetailViewComponent implements OnInit {
               this.createFormGroup();
             } else {
               this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id.ExamCategory}, ${id.ExamTitle}.`);
-              this.examDef = null;
+              this.examDef = undefined;
             }
           }
         )
@@ -93,12 +93,12 @@ export class ExamDefDetailViewComponent implements OnInit {
     } else {
       this.isNew = true;
       this.examDef = {
-        ExamCategory: null,
-        ExamYear: null,
-        ExamTitle: null,
-        ExamType: null,
+        ExamCategory: '',
+        ExamYear: '',
+        ExamTitle: '',
+        ExamType: '',
         Active: true,
-        Memo: null,
+        Memo: '',
         ExamDetails: []
       };
       this.createFormGroup();
@@ -107,19 +107,19 @@ export class ExamDefDetailViewComponent implements OnInit {
 
   private createFormGroup(): void {
     const f = this.formBuilder.group({
-      ExamCategory: [this.examDef.ExamCategory, Validators.required],
-      ExamTitle: [this.examDef.ExamTitle, Validators.required],
-      ExamYear: this.examDef.ExamYear,
-      ExamType: this.examDef.ExamType,
-      Active: this.examDef.Active,
-      Memo: this.examDef.Memo,
+      ExamCategory: [this.examDef!.ExamCategory, Validators.required],
+      ExamTitle: [this.examDef!.ExamTitle, Validators.required],
+      ExamYear: this.examDef!.ExamYear,
+      ExamType: this.examDef!.ExamType,
+      Active: this.examDef!.Active,
+      Memo: this.examDef!.Memo,
       ExamDetails: this.formBuilder.array([])
     });
 
     const detailForms = f.get('ExamDetails') as FormArray;
-    if (this.examDef.ExamDetails) {
+    if (this.examDef!.ExamDetails) {
       let i = 0;
-      this.examDef.ExamDetails.forEach(detail => {
+      this.examDef!.ExamDetails.forEach(detail => {
         detailForms.push(this.formBuilder.group(
           {
             ProblemTitle: detail.ProblemTitle
@@ -142,16 +142,16 @@ export class ExamDefDetailViewComponent implements OnInit {
     switch (action) {
       case 0:
       default:
-        keyword = `${this.examEditorForm.get('ExamCategory').value}-${this.examEditorForm.get('ExamYear').value || ''}`;
+        keyword = `${this.examEditorForm!.get('ExamCategory')!.value}-${this.examEditorForm!.get('ExamYear')!.value || ''}`;
         dialogRef = this.query.open(ProblemSearchDialogComponent, {
           data: { keyword: keyword, isStaging: false }
         });
         break;
 
       case 1:
-        keyword = `${this.examEditorForm.get('ExamCategory').value}-${this.examEditorForm.get('ExamYear').value || ''}`;
+        keyword = `${this.examEditorForm!.get('ExamCategory')!.value}-${this.examEditorForm!.get('ExamYear')!.value || ''}`;
         dialogRef = this.query.open(ProblemSummarySearchDialogComponent, {
-          data: { keyword: keyword, category: this.examEditorForm.get('ExamCategory').value }
+          data: { keyword: keyword, category: this.examEditorForm!.get('ExamCategory')!.value }
         });
         break;
     }
@@ -166,7 +166,7 @@ export class ExamDefDetailViewComponent implements OnInit {
               {
                 ProblemTitle: problem.ProblemTitle
               }));
-            this.examEditorForm.markAsDirty();
+            this.examEditorForm!.markAsDirty();
           }
         });
       }
@@ -175,11 +175,11 @@ export class ExamDefDetailViewComponent implements OnInit {
 
   deleteDetail(i: number) {
     this.details.removeAt(i);
-    this.examEditorForm.markAsDirty();
+    this.examEditorForm!.markAsDirty();
   }
 
   save() {
-    if (!this.examEditorForm.valid) {
+    if (!this.examEditorForm!.valid) {
       this.messageService.add(this.messageTexts.invalidFormData);
       return;
     }
@@ -188,7 +188,7 @@ export class ExamDefDetailViewComponent implements OnInit {
       return;
     }
 
-    const entity = this.examEditorForm.value as ExamDefinition;
+    const entity = this.examEditorForm!.value as ExamDefinition;
 
     this.loading.start();
     if (this.isNew) {
@@ -209,14 +209,14 @@ export class ExamDefDetailViewComponent implements OnInit {
     const messages: string[] = [];
 
     if (data != null) {
-      isSuccessful = data.IsSuccessful;
-      messages.push(data.ReturnResult);
+      isSuccessful = data.IsSuccessful ?? false;
+      messages.push(data.ReturnResult ?? '');
       this.examDef = data;
     }
 
     if (isSuccessful) {
       this.messageService.openSnackBar(`${this.messageTexts.saveSuccessful}`);
-      this.examEditorForm.markAsPristine();
+      this.examEditorForm!.markAsPristine();
       this.changed.emit(false);
       if (this.isNew) {
         this.created.emit({ ExamCategory: data.ExamCategory, ExamTitle: data.ExamTitle });
@@ -234,7 +234,7 @@ export class ExamDefDetailViewComponent implements OnInit {
     }
 
     this.loading.start();
-    this.service.deleteExamDefinition(this.examDef.ExamCategory, this.examDef.ExamTitle)
+    this.service.deleteExamDefinition(this.examDef!.ExamCategory, this.examDef!.ExamTitle)
       .then(
         data => {
           if (data != null && data.IsSuccessful) {

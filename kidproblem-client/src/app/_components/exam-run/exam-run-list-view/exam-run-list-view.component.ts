@@ -23,11 +23,11 @@ const PageSize = 25;
   imports: [ReactiveFormsModule, FormsModule, MatFormFieldModule, MatDatepickerModule, MatButtonModule, MatProgressBarModule, MatTableModule, RouterLink, MatPaginatorModule, NgClass, MatTooltipModule, DecimalPipe, DatePipe]
 })
 export class ExamRunListViewComponent {
-  @Input('start-time') startTime: Date;
-  @Input('end-time') endTime: Date;
+  @Input('start-time') startTime: Date | undefined;
+  @Input('end-time') endTime: Date | undefined;
   @Input({ alias: 'query-family' }) queryFamily$ = new BehaviorSubject<boolean>(false);
   @Input({ alias: 'pagination', transform: booleanAttribute }) pagination = true;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
   dataSource = new MatTableDataSource<ExamRun>();
   displayedColumns = ['examCategory', 'examTitle', 'cntAllProblem', 'cntCorrect',
@@ -35,8 +35,8 @@ export class ExamRunListViewComponent {
   loadMoreData = false;
   private loading = inject(LoadingBusService);
   private paginationToken = PaginationIndicator;
-  private currentStartTime: Date;
-  private currentEndTime: Date;
+  private currentStartTime: Date | undefined;
+  private currentEndTime: Date | undefined;
   private queryFamily = false;
   messageTexts: any;
 
@@ -94,7 +94,7 @@ export class ExamRunListViewComponent {
     }
 
     this.loading.start();
-    this.service.queryExamRuns(this.startTime, this.endTime, this.paginationToken, PageSize, this.queryFamily).then(d => {
+    this.service.queryExamRuns(this.startTime!, this.endTime!, this.paginationToken, PageSize, this.queryFamily).then(d => {
       d.data.sort((a, b) => { return (b.CreateTime > a.CreateTime) ? 1 : -1; });
       this.dataSource.data.push(...d.data);
       this.paginationToken = d.pagination;

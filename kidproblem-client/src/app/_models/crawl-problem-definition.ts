@@ -1,4 +1,4 @@
-export class CrawlProblemDefinition {
+export interface CrawlProblemDefinition {
     StartUrl: string;
     ProblemCategory: string;
     ProblemYear: string;

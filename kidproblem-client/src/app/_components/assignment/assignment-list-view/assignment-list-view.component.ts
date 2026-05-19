@@ -23,10 +23,10 @@ const PageSize = 25;
   imports: [ReactiveFormsModule, FormsModule, MatFormFieldModule, MatDatepickerModule, MatButtonModule, MatPaginatorModule, MatTableModule, RouterLink, NgClass, MatTooltipModule, DatePipe, BooleanLikeToTextPipe]
 })
 export class AssignmentListViewComponent implements OnInit {
-  @Input('start-time') startTime: Date;
-  @Input('end-time') endTime: Date;
+  @Input('start-time') startTime: Date | undefined;
+  @Input('end-time') endTime: Date | undefined;
   @Input({ alias: 'pagination', transform: booleanAttribute }) pagination = true;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
   @Output() run = new EventEmitter<string>();
 
   dataSource = new MatTableDataSource<Assignment>();
@@ -34,8 +34,8 @@ export class AssignmentListViewComponent implements OnInit {
   loadMoreData = false;
   private loading = inject(LoadingBusService);
   private paginationToken = PaginationIndicator;
-  private currentStartTime: Date;
-  private currentEndTime: Date;
+  private currentStartTime: Date | undefined;
+  private currentEndTime: Date | undefined;
   private parentUser = false;
   messageTexts = DisplayMessages;
 
@@ -98,7 +98,7 @@ export class AssignmentListViewComponent implements OnInit {
     }
 
     this.loading.start();
-    this.service.queryAssignments(this.startTime, this.endTime, this.paginationToken, PageSize)
+    this.service.queryAssignments(this.startTime!, this.endTime!, this.paginationToken, PageSize)
       .then(d => {
         d.data.sort((a, b) => { return (b.CreateTime > a.CreateTime) ? 1 : -1; });
         this.dataSource.data.push(...d.data);

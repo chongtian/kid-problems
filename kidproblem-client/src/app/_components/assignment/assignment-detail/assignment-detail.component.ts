@@ -17,7 +17,7 @@ import { AssignmentDetailViewComponent } from '../assignment-detail-view/assignm
   imports: [AssignmentDetailViewComponent, MatDividerModule, MatCardModule, MatButtonModule, MatTooltipModule]
 })
 export class AssignmentDetailComponent implements OnInit {
-  assignmentId$ = new BehaviorSubject<string>(null);
+  assignmentId$ = new BehaviorSubject<string>('');
   isEdit$ = new BehaviorSubject<boolean>(false);
   messageTexts = DisplayMessages;
   private isChildChanged = false;

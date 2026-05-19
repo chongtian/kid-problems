@@ -18,14 +18,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule, MatCardModule, RouterLink, MathDirective, MatDividerModule]
 })
 export class ProblemScrapComponent implements OnInit {
-  startUrl: string;
-  problemCategory: string;
-  problemYear: string;
+  startUrl: string = '';
+  problemCategory: string = '';
+  problemYear: string = '';
   // regexPattern: string;
   startPattern = '<h2>.+?Problem\\s\\d{1,}.+?<\\/h2>';
   endPattern = '<a.+?>Solution<\\/a>';
-  isSubmitted: boolean;
-  problems: Problem[];
+  isSubmitted: boolean = false;
+  problems: Problem[] = [];
   private loading = inject(LoadingBusService);
 
   constructor(
@@ -46,7 +46,7 @@ export class ProblemScrapComponent implements OnInit {
       StartUrl: this.startUrl,
       ProblemCategory: this.problemCategory,
       ProblemYear: this.problemYear,
-      RegexPattern: null,
+      RegexPattern: '',
       StartPattern: this.startPattern,
       EndPattern: this.endPattern,
       UseSinglePattern: false
