@@ -21,7 +21,7 @@ import { ExamDefDetailViewComponent } from '../exam-def-detail-view/exam-def-det
 })
 export class ExamDefDetailComponent implements OnInit {
 
-  examDefId$ = new BehaviorSubject<ExamDefinitionId>({} as ExamDefinitionId);
+  examDefId$ = new BehaviorSubject<ExamDefinitionId | null>(null);
   isEdit$ = new BehaviorSubject<boolean>(false);
   messageTexts = DisplayMessages;
   isNew = false;
@@ -33,7 +33,7 @@ export class ExamDefDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private assignmentService: AssignmentService,
-    private messageService: MessageService  ) { }
+    private messageService: MessageService) { }
 
   ngOnInit() {
     this.route.url.subscribe(urls => {
@@ -109,7 +109,7 @@ export class ExamDefDetailComponent implements OnInit {
     if (!window.confirm(this.messageTexts.confirmSubmit)) {
       return;
     }
-    const examDef: ExamDefinition = { ExamCategory: this.examDefId$.value.ExamCategory, ExamTitle: this.examDefId$.value.ExamTitle, Active: true };
+    const examDef: ExamDefinition = { ExamCategory: this.examDefId$.value?.ExamCategory!, ExamTitle: this.examDefId$.value?.ExamTitle!, Active: true };
 
     this.loading.start();
     this.assignmentService.createAssignmentFromDefinition(examDef)

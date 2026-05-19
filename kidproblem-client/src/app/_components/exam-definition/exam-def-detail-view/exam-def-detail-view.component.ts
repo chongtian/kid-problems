@@ -29,7 +29,7 @@ import { NgClass } from '@angular/common';
 export class ExamDefDetailViewComponent implements OnInit {
 
   @Input({ alias: 'edit' }) isEdit$ = new BehaviorSubject<boolean>(false);
-  @Input({ alias: 'entity-id' }) examDefId$ = new BehaviorSubject<ExamDefinitionId>({} as ExamDefinitionId);
+  @Input({ alias: 'entity-id' }) examDefId$ = new BehaviorSubject<ExamDefinitionId | null>(null);
   @Output() created = new EventEmitter<ExamDefinitionId>();
   @Output() deleted = new EventEmitter<boolean>();
   @Output() changed = new EventEmitter<boolean>();
@@ -71,7 +71,7 @@ export class ExamDefDetailViewComponent implements OnInit {
     return this.examEditorForm?.get('ExamDetails') as FormArray;
   }
 
-  private getExamDefinition(id: ExamDefinitionId) {
+  private getExamDefinition(id: ExamDefinitionId | null) {
     if (id) {
       this.isNew = false;
       this.loading.start();
