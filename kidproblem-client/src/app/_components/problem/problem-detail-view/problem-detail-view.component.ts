@@ -18,7 +18,7 @@ export class ProblemDetailViewComponent {
   @Input({ alias: 'display-all', transform: booleanAttribute }) displayAll = true;
   @Input({ alias: 'problem-title' }) problemTitle$ = new BehaviorSubject<string>('');
 
-  problem: Problem;
+  problem?: Problem;
   messageTexts = DisplayMessages;
   private loading = inject(LoadingBusService);
   AnswerOptions: string[] = []; // this property is used by exam-runner component
@@ -48,7 +48,7 @@ export class ProblemDetailViewComponent {
             }
           } else {
             this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${problemTitle}.`);
-            this.problem = null;
+            this.problem = undefined;
           }
         }
       )

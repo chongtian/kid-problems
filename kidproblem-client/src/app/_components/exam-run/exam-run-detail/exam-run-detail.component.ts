@@ -11,7 +11,7 @@ import { ExamRunDetailViewComponent } from '../exam-run-detail-view/exam-run-det
     imports: [ExamRunDetailViewComponent]
 })
 export class ExamRunDetailComponent {
-  examRunId$ = new BehaviorSubject<string>(null);
+  examRunId$ = new BehaviorSubject<string>('');
   messageTexts = DisplayMessages;
 
   constructor(

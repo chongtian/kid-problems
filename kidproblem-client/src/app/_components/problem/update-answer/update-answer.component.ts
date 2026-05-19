@@ -19,7 +19,7 @@ export class UpdateAnswerComponent implements OnInit {
   problemCategory = '';
   problemYear = '';
   problemAnswersText = '';
-  problemAnswers: Problem[];
+  problemAnswers: Problem[] = [];
   private loading = inject(LoadingBusService);
   cannotSave = true;
 
@@ -90,7 +90,7 @@ export class UpdateAnswerComponent implements OnInit {
             let t = '';
             this.problemAnswers.forEach(p => {
               t += p.ProblemTitle + ' ' + p.ProblemAnswer + ' ' + p.ReturnResult + '\n';
-              isSuccessful = isSuccessful && p.IsSuccessful;
+              isSuccessful = isSuccessful && (p.IsSuccessful ?? false);
             });
             this.problemAnswersText = t.trim();
             this.cannotSave = true;

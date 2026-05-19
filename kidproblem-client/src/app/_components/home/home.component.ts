@@ -21,7 +21,7 @@ export class HomeComponent implements OnInit {
   startTime: Date;
   endTime: Date;
   parentUser = false;
-  queryFamily$ = new BehaviorSubject<boolean>(undefined);
+  queryFamily$ = new BehaviorSubject<boolean>(false);
   private loading = inject(LoadingBusService);
 
   constructor(

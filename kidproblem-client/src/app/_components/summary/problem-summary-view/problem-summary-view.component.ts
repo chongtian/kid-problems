@@ -24,36 +24,49 @@ export class ProblemSummaryViewComponent implements OnInit {
     private service: SummaryService
   ) { }
 
-  ngOnInit(): void {
-    this.loading.start();
-    this.cognitoService.getUserAccess()
-      .then(a => {
-        if ((a | Access.parent) === a) {
-          this.adminService.getChildren().then(children => {
-            children.forEach(child => {
-              this.service.getProblemSummary(this.problemTitle, child).then(
-                d => {
-                  if (d) {
-                    this.summaries.push(d);
-                  }
-                }
-              );
-            });
-          });
-        } else {
-          this.cognitoService.getCurrentAuthenticatedUser().then(user => {
-            const username = user.username;
-            this.service.getProblemSummary(this.problemTitle, username).then(
-              d => {
-                if (d) {
-                  this.summaries.push(d);
-                }
-              }
-            );
-          });
-        }
-      })
-      .catch(err => { console.log(err); })
-      .finally(() => { this.loading.stop(); });
+  async ngOnInit() {
+    await this.loadSummaries();
   }
+
+  async loadSummaries() {
+    try {
+      this.loading.start();
+
+      const access = await this.cognitoService.getUserAccess();
+
+      let results;
+
+      if ((access | Access.parent) === access) {
+        const children = await this.adminService.getChildren();
+
+        results = await Promise.all(
+          children.map(child =>
+            this.service.getProblemSummary(this.problemTitle, child)
+              .then(summary => ({ child, summary }))
+          )
+        );
+      } else {
+        const user = await this.cognitoService.getCurrentAuthenticatedUser();
+
+        const summary = await this.service.getProblemSummary(
+          this.problemTitle,
+          user.username
+        );
+
+        results = [{ child: user.username, summary }];
+      }
+
+      results.forEach(({ summary }) => {
+        if (summary) {
+          this.summaries.push(summary);
+        }
+      });
+
+    } catch (err) {
+      console.log(err);
+    } finally {
+      this.loading.stop();
+    }
+  }
+
 }

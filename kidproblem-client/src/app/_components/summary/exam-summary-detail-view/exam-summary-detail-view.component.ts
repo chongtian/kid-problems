@@ -11,7 +11,7 @@ import { DecimalPipe } from '@angular/common';
 })
 export class ExamSummaryDetailViewComponent  {
 
-  @Input({ alias: 'data' }) data: ExamSummary = null;
+  @Input({ alias: 'data' }) data: ExamSummary | undefined;
 
   constructor() { }
 

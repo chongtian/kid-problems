@@ -25,15 +25,15 @@ import { DatePipe } from '@angular/common';
 export class AssignmentDetailViewComponent implements OnInit {
 
   @Input({ alias: 'edit' }) isEdit$ = new BehaviorSubject<boolean>(false);
-  @Input({ alias: 'entity-id' }) assignmentId$ = new BehaviorSubject<string>(null);
+  @Input({ alias: 'entity-id' }) assignmentId$ = new BehaviorSubject<string>('');
   @Output() deleted = new EventEmitter<boolean>();
   @Output() changed = new EventEmitter<boolean>();
 
-  private assignment: Assignment;
+  private assignment: Assignment | undefined;
   messageTexts = DisplayMessages;
   private loading = inject(LoadingBusService);
   isEdit = false;
-  editorForm: FormGroup;
+  editorForm: FormGroup | undefined;
 
   constructor(
     private service: AssignmentService,
@@ -61,7 +61,7 @@ export class AssignmentDetailViewComponent implements OnInit {
             this.createFormGroup();
           } else {
             this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id}.`);
-            this.assignment = null;
+            this.assignment = undefined;
           }
         }
       ).catch(err => { console.log(err); })
@@ -71,14 +71,14 @@ export class AssignmentDetailViewComponent implements OnInit {
 
   private createFormGroup(): void {
     const f = this.formBuilder.group({
-      Id: this.assignment.Id,
-      FamilyId: this.assignment.FamilyId,
-      ExamCategory: [this.assignment.ExamCategory, Validators.required],
-      ExamTitle: [this.assignment.ExamTitle, Validators.required],
-      CreateTime: this.assignment.CreateTime,
-      IsComplete: this.assignment.IsComplete,
-      Memo: this.assignment.Memo,
-      ExamRunIds: this.formBuilder.array(this.assignment.ExamRunIds)
+      Id: this.assignment!.Id,
+      FamilyId: this.assignment!.FamilyId,
+      ExamCategory: [this.assignment!.ExamCategory, Validators.required],
+      ExamTitle: [this.assignment!.ExamTitle, Validators.required],
+      CreateTime: this.assignment!.CreateTime,
+      IsComplete: this.assignment!.IsComplete,
+      Memo: this.assignment!.Memo,
+      ExamRunIds: this.formBuilder.array(this.assignment!.ExamRunIds!)
     });
 
     f.valueChanges.subscribe(() => {
@@ -89,7 +89,7 @@ export class AssignmentDetailViewComponent implements OnInit {
   }
 
   save() {
-    if (!this.editorForm.valid) {
+    if (!this.editorForm!.valid) {
       this.messageService.add(this.messageTexts.invalidFormData);
       return;
     }
@@ -98,7 +98,7 @@ export class AssignmentDetailViewComponent implements OnInit {
       return;
     }
 
-    const entity = this.editorForm.value as Assignment;
+    const entity = this.editorForm!.value as Assignment;
     this.loading.start();
     this.service.updateAssignment(entity)
       .then(data => this.handleSaveResponse(data))
@@ -111,14 +111,14 @@ export class AssignmentDetailViewComponent implements OnInit {
     const messages: string[] = [];
 
     if (data != null) {
-      isSuccessful = data.IsSuccessful;
-      messages.push(data.ReturnResult);
+      isSuccessful = data.IsSuccessful ?? false;
+      messages.push(data.ReturnResult ?? '');
       this.assignment = data;
     }
 
     if (isSuccessful) {
       this.messageService.openSnackBar(`${this.messageTexts.saveSuccessful}`);
-      this.editorForm.markAsPristine();
+      this.editorForm!.markAsPristine();
       this.changed.emit(false);
     } else {
       const message = messages.join(' ');
@@ -132,7 +132,7 @@ export class AssignmentDetailViewComponent implements OnInit {
       return;
     }
     this.loading.start();
-    this.service.deleteAssignment(this.assignment.Id)
+    this.service.deleteAssignment(this.assignment!.Id)
       .then(
         data => {
           if (data != null && data.IsSuccessful) {

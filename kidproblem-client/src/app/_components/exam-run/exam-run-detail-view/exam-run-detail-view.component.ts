@@ -17,10 +17,10 @@ import { NgClass, DecimalPipe, DatePipe } from '@angular/common';
   imports: [RouterLink, MatButtonModule, MatTooltipModule, MatTableModule, NgClass, DecimalPipe, DatePipe, BooleanLikeToTextPipe]
 })
 export class ExamRunDetailViewComponent {
-  @Input({ alias: 'entity-id' }) examRunId$ = new BehaviorSubject<string>(null);
+  @Input({ alias: 'entity-id' }) examRunId$ = new BehaviorSubject<string>('');
   @Output() deleted = new EventEmitter<boolean>();
 
-  data: ExamRun;
+  data: ExamRun | undefined;
   messageTexts = DisplayMessages;
   private loading = inject(LoadingBusService);
   displayedColumns: string[] = ['problemTitle', 'answer', 'isCorrect', 'isGuess', 'duration'];
@@ -48,7 +48,7 @@ export class ExamRunDetailViewComponent {
             if (data != null) {
               this.data = data;
               this.data.ExamRunDetails.forEach(d => {
-                if (d.Duration > 0 || d.UserAnswer) {
+                if ((d?.Duration || 0) > 0 || d.UserAnswer) {
                   this.canDelete = false;
                   return;
                 }
@@ -56,7 +56,7 @@ export class ExamRunDetailViewComponent {
 
             } else {
               this.messageService.add(`${this.messageTexts.cannotRetrieveRecord} ${id}.`);
-              this.data = null;
+              this.data = undefined;
             }
           }
         )
@@ -71,7 +71,7 @@ export class ExamRunDetailViewComponent {
     }
 
     this.loading.start();
-    this.service.deleteExamRun(this.data.Id)
+    this.service.deleteExamRun(this.data!.Id)
       .then(
         data => {
           if (data != null && data.IsSuccessful) {

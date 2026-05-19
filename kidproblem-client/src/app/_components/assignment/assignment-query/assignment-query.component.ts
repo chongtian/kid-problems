@@ -9,8 +9,8 @@ import { AssignmentListViewComponent } from '../assignment-list-view/assignment-
     imports: [AssignmentListViewComponent]
 })
 export class AssignmentQueryComponent implements OnInit {
-  startTime: Date;
-  endTime: Date;
+  startTime: Date | undefined;
+  endTime: Date | undefined;
   latest = true;
 
   constructor(private route: ActivatedRoute, private router: Router) {

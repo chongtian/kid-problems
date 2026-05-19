@@ -34,10 +34,10 @@ export class ProblemSummaryListViewComponent implements OnInit {
 
   data: ProblemSummary[];
   selectedIds: string[];
-  categories: InfoCentralCodeDetail[];
-  children: string[];
+  categories: InfoCentralCodeDetail[] | undefined;
+  children: string[] | undefined;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
   dataSource = new MatTableDataSource<ExamSummary>();
   displayedColumns = ['select', 'problemTitle', 'answerBy', 'trueCorrectRate', 'cntAll', 'cntCorrect', 'cntGuess', 'cntGuessCorrect', 'averageDuration'];
 
