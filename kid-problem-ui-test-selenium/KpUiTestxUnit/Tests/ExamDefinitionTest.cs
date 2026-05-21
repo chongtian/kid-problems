@@ -2,22 +2,21 @@
 using KpUiTestxUnit.Models;
 using KpUiTestxUnit.Pages;
 using KpUiTestxUnit.Utilties;
-using OpenQA.Selenium.DevTools.V142.Debugger;
 
 namespace KpUiTestxUnit.Tests
 {
     public class ExamDefinitionTest : TestBase
     {
-        public static IEnumerable<object?[]> DataForCreateExamDefinition()
+        public static IEnumerable<object[]> DataForCreateExamDefinition()
         {
-            yield return new object?[] { TestDataExamDefinition.CreateExamDefinition1 };
-            yield return new object?[] { TestDataExamDefinition.CreateExamDefinition2 };
+            yield return new object[] { TestDataExamDefinition.CreateExamDefinition1 };
+            yield return new object[] { TestDataExamDefinition.CreateExamDefinition2 };
         }
 
-        public static IEnumerable<object?[]> DataForViewExamDefinition()
+        public static IEnumerable<object[]> DataForViewExamDefinition()
         {
-            yield return new object?[] { TestDataExamDefinition.ViewExamDefinition1 };
-            yield return new object?[] { TestDataExamDefinition.ViewExamDefinition2 };
+            yield return new object[] { TestDataExamDefinition.ViewExamDefinition1 };
+            yield return new object[] { TestDataExamDefinition.ViewExamDefinition2 };
         }
 
         public ExamDefinitionTest(SetupFixture fixture) : base(fixture, true)
@@ -32,16 +31,17 @@ namespace KpUiTestxUnit.Tests
             await RunTestAsync(async () =>
                     {
                         var page = new ExamDefEditPage(_driver);
-                        page.GoTo();
+                        page.GoTo()
+                        .SelectExamCategory(testData.ExamCategory!)
+                        .EnterExamTitle(testData.ExamTitle!)
+                        .EnterExamYear(testData.ExamYear!)
+                        .EnterMemo(testData.Memo!)
+                        .SelectExamType(testData.ExamType!)
+                        .ClickAddProblemButton();
 
-                        page.SelectExamCategory(testData.ExamCategory);
-                        page.EnterExamTitle(testData.ExamTitle);
-                        page.EnterExamYear(testData.ExamYear!);
-                        page.EnterMemo(testData.Memo!);
-                        page.SelectExamType(testData.ExamType); // To Do: for unknown reason, the exam type selection is not working sometimes.
-                        page.ClickAddProblemButton();
-                        page.QueryPage.ClickProblemCheckboxes(testData.ProblemTitleSelectIndexes!);
-                        page.QueryPage.ClickSelectButton();
+                        page.QueryPage
+                        .ClickProblemCheckboxes(testData.ProblemTitleSelectIndexes!)
+                        .ClickSelectButton();
 
                         var details = page.GetExamDetails();
                         Assert.True(details.Length == testData.ProblemTitles!.Length);
@@ -99,9 +99,8 @@ namespace KpUiTestxUnit.Tests
             {
                 string testExamDefTitle = CommonHelper.EncodeUrl($"{examCategory}/{examTitle}");
                 var page = new ExamDefViewPage(_driver);
-                page.GoTo(testExamDefTitle);
-
-                page.ClickCreateAssignmentButton();
+                page.GoTo(testExamDefTitle)
+                .ClickCreateAssignmentButton();
                 Assert.True(_wait.Until(d => d.Url.Contains("/assignment/view/")));
 
                 var destPage = new AssignmentViewPage(_driver);
@@ -129,8 +128,7 @@ namespace KpUiTestxUnit.Tests
                 var currStatus = page.GetExamStatus();
                 Assert.NotNull(currStatus);
 
-                page.ClickExamStatus();
-                page.ClickSaveButton();
+                page.ClickExamStatus().ClickSaveButton();
 
                 var viewPage = new ExamDefViewPage(_driver);
                 viewPage.GoTo(testExamDefTitle);
@@ -145,11 +143,10 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new ExamDefinitionListPage(_driver);
-                page.GoTo();
-
-                page.SelectExamCategory("AMC8");
-                page.EnterKeyword("AMC8-201");
-                page.ClickSearchButton();
+                page.GoTo()
+                .SelectExamCategory("AMC8")
+                .EnterKeyword("AMC8-201")
+                .ClickSearchButton();
 
                 Assert.Equal("25", page.GetCountOfQueryResults());
 
@@ -181,11 +178,10 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new ExamDefinitionListPage(_driver);
-                page.GoTo();
-
-                page.SelectExamCategory("AMC8");
-                page.EnterKeyword("AMC8-201");
-                page.ClickSearchButton();
+                page.GoTo()
+                .SelectExamCategory("AMC8")
+                .EnterKeyword("AMC8-201")
+                .ClickSearchButton();
 
                 Assert.Equal("25", page.GetCountOfQueryResults());
                 Assert.True(page.IsLoadMoreButtonShown());
@@ -208,13 +204,11 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new ExamDefinitionListPage(_driver);
-                page.GoTo();
-
-                page.SelectExamCategory("AMC8");
-                page.EnterKeyword("AMC8-201");
-                page.ClickSearchButton();
-
-                page.ClickExamTitleInQueryResults(0);
+                page.GoTo()
+                .SelectExamCategory("AMC8")
+                .EnterKeyword("AMC8-201")
+                .ClickSearchButton()
+                .ClickExamTitleInQueryResults(0);
                 Assert.True(_wait.Until(d => d.Url.Contains($"{Constants.BASE_URL}/examdef/view/AMC8/AMC8-2010%2027")));
                 var destPage = new ExamDefViewPage(_driver);
                 Assert.Equal("AMC8-2010 27", destPage.GetExamTitle());

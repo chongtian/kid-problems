@@ -8,7 +8,7 @@ public sealed class PaginatorComponentPage : BasePage
     public PaginatorComponentPage(IWebDriver driver, string? parentSelector = null) : base(driver, $"{parentSelector} mat-paginator".Trim())
     { }
 
-    public void ClickFirstPageButton()
+    public PaginatorComponentPage ClickFirstPageButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[aria-label=\"First page\"]")));
@@ -17,9 +17,11 @@ public sealed class PaginatorComponentPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
-    public void ClickPreviousPageButton()
+    public PaginatorComponentPage ClickPreviousPageButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[aria-label=\"Previous page\"]")));
@@ -28,9 +30,11 @@ public sealed class PaginatorComponentPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
-    public void ClickNextPageButton()
+    public PaginatorComponentPage ClickNextPageButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[aria-label=\"Next page\"]")));
@@ -39,9 +43,11 @@ public sealed class PaginatorComponentPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
-    public void ClickLastPageButton()
+    public PaginatorComponentPage ClickLastPageButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[aria-label=\"Last page\"]")));
@@ -50,6 +56,8 @@ public sealed class PaginatorComponentPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
     public string? GetPaginationStatus()
@@ -63,7 +71,7 @@ public sealed class PaginatorComponentPage : BasePage
         return null;
     }
 
-    public void SelectItemsPerPage(string value)
+    public PaginatorComponentPage SelectItemsPerPage(string value)
     {
         IsNotLoading();
         var select = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} mat-select")));
@@ -72,6 +80,8 @@ public sealed class PaginatorComponentPage : BasePage
             MatSelectHelper.SelectOptionByLabelValue(_driver, _wait, select, value);
             IsNotLoading();
         }
+
+        return this;
     }
 
 }

@@ -13,7 +13,7 @@ public sealed class ExamRunListPage : BasePage
         Paginator = new PaginatorComponentPage(driver);
     }
 
-    public void GoTo(bool all = true)
+    public ExamRunListPage GoTo(bool all = true)
     {
         if (all)
         {
@@ -24,9 +24,11 @@ public sealed class ExamRunListPage : BasePage
             _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/examruns");
         }
         IsNotLoading();
+
+        return this;
     }
 
-    public void SetQueryDateRange(string startTimeText, string endTimeText)
+    public ExamRunListPage SetQueryDateRange(string startTimeText, string endTimeText)
     {
         IsNotLoading();
 
@@ -45,9 +47,11 @@ public sealed class ExamRunListPage : BasePage
             endTimeElement.SendKeys(Keys.Backspace);
             endTimeElement.SendKeys(endTimeText);
         }
+
+        return this;
     }
 
-    public void ClickSearchButton()
+    public ExamRunListPage ClickSearchButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnSearch\"]")));
@@ -56,6 +60,8 @@ public sealed class ExamRunListPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
     public ExamRun[] GetExamRunsFromQueryResults()
@@ -98,7 +104,7 @@ public sealed class ExamRunListPage : BasePage
         return [];
     }
 
-    public void ClickExamTitleInQueryResults(int index)
+    public ExamRunListPage ClickExamTitleInQueryResults(int index)
     {
         IsNotLoading();
         var selector = By.CssSelector($"{_rootCssSelector} tbody tr");
@@ -117,6 +123,8 @@ public sealed class ExamRunListPage : BasePage
                 }
             }
         }
+
+        return this;
     }
 
     public string? GetCountOfQueryResults()
@@ -148,7 +156,7 @@ public sealed class ExamRunListPage : BasePage
         return _wait.Until(d => d.FindElements(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")).Count == 0);
     }
 
-    public void ClickMoreButton()
+    public ExamRunListPage ClickMoreButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")));
@@ -157,6 +165,8 @@ public sealed class ExamRunListPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
 }

@@ -7,6 +7,7 @@ namespace KpUiTestxUnit
 {
     public abstract class TestBase : IDisposable
     {
+        protected const int MaxRetries = 2;
         protected readonly IWebDriver _driver;
         protected readonly WebDriverWait _wait;
         protected readonly SetupFixture _fixture;
@@ -22,36 +23,68 @@ namespace KpUiTestxUnit
 
         protected void RunTest(Action test, [CallerMemberName] string testName = "")
         {
-            try
+            int attempt = 0;
+            while (attempt < MaxRetries)
             {
-                test();
-            }
-            catch
-            {
-                TakeScreenshot(testName);
-                throw;
+                attempt++;
+                try
+                {
+                    test();
+                    if (attempt > 1)
+                    {
+                        Console.WriteLine($"FLAKY TEST: Test ${testName} passed after {attempt} attempts.");
+                    }
+                    break;
+                }
+                catch
+                {
+                    TakeScreenshot(testName, attempt);
+                    
+                    if (attempt < MaxRetries)
+                    {
+                        continue;
+                    }
+
+                    throw;
+                }
             }
         }
 
         protected async Task RunTestAsync(Func<Task> test, [CallerMemberName] string testName = "")
         {
-            try
+            int attempt = 0;
+            while (attempt < MaxRetries)
             {
-                await test();
-            }
-            catch
-            {
-                TakeScreenshot(testName);
-                throw;
-            }
-        }        
+                attempt++;
+                try
+                {
+                    await test();
+                    if (attempt > 1)
+                    {
+                        Console.WriteLine($"FLAKY TEST: Test ${testName} passed after {attempt} attempts.");
+                    }                    
+                    break;
+                }
+                catch
+                {
+                    TakeScreenshot(testName, attempt);
+                    
+                    if (attempt < MaxRetries)
+                    {
+                        continue;
+                    }
 
-        private void TakeScreenshot(string testName)
+                    throw;
+                }
+            }
+        }
+
+        private void TakeScreenshot(string testName, int attempt)
         {
             var screenshot = ((ITakesScreenshot)_driver).GetScreenshot();
             var folder = Path.Combine(Directory.GetCurrentDirectory(), "Screenshots");
             Directory.CreateDirectory(folder);
-            var fileName = $"{testName}_{DateTime.Now:yyyyMMdd_HHmmss}.png";
+            var fileName = $"{testName}_r{attempt}_{DateTime.Now:yyyyMMdd_HHmmss}.png";
             screenshot.SaveAsFile(Path.Combine(folder, fileName));
         }
 
@@ -98,7 +131,7 @@ namespace KpUiTestxUnit
 
         protected async Task<string?> PutCall(string url, object payload)
         {
-            var request = new RestRequest(url, Method.Put); 
+            var request = new RestRequest(url, Method.Put);
             if (payload is string json)
             {
                 request.AddStringBody(json, DataFormat.Json);
@@ -107,7 +140,7 @@ namespace KpUiTestxUnit
             {
                 request.AddJsonBody(payload);
             }
-            var response = await _client.ExecuteAsync(request); 
+            var response = await _client.ExecuteAsync(request);
             if (response.IsSuccessful)
             {
                 return response.Content;

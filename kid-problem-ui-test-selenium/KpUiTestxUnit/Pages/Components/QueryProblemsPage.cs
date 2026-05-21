@@ -8,7 +8,7 @@ public sealed class QueryProblemsPage : BasePage
     public QueryProblemsPage(IWebDriver driver) : base(driver, "app-problem-search-dialog")
     { }
 
-    public void EnterKeyword(string keyword)
+    public QueryProblemsPage EnterKeyword(string keyword)
     {
         IsNotLoading();
         var textbox = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} input[data-testid=\"keyword\"]")));
@@ -18,9 +18,11 @@ public sealed class QueryProblemsPage : BasePage
             textbox.SendKeys(Keys.Backspace);
             textbox.SendKeys(keyword);
         }
+
+        return this;
     }
 
-    public void ClickSearchButton()
+    public QueryProblemsPage ClickSearchButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnSearch\"]")));
@@ -29,9 +31,11 @@ public sealed class QueryProblemsPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
-    public void ClickSelectButton()
+    public QueryProblemsPage ClickSelectButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnSelect\"]")));
@@ -40,9 +44,11 @@ public sealed class QueryProblemsPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
-    public void ClickCloseButton()
+    public QueryProblemsPage ClickCloseButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnClose\"]")));
@@ -51,9 +57,11 @@ public sealed class QueryProblemsPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
-    public void ClickSelectAllButton()
+    public QueryProblemsPage ClickSelectAllButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} mat-slide-toggle[data-testid=\"btnSelectAll\"]")));
@@ -62,9 +70,11 @@ public sealed class QueryProblemsPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
-    public void ClickProblemCheckboxes(int[] indexes)
+    public QueryProblemsPage ClickProblemCheckboxes(int[] indexes)
     {
         IsNotLoading();
         _wait.Until(d => d.FindElements(By.CssSelector($"{_rootCssSelector} mat-checkbox[data-testid=\"problemTitle\"]")).Count > 0);
@@ -77,6 +87,8 @@ public sealed class QueryProblemsPage : BasePage
                 checkbox.Click();
             }
         }
+
+        return this;
     }
 
     public string[] GetProblemTitle()

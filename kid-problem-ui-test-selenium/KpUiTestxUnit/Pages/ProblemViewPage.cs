@@ -10,10 +10,11 @@ public sealed class ProblemViewPage : BasePage
     public ProblemViewPage(IWebDriver driver) : base(driver)
     { }
 
-    public void GoTo(string problemTitle)
+    public ProblemViewPage GoTo(string problemTitle)
     {
         _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/problem/view/{problemTitle}");
         IsNotLoading();
+        return this;
     }
 
     public string? GetProblemTitle()
@@ -136,7 +137,7 @@ public sealed class ProblemViewPage : BasePage
         return null;
     }
 
-    public void ClickPreviewButton()
+    public ProblemViewPage ClickPreviewButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} button[data-testid=\"btnPreview\"]")));
@@ -145,9 +146,10 @@ public sealed class ProblemViewPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
-    public void ClickEditButton()
+    public ProblemViewPage ClickEditButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} a[data-testid=\"btnEdit\"]")));
@@ -156,6 +158,7 @@ public sealed class ProblemViewPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
     public string? GetPreviousProblem()

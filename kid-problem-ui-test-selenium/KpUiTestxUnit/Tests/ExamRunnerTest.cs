@@ -69,8 +69,7 @@ namespace KpUiTestxUnit.Tests
 
                 Assert.Equal("Problem 1 - AMC10-2010A-001", page.GetCurrentProblemTitle());
 
-                page.ClickAnswerButton("A");
-                page.ClickNavigateButton("2");
+                page.ClickAnswerButton("A").ClickNavigateButton("2");
                 Assert.Equal("Problem 2 - AMC10-2010A-002", page.GetCurrentProblemTitle());
 
             });
@@ -112,8 +111,7 @@ namespace KpUiTestxUnit.Tests
             {
                 string runId = "af27a24b-6a90-4b79-bed6-78edc74ee3c0";
                 var page = new ExamRunnerPage(_driver);
-                page.GoTo(runId);
-                page.ClickCompleteButton();
+                page.GoTo(runId).ClickCompleteButton();
                 Assert.True(page.IsReviewButtonsShown());
 
                 page.ClickNotCompleteButton();
@@ -130,26 +128,26 @@ namespace KpUiTestxUnit.Tests
                 // a long and slow test
 
                 var assignmentListPage = new AssignmentListPage(_driver);
-                assignmentListPage.GoTo(true);
-                assignmentListPage.SetQueryDateRange("3/1/2026", "3/3/2026");
-                assignmentListPage.ClickSearchButton();
-                assignmentListPage.ClickDoAssignmentButtonInQueryResults(0);
+                assignmentListPage.GoTo(true)
+                .SetQueryDateRange("3/1/2026", "3/3/2026")
+                .ClickSearchButton()
+                .ClickDoAssignmentButtonInQueryResults(0);
                 Assert.True(_wait.Until(d => d.Url.Contains("/examrun/run/")));
 
                 var runnerPage = new ExamRunnerPage(_driver);
                 Assert.Equal("Problem 1 - AMC10-2010A-001", runnerPage.GetCurrentProblemTitle());
-                runnerPage.ClickAnswerButton("A");
-                runnerPage.ClickSubmitButton();
-                runnerPage.ClickAnswerButton("B");
-                runnerPage.ClickNavigateButton("3");
-                runnerPage.ClickAnswerButton("C");
-                runnerPage.ClickSubmitButton();
-                runnerPage.ClickAnswerButton("D");
-                runnerPage.ClickGuessButton();
-                runnerPage.ClickNavigateButton("5");
-                runnerPage.ClickAnswerButton("E");
-                runnerPage.ClickCompleteButton();
-                runnerPage.ClickFinalCompleteButton();
+                runnerPage.ClickAnswerButton("A")
+                .ClickSubmitButton()
+                .ClickAnswerButton("B")
+                .ClickNavigateButton("3")
+                .ClickAnswerButton("C")
+                .ClickSubmitButton()
+                .ClickAnswerButton("D")
+                .ClickGuessButton()
+                .ClickNavigateButton("5")
+                .ClickAnswerButton("E")
+                .ClickCompleteButton()
+                .ClickFinalCompleteButton();
 
                 var viewPage = new ExamRunViewPage(_driver);
                 Assert.Equal("AMC10", viewPage.GetExamCategory());

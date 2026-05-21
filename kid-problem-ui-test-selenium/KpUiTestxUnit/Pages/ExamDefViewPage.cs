@@ -1,5 +1,4 @@
 using OpenQA.Selenium;
-using OpenQA.Selenium.Internal;
 
 namespace KpUiTestxUnit.Pages;
 
@@ -9,10 +8,11 @@ public sealed class ExamDefViewPage : BasePage
     public ExamDefViewPage(IWebDriver driver) : base(driver, "app-exam-def-detail")
     { }
 
-    public void GoTo(string id)
+    public ExamDefViewPage GoTo(string id)
     {
         _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/examdef/view/{id}");
         IsNotLoading();
+        return this;
     }
 
 
@@ -65,7 +65,7 @@ public sealed class ExamDefViewPage : BasePage
         return [];
     }
 
-    public void ClickProblemTitleInExamDetails(string problemTitle)
+    public ExamDefViewPage ClickProblemTitleInExamDetails(string problemTitle)
     {
         IsNotLoading();
         string selector = $"{_rootCssSelector} span[data-testid=\"problemTitle\"]";
@@ -75,12 +75,14 @@ public sealed class ExamDefViewPage : BasePage
         if (item != null && item.Displayed && item.Enabled)
         {
             item.Click();
-            IsNotLoading(); 
+            IsNotLoading();
         }
+
+        return this;
     }
 
 
-    public void ClickCreateAssignmentButton(bool confirm = true)
+    public ExamDefViewPage ClickCreateAssignmentButton(bool confirm = true)
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnCreateAssignment\"]")));
@@ -91,9 +93,10 @@ public sealed class ExamDefViewPage : BasePage
             IsNotLoading();
         }
 
+        return this;
     }
 
-    public void ClickEditButton()
+    public ExamDefViewPage ClickEditButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnSwitchView\"]")));
@@ -101,8 +104,9 @@ public sealed class ExamDefViewPage : BasePage
         {
             button.Click();
             IsNotLoading();
-        }        
-        
+        }
+
+        return this;
     }
 
 }

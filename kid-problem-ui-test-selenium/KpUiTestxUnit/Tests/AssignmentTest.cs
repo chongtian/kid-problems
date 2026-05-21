@@ -1,7 +1,6 @@
 ﻿using KpUiTestxUnit.Data;
 using KpUiTestxUnit.Models;
 using KpUiTestxUnit.Pages;
-using NuGet.Frameworks;
 
 namespace KpUiTestxUnit.Tests
 {
@@ -25,10 +24,10 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new AssignmentListPage(_driver);
-                page.GoTo();
+                page.GoTo()
+                .SetQueryDateRange(startTime, endTime)
+                .ClickSearchButton();
 
-                page.SetQueryDateRange(startTime, endTime);
-                page.ClickSearchButton();
                 Assert.Equal(expectedCount, page.GetCountOfQueryResults());
                 var records = page.GetAssignmentsFromQueryResults();
                 Assert.True(records.Length > 0);
@@ -45,11 +44,11 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new AssignmentListPage(_driver);
-                page.GoTo();
+                page.GoTo()
+                .SetQueryDateRange(startTime, endTime)
+                .ClickSearchButton()
+                .ClickAssignmentTitleInQueryResults(selectIndex);
 
-                page.SetQueryDateRange(startTime, endTime);
-                page.ClickSearchButton();
-                page.ClickAssignmentTitleInQueryResults(selectIndex);
                 Assert.True(_wait.Until(d => d.Url.Contains($"{Constants.BASE_URL}/assignment/view/{uid}")));
                 var destPage = new AssignmentViewPage(_driver);
                 Assert.Equal(examTitle, destPage.GetExamTitle());
@@ -85,10 +84,9 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new AssignmentListPage(_driver);
-                page.GoTo();
-
-                page.SetQueryDateRange("4/1/2023", "4/30/2023");
-                page.ClickSearchButton();
+                page.GoTo()
+                .SetQueryDateRange("4/1/2023", "4/30/2023")
+                .ClickSearchButton();
                 Assert.Equal("25", page.GetCountOfQueryResults());
 
                 page.Paginator.ClickNextPageButton();
@@ -119,10 +117,9 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new AssignmentListPage(_driver);
-                page.GoTo();
-
-                page.SetQueryDateRange("4/1/2023", "4/30/2023");
-                page.ClickSearchButton();
+                page.GoTo()
+                .SetQueryDateRange("4/1/2023", "4/30/2023")
+                .ClickSearchButton();
                 Assert.Equal("25", page.GetCountOfQueryResults());
                 Assert.True(page.IsLoadMoreButtonShown());
 

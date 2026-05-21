@@ -7,12 +7,13 @@ public class ProblemUploadAnswersPage : BasePage
     private readonly string rootCssSelector = "app-update-answer";
     public ProblemUploadAnswersPage(IWebDriver driver) : base(driver) { }
 
-    public void GoTo()
+    public ProblemUploadAnswersPage GoTo()
     {
         _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/problem/answers");
+        return this;
     }
 
-    public void EnterProblemCategory(string value)
+    public ProblemUploadAnswersPage EnterProblemCategory(string value)
     {
         IsNotLoading();
         var textbox = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} input[data-testid=\"problemCategory\"]")));
@@ -22,9 +23,10 @@ public class ProblemUploadAnswersPage : BasePage
             textbox.SendKeys(Keys.Backspace);
             textbox.SendKeys(value);
         }
+        return this;
     }
 
-    public void EnterProblemYear(string value)
+    public ProblemUploadAnswersPage EnterProblemYear(string value)
     {
         IsNotLoading();
         var textbox = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} input[data-testid=\"problemYear\"]")));
@@ -34,9 +36,10 @@ public class ProblemUploadAnswersPage : BasePage
             textbox.SendKeys(Keys.Backspace);
             textbox.SendKeys(value);
         }
+        return this;
     }
 
-    public void EnterAnswerKeys(string value)
+    public ProblemUploadAnswersPage EnterAnswerKeys(string value)
     {
         IsNotLoading();
         var textbox = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} textarea[data-testid=\"answerKeys\"]")));
@@ -46,6 +49,7 @@ public class ProblemUploadAnswersPage : BasePage
             textbox.SendKeys(Keys.Backspace);
             textbox.SendKeys(value);
         }
+        return this;
     }
 
     public string? GetGeneratedAnswerKeys()
@@ -59,7 +63,7 @@ public class ProblemUploadAnswersPage : BasePage
         return null;
     }
 
-    public void ClickGenerateButton()
+    public ProblemUploadAnswersPage ClickGenerateButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} button[data-testid=\"btnGenerate\"]")));
@@ -68,9 +72,10 @@ public class ProblemUploadAnswersPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
-    public void ClickSaveButton()
+    public ProblemUploadAnswersPage ClickSaveButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} button[data-testid=\"btnSave\"]")));
@@ -79,6 +84,7 @@ public class ProblemUploadAnswersPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
 }

@@ -6,9 +6,10 @@ public class DashboardPage : BasePage
 {
     public DashboardPage(IWebDriver driver) : base(driver, "app-home") { }
 
-    public void GoTo()
+    public DashboardPage GoTo()
     {
         _driver.Navigate().GoToUrl($"{Constants.HOME_URL}");
+        return this;
     }
 
     public string[] GetDashboardItemTitles()

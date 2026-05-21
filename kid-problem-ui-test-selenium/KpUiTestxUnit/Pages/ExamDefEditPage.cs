@@ -12,7 +12,7 @@ public sealed class ExamDefEditPage : BasePage
         QueryPage = new QueryProblemsPage(driver);
     }
 
-    public void GoTo(string? id = null)
+    public ExamDefEditPage GoTo(string? id = null)
     {
         if (string.IsNullOrEmpty(id))
         {
@@ -24,9 +24,11 @@ public sealed class ExamDefEditPage : BasePage
         }
 
         IsNotLoading();
+
+        return this;
     }
 
-    public void SelectExamCategory(string value)
+    public ExamDefEditPage SelectExamCategory(string value)
     {
         IsNotLoading();
         var select = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} mat-select[data-testid=\"examCategory\"]")));
@@ -34,6 +36,8 @@ public sealed class ExamDefEditPage : BasePage
         {
             MatSelectHelper.SelectOptionByLabelValue(_driver, _wait, select, value, _rootCssSelector);
         }
+
+        return this;
     }
 
     public string GetExamCategory()
@@ -44,9 +48,10 @@ public sealed class ExamDefEditPage : BasePage
     }
 
 
-    public void EnterExamTitle(string value)
+    public ExamDefEditPage EnterExamTitle(string value)
     {
         EnterTextField("examTitle", value);
+        return this;
     }
 
     public string? GetExamTitle()
@@ -54,9 +59,10 @@ public sealed class ExamDefEditPage : BasePage
         return GetTextFieldValue("examTitle");
     }
 
-    public void EnterExamYear(string value)
+    public ExamDefEditPage EnterExamYear(string value)
     {
         EnterTextField("examYear", value);
+        return this;
     }
 
     public string? GetExamYear()
@@ -64,9 +70,10 @@ public sealed class ExamDefEditPage : BasePage
         return GetTextFieldValue("examYear");
     }
 
-    public void EnterMemo(string value)
+    public ExamDefEditPage EnterMemo(string value)
     {
         EnterTextField("memo", value);
+        return this;
     }
 
     public string? GetMemo()
@@ -74,7 +81,7 @@ public sealed class ExamDefEditPage : BasePage
         return GetTextFieldValue("memo");
     }
 
-    public void ClickExamStatus()
+    public ExamDefEditPage ClickExamStatus()
     {
         IsNotLoading();
         var checkbox = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} mat-checkbox[data-testid=\"examStatus\"] input[type=\"checkbox\"]")));
@@ -82,6 +89,7 @@ public sealed class ExamDefEditPage : BasePage
         {
             checkbox.Click();
         }
+        return this;
     }
 
     public bool? GetExamStatus()
@@ -95,7 +103,7 @@ public sealed class ExamDefEditPage : BasePage
         return null;
     }
 
-    public void SelectExamType(string value)
+    public ExamDefEditPage SelectExamType(string value)
     {
         IsNotLoading();
         var select = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} mat-select[data-testid=\"examType\"]")));
@@ -103,6 +111,7 @@ public sealed class ExamDefEditPage : BasePage
         {
             MatSelectHelper.SelectOptionByLabelValue(_driver, _wait, select, value, _rootCssSelector);
         }
+        return this;
     }
 
     public string GetExamType()
@@ -112,7 +121,7 @@ public sealed class ExamDefEditPage : BasePage
         return selector.Text;
     }
 
-    public void ClickAddProblemButton()
+    public ExamDefEditPage ClickAddProblemButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnAddProblems\"]")));
@@ -121,6 +130,7 @@ public sealed class ExamDefEditPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
     public string[] GetExamDetails()
@@ -143,7 +153,7 @@ public sealed class ExamDefEditPage : BasePage
         }
     }
 
-    public void ClickDeleteButtonOnExamDetails(int index)
+    public ExamDefEditPage ClickDeleteButtonOnExamDetails(int index)
     {
         IsNotLoading();
         var buttons = _wait.Until(d => d.FindElements(By.CssSelector($"{_rootCssSelector} div[data-testid=\"problem\"] button[data-testid=\"btnDelete\"]")));
@@ -155,9 +165,10 @@ public sealed class ExamDefEditPage : BasePage
                 button.Click();
             }
         }
+        return this;
     }
 
-    public void ClickSaveButton(bool confirm = true)
+    public ExamDefEditPage ClickSaveButton(bool confirm = true)
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnSave\"]")));
@@ -167,9 +178,10 @@ public sealed class ExamDefEditPage : BasePage
             AlertHelper.HandleAlert(_wait, confirm);
             IsNotLoading();
         }
+        return this;
     }
 
-    public void ClickDeleteButton(bool confirm = true)
+    public ExamDefEditPage ClickDeleteButton(bool confirm = true)
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnDelete\"]")));
@@ -179,9 +191,10 @@ public sealed class ExamDefEditPage : BasePage
             AlertHelper.HandleAlert(_wait, confirm);
             IsNotLoading();
         }
+        return this;
     }
 
-    public void ClickBackToViewButton()
+    public ExamDefEditPage ClickBackToViewButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnSwitchView\"]")));
@@ -190,6 +203,7 @@ public sealed class ExamDefEditPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
 }

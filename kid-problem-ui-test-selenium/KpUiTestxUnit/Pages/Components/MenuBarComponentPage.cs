@@ -1,4 +1,3 @@
-using KpUiTestxUnit.Utilties;
 using OpenQA.Selenium;
 
 namespace KpUiTestxUnit.Pages;
@@ -10,116 +9,132 @@ public sealed class MenuBarComponentPage : BasePage
     public MenuBarComponentPage(IWebDriver driver) : base(driver)
     { }
 
-    public void ClickExamRunsBrowseAll()
+    public MenuBarComponentPage ClickExamRunsBrowseAll()
     {
         var lv1MenuId = "menuExamRuns";
         var lv2MenuId = "menuBrowseAllExam";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickExamRunsBrowseLatest()
+    public MenuBarComponentPage ClickExamRunsBrowseLatest()
     {
         var lv1MenuId = "menuExamRuns";
         var lv2MenuId = "menuBrowseLatestExam";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickExamRunsExamSummary()
+    public MenuBarComponentPage ClickExamRunsExamSummary()
     {
         var lv1MenuId = "menuExamRuns";
         var lv2MenuId = "menuBrowseExamSummary";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickExamRunsProblemSummary()
+    public MenuBarComponentPage ClickExamRunsProblemSummary()
     {
         var lv1MenuId = "menuExamRuns";
         var lv2MenuId = "menuBrowseProblemSummary";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickBrowseAllAssignments()
+    public MenuBarComponentPage ClickBrowseAllAssignments()
     {
         var lv1MenuId = "menuAssignments";
         var lv2MenuId = "menuBrowseAllAssignment";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickBrowseLatestAssignments()
+    public MenuBarComponentPage ClickBrowseLatestAssignments()
     {
         var lv1MenuId = "menuAssignments";
         var lv2MenuId = "menuBrowseLatestAssignment";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickCreateExamDefinition()
+    public MenuBarComponentPage ClickCreateExamDefinition()
     {
         var lv1MenuId = "menuExamDefinitions";
         var lv2MenuId = "menuCreateExamDefinitions";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickBrowseActiveExamDefinition()
+    public MenuBarComponentPage ClickBrowseActiveExamDefinition()
     {
         var lv1MenuId = "menuExamDefinitions";
         var lv2MenuId = "menuBrowseActiveExamDefinitions";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickBrowseAllExamDefinition()
+    public MenuBarComponentPage ClickBrowseAllExamDefinition()
     {
         var lv1MenuId = "menuExamDefinitions";
         var lv2MenuId = "menuBrowseAllExamDefinitions";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickBrowseProblems()
+    public MenuBarComponentPage ClickBrowseProblems()
     {
         var lv1MenuId = "menuProblems";
         var lv2MenuId = "menuBrowseProblems";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickCreateProblem()
+    public MenuBarComponentPage ClickCreateProblem()
     {
         var lv1MenuId = "menuProblems";
         var lv2MenuId = "menuCreateProblem";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickBrowseStagingProblems()
+    public MenuBarComponentPage ClickBrowseStagingProblems()
     {
         var lv1MenuId = "menuProblems";
         var lv2MenuId = "menuBrowseStagingProblems";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickCrawlProblems()
+    public MenuBarComponentPage ClickCrawlProblems()
     {
         var lv1MenuId = "menuProblems";
         var lv2MenuId = "menuCrawlProblems";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickUploadAnswers()
+    public MenuBarComponentPage ClickUploadAnswers()
     {
         var lv1MenuId = "menuProblems";
         var lv2MenuId = "menuUploadAnswers";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickBulkUpdate()
+    public MenuBarComponentPage ClickBulkUpdate()
     {
         var lv1MenuId = "menuProblems";
         var lv2MenuId = "menuBulkUpdate";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
-    public void ClickBulkCreate()
+    public MenuBarComponentPage ClickBulkCreate()
     {
         var lv1MenuId = "menuProblems";
         var lv2MenuId = "menuBulkCreate";
         ClickSubmenu(lv1MenuId, lv2MenuId);
+        return this;
     }
 
     private void ClickSubmenu(string lv1MenuId, string lv2MenuId)
