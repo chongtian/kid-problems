@@ -13,7 +13,7 @@ public sealed class ExamDefinitionListPage : BasePage
         Paginator = new PaginatorComponentPage(driver);
     }
 
-    public void GoTo(bool all = true)
+    public ExamDefinitionListPage GoTo(bool all = true)
     {
         if (all)
         {
@@ -24,9 +24,11 @@ public sealed class ExamDefinitionListPage : BasePage
             _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/examdefs");
         }
         IsNotLoading();
+
+        return this;
     }
 
-    public void EnterKeyword(string keyword)
+    public ExamDefinitionListPage EnterKeyword(string keyword)
     {
         IsNotLoading();
         var textbox = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} input[data-testid=\"keyword\"]")));
@@ -36,9 +38,11 @@ public sealed class ExamDefinitionListPage : BasePage
             textbox.SendKeys(Keys.Backspace);
             textbox.SendKeys(keyword);
         }
+
+        return this;
     }
 
-    public void ClickSearchButton()
+    public ExamDefinitionListPage ClickSearchButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnSearch\"]")));
@@ -47,9 +51,11 @@ public sealed class ExamDefinitionListPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
-    public void SelectExamCategory(string value)
+    public ExamDefinitionListPage SelectExamCategory(string value)
     {
         IsNotLoading();
         var select = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} mat-select[data-testid=\"category\"]")));
@@ -57,6 +63,8 @@ public sealed class ExamDefinitionListPage : BasePage
         {
             MatSelectHelper.SelectOptionByLabelValue(_driver, _wait, select, value);
         }
+
+        return this;
     }
 
     public string GetExamCategory()
@@ -102,7 +110,7 @@ public sealed class ExamDefinitionListPage : BasePage
         return [];
     }
 
-    public void ClickExamTitleInQueryResults(int index)
+    public ExamDefinitionListPage ClickExamTitleInQueryResults(int index)
     {
         IsNotLoading();
         var selector = By.CssSelector($"{_rootCssSelector} tbody tr");
@@ -121,6 +129,8 @@ public sealed class ExamDefinitionListPage : BasePage
                 }
             }
         }
+
+        return this;
     }
 
     public string? GetCountOfQueryResults()
@@ -152,7 +162,7 @@ public sealed class ExamDefinitionListPage : BasePage
         return _wait.Until(d => d.FindElements(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")).Count == 0);
     }
 
-    public void ClickMoreButton()
+    public ExamDefinitionListPage ClickMoreButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")));
@@ -161,6 +171,8 @@ public sealed class ExamDefinitionListPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
 }

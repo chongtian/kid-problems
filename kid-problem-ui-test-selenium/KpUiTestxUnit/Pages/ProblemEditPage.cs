@@ -8,7 +8,7 @@ public sealed class ProblemEditPage : BasePage
     public ProblemEditPage(IWebDriver driver) : base(driver, "app-problem-detail")
     { }
 
-    public void GoTo(string? problemTitle = null)
+    public ProblemEditPage GoTo(string? problemTitle = null)
     {
         if (string.IsNullOrEmpty(problemTitle))
         {
@@ -20,10 +20,12 @@ public sealed class ProblemEditPage : BasePage
         }
 
         IsNotLoading();
+
+        return this;
     }
 
     // ProblemTitle is readonly
-    // public void EnterProblemTitle(string value)
+    // public ProblemEditPage EnterProblemTitle(string value)
     // {
     //     EnterTextField("problemTitle", value);
     // }
@@ -33,9 +35,10 @@ public sealed class ProblemEditPage : BasePage
         return GetTextFieldValue("problemTitle");
     }
 
-    public void EnterProblemCategory(string value)
+    public ProblemEditPage EnterProblemCategory(string value)
     {
         EnterTextField("problemCategory", value);
+        return this;
     }
 
     public string? GetProblemCategory()
@@ -43,9 +46,10 @@ public sealed class ProblemEditPage : BasePage
         return GetTextFieldValue("problemCategory");
     }
 
-    public void EnterProblemYear(string value)
+    public ProblemEditPage EnterProblemYear(string value)
     {
         EnterTextField("problemYear", value);
+        return this;
     }
 
     public string? GetProblemYear()
@@ -53,9 +57,10 @@ public sealed class ProblemEditPage : BasePage
         return GetTextFieldValue("problemYear");
     }
 
-    public void EnterProblemNumber(string value)
+    public ProblemEditPage EnterProblemNumber(string value)
     {
         EnterTextField("problemNumber", value);
+        return this;
     }
 
     public string? GetProblemNumber()
@@ -63,9 +68,10 @@ public sealed class ProblemEditPage : BasePage
         return GetTextFieldValue("problemNumber");
     }
 
-    public void EnterProblemAnswer(string value)
+    public ProblemEditPage EnterProblemAnswer(string value)
     {
         EnterTextField("problemAnswer", value);
+        return this;
     }
 
     public string? GetProblemAnswer()
@@ -73,9 +79,10 @@ public sealed class ProblemEditPage : BasePage
         return GetTextFieldValue("problemAnswer");
     }
 
-    public void EnterProblemTags(string value)
+    public ProblemEditPage EnterProblemTags(string value)
     {
         EnterTextField("problemTags", value);
+        return this;
     }
 
     public string? GetProblemTags()
@@ -83,9 +90,10 @@ public sealed class ProblemEditPage : BasePage
         return GetTextFieldValue("problemTags");
     }
 
-    public void EnterAnswerOptions(string value)
+    public ProblemEditPage EnterAnswerOptions(string value)
     {
         EnterTextField("answerOptions", value);
+        return this;
     }
 
     public string? GetAnswerOptions()
@@ -93,9 +101,10 @@ public sealed class ProblemEditPage : BasePage
         return GetTextFieldValue("answerOptions");
     }
 
-    public void EnterProblemText(string value)
+    public ProblemEditPage EnterProblemText(string value)
     {
         EnterTextField("problemText", value, true);
+        return this;
     }
 
     public string? GetProblemText()
@@ -103,9 +112,10 @@ public sealed class ProblemEditPage : BasePage
         return GetTextFieldValue("problemText", true);
     }
 
-    public void EnterSolutionText(string value)
+    public ProblemEditPage EnterSolutionText(string value)
     {
         EnterTextField("solutionText", value, true);
+        return this;
     }
 
     public string? GetSolutionText()
@@ -113,7 +123,7 @@ public sealed class ProblemEditPage : BasePage
         return GetTextFieldValue("solutionText", true);
     }
 
-    public void ClickIsStaging()
+    public ProblemEditPage ClickIsStaging()
     {
         IsNotLoading();
         var checkbox = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} mat-checkbox[data-testid=\"isStaging\"] input[type=\"checkbox\"]")));
@@ -121,6 +131,7 @@ public sealed class ProblemEditPage : BasePage
         {
             checkbox.Click();
         }
+        return this;
     }
 
     public bool? GetIsStaging()
@@ -140,20 +151,20 @@ public sealed class ProblemEditPage : BasePage
         return textField.Text.Trim();
     }
 
-    public void ClickSaveButton(bool confirm = true)
+    public ProblemEditPage ClickSaveButton(bool confirm = true)
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnSave\"]")));
         if (button != null && button.Enabled && button.Displayed)
         {
             button.Click();
-            AlertHelper.HandleAlert(_wait, confirm); 
+            AlertHelper.HandleAlert(_wait, confirm);
             IsNotLoading();
         }
-
+        return this;
     }
 
-    public void ClickPreviewButton()
+    public ProblemEditPage ClickPreviewButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnPreview\"]")));
@@ -162,18 +173,20 @@ public sealed class ProblemEditPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
-    public void ClickDeleteButton(bool confirm = true)
+    public ProblemEditPage ClickDeleteButton(bool confirm = true)
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnDelete\"]")));
         if (button != null && button.Enabled && button.Displayed)
         {
             button.Click();
-            AlertHelper.HandleAlert(_wait, confirm); 
+            AlertHelper.HandleAlert(_wait, confirm);
             IsNotLoading();
         }
-    }    
+        return this;
+    }
 
 }

@@ -9,10 +9,11 @@ public sealed class ExamRunViewPage : BasePage
     public ExamRunViewPage(IWebDriver driver) : base(driver, "app-exam-run-detail")
     { }
 
-    public void GoTo(string id)
+    public ExamRunViewPage GoTo(string id)
     {
         _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/examrun/view/{id}");
         IsNotLoading();
+        return this;
     }
 
     public string? GetExamTitle()
@@ -96,7 +97,7 @@ public sealed class ExamRunViewPage : BasePage
 
         return [];
     }
-    public void ClickProblemTitleInExamRunDetails(int index)
+    public ExamRunViewPage ClickProblemTitleInExamRunDetails(int index)
     {
         IsNotLoading();
         var selector = By.CssSelector($"{_rootCssSelector} tbody tr");
@@ -115,9 +116,11 @@ public sealed class ExamRunViewPage : BasePage
                 }
             }
         }
+
+        return this;
     }
 
-    public void ClickGoToAssignment()
+    public ExamRunViewPage ClickGoToAssignment()
     {
         var link = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} span[data-testid=\"linkToAssignment\"] a")));
         if (link != null && link.Enabled && link.Displayed)
@@ -125,6 +128,8 @@ public sealed class ExamRunViewPage : BasePage
             link.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
 }

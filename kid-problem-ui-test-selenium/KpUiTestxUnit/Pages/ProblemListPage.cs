@@ -8,7 +8,7 @@ public sealed class ProblemListPage : BasePage
     public ProblemListPage(IWebDriver driver) : base(driver, "app-problem-query")
     { }
 
-    public void GoTo(bool isStaging = false)
+    public ProblemListPage GoTo(bool isStaging = false)
     {
         if (isStaging)
         {
@@ -20,9 +20,11 @@ public sealed class ProblemListPage : BasePage
         }
 
         IsNotLoading();
+
+        return this;
     }
 
-    public void EnterKeyword(string keyword)
+    public ProblemListPage EnterKeyword(string keyword)
     {
         IsNotLoading();
         var textbox = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} input[data-testid=\"keyword\"]")));
@@ -32,9 +34,11 @@ public sealed class ProblemListPage : BasePage
             textbox.SendKeys(Keys.Backspace);
             textbox.SendKeys(keyword);
         }
+
+        return this;
     }
 
-    public void ClickSearchButton()
+    public ProblemListPage ClickSearchButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnSearch\"]")));
@@ -43,6 +47,8 @@ public sealed class ProblemListPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
     public bool IsLoadMoreButtonShown()
@@ -64,7 +70,7 @@ public sealed class ProblemListPage : BasePage
         }
     }
 
-    public void ClickLoadMoreButton()
+    public ProblemListPage ClickLoadMoreButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")));
@@ -73,6 +79,8 @@ public sealed class ProblemListPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
     public string[] GetProblemTitle()

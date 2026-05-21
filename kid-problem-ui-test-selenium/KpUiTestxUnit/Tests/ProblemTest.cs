@@ -20,9 +20,9 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new ProblemListPage(_driver);
-                page.GoTo(isStaging);
-                page.EnterKeyword(keyword);
-                page.ClickSearchButton();
+                page.GoTo(isStaging)
+                .EnterKeyword(keyword)
+                .ClickSearchButton();
                 Assert.False(page.IsLoadMoreButtonShown());
                 var results = page.GetProblemTitle();
                 Assert.True(results.Length == expectedCount);
@@ -39,9 +39,9 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new ProblemListPage(_driver);
-                page.GoTo(isStaging);
-                page.EnterKeyword(keyword);
-                page.ClickSearchButton();
+                page.GoTo(isStaging)
+                .EnterKeyword(keyword)
+                .ClickSearchButton();
                 Assert.True(page.IsLoadMoreButtonShown());
                 page.ClickLoadMoreButton();
                 Assert.False(page.IsLoadMoreButtonShown());
@@ -58,11 +58,10 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new ProblemBulkUpdatePage(_driver);
-                page.GoTo();
-                page.EnterKeyword(keyword);
-                page.ClickOpenQueryButton();
-                page.QueryPage.ClickSelectAllButton();
-                page.QueryPage.ClickSelectButton();
+                page.GoTo()
+                .EnterKeyword(keyword)
+                .ClickOpenQueryButton();
+                page.QueryPage.ClickSelectAllButton().ClickSelectButton();
                 var stagingProblemTitles = page.GetStagingProblemTitles();
                 var stagingProblemAnswers = page.GetStagingProblemAnswers();
 
@@ -77,11 +76,11 @@ namespace KpUiTestxUnit.Tests
             RunTest(() =>
             {
                 var page = new ProblemUploadAnswersPage(_driver);
-                page.GoTo();
-                page.EnterProblemCategory("AMC12");
-                page.EnterProblemYear("2020A");
-                page.EnterAnswerKeys("A\nB\nC\nD\nE");
-                page.ClickGenerateButton();
+                page.GoTo()
+                .EnterProblemCategory("AMC12")
+                .EnterProblemYear("2020A")
+                .EnterAnswerKeys("A\nB\nC\nD\nE")
+                .ClickGenerateButton();
 
                 var result = page.GetGeneratedAnswerKeys();
                 Assert.NotNull(result);
@@ -101,23 +100,21 @@ namespace KpUiTestxUnit.Tests
             await RunTestAsync(async () =>
             {
                 var page = new ProblemEditPage(_driver);
-                page.GoTo();
-
-                page.EnterProblemCategory("TEST");
-                page.EnterProblemYear("2026");
-                page.EnterProblemNumber("001");
-                page.EnterProblemAnswer("A");
-                page.EnterProblemTags("Test");
-                page.EnterAnswerOptions("A,B,C,D,E");
-                page.ClickIsStaging();
-                page.EnterProblemText("TEST PROBLEM TEXT LINE 1\nTEST PROBLEM TEXT LINE 2");
-                page.EnterSolutionText("TEST SOLUTION TEXT LINE 1\nTEST SOLUTION TEXT LINE 2");
+                page.GoTo()
+                .EnterProblemCategory("TEST")
+                .EnterProblemYear("2026")
+                .EnterProblemNumber("001")
+                .EnterProblemAnswer("A")
+                .EnterProblemTags("Test")
+                .EnterAnswerOptions("A,B,C,D,E")
+                .ClickIsStaging()
+                .EnterProblemText("TEST PROBLEM TEXT LINE 1\nTEST PROBLEM TEXT LINE 2")
+                .EnterSolutionText("TEST SOLUTION TEXT LINE 1\nTEST SOLUTION TEXT LINE 2");
 
                 string problemTitle = "TEST-2026-001";
                 Assert.Equal(problemTitle, page.GetProblemTitle());
 
                 page.ClickSaveButton();
-
                 Assert.True(_wait.Until(d => d.Url.Contains($"/problem/edit/{problemTitle}")));
 
                 // rollback
@@ -144,14 +141,13 @@ namespace KpUiTestxUnit.Tests
                 string problemTitle = "TEST-2026-002";
 
                 var page = new ProblemEditPage(_driver);
-                page.GoTo(problemTitle);
-
-                page.EnterProblemAnswer("E");
-                page.EnterProblemTags("PL,Test");
-                page.ClickIsStaging();
-                page.EnterProblemText("UPDATE PROBLEM TEXT LINE 1\nUPDATE PROBLEM TEXT LINE 2");
-                page.EnterSolutionText("UPDATE SOLUTION TEXT LINE 1\nUPDATE SOLUTION TEXT LINE 2");
-                page.ClickSaveButton();
+                page.GoTo(problemTitle)
+                .EnterProblemAnswer("E")
+                .EnterProblemTags("PL,Test")
+                .ClickIsStaging()
+                .EnterProblemText("UPDATE PROBLEM TEXT LINE 1\nUPDATE PROBLEM TEXT LINE 2")
+                .EnterSolutionText("UPDATE SOLUTION TEXT LINE 1\nUPDATE SOLUTION TEXT LINE 2")
+                .ClickSaveButton();
 
                 // get data from service and assert
                 var data = await GetCall<ProblemInfo>($"problem/{problemTitle}");

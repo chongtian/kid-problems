@@ -1,4 +1,3 @@
-using Newtonsoft.Json.Converters;
 using OpenQA.Selenium;
 
 namespace KpUiTestxUnit.Pages;
@@ -8,10 +7,11 @@ public sealed class AssignmentViewPage : BasePage
     public AssignmentViewPage(IWebDriver driver) : base(driver, "app-assignment-detail")
     { }
 
-    public void GoTo(string id)
+    public AssignmentViewPage GoTo(string id)
     {
         _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/assignment/view/{id}");
         IsNotLoading();
+        return this;
     }
 
     public string? GetExamCategory()

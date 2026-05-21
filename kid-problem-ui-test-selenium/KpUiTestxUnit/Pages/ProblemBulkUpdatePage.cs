@@ -12,12 +12,13 @@ public sealed class ProblemBulkUpdatePage : BasePage
         QueryPage = new QueryProblemsPage(driver);
     }
 
-    public void GoTo()
+    public ProblemBulkUpdatePage GoTo()
     {
         _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/problem/bulkupdate");
+        return this;
     }
 
-    public void EnterKeyword(string keyword)
+    public ProblemBulkUpdatePage EnterKeyword(string keyword)
     {
         IsNotLoading();
         var textbox = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} input[data-testid=\"keyword\"]")));
@@ -27,9 +28,11 @@ public sealed class ProblemBulkUpdatePage : BasePage
             textbox.SendKeys(Keys.Backspace);
             textbox.SendKeys(keyword);
         }
+
+        return this;
     }
 
-    public void ClickOpenQueryButton()
+    public ProblemBulkUpdatePage ClickOpenQueryButton()
     {
         IsNotLoading();
 
@@ -42,9 +45,11 @@ public sealed class ProblemBulkUpdatePage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
-    public void ClickSaveButton()
+    public ProblemBulkUpdatePage ClickSaveButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{rootCssSelector} button[data-testid=\"btnSave\"]")));
@@ -53,6 +58,8 @@ public sealed class ProblemBulkUpdatePage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
     public string[] GetStagingProblemTitles()
@@ -65,7 +72,7 @@ public sealed class ProblemBulkUpdatePage : BasePage
         return GetTextFields("problemAnswer");
     }
 
-    public void ClickDeleteButton(int index)
+    public ProblemBulkUpdatePage ClickDeleteButton(int index)
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElements(By.CssSelector($"{rootCssSelector} span[data-testid=\"btnDelete\"]")).ElementAt(index));
@@ -74,6 +81,8 @@ public sealed class ProblemBulkUpdatePage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
     private string[] GetTextFields(string testId)

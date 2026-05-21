@@ -12,7 +12,7 @@ public sealed class AssignmentListPage : BasePage
         Paginator = new PaginatorComponentPage(driver);
     }
 
-    public void GoTo(bool all = true)
+    public AssignmentListPage GoTo(bool all = true)
     {
         if (all)
         {
@@ -23,9 +23,11 @@ public sealed class AssignmentListPage : BasePage
             _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/assignments");
         }
         IsNotLoading();
+
+        return this;
     }
 
-    public void SetQueryDateRange(string startTimeText, string endTimeText)
+    public AssignmentListPage SetQueryDateRange(string startTimeText, string endTimeText)
     {
         IsNotLoading();
 
@@ -44,9 +46,11 @@ public sealed class AssignmentListPage : BasePage
             endTimeElement.SendKeys(Keys.Backspace);
             endTimeElement.SendKeys(endTimeText);
         }
+
+        return this;
     }
 
-    public void ClickSearchButton()
+    public AssignmentListPage ClickSearchButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnSearch\"]")));
@@ -55,6 +59,8 @@ public sealed class AssignmentListPage : BasePage
             button.Click();
         }
         IsNotLoading();
+
+        return this;
     }
 
     public Assignment[] GetAssignmentsFromQueryResults()
@@ -91,7 +97,7 @@ public sealed class AssignmentListPage : BasePage
         return [];
     }
 
-    public void ClickAssignmentTitleInQueryResults(int index)
+    public AssignmentListPage ClickAssignmentTitleInQueryResults(int index)
     {
         IsNotLoading();
         var selector = By.CssSelector($"{_rootCssSelector} tbody tr");
@@ -110,9 +116,11 @@ public sealed class AssignmentListPage : BasePage
                 }
             }
         }
+
+        return this;
     }
 
-    public void ClickDoAssignmentButtonInQueryResults(int index)
+    public AssignmentListPage ClickDoAssignmentButtonInQueryResults(int index)
     {
         IsNotLoading();
         var selector = By.CssSelector($"{_rootCssSelector} tbody tr");
@@ -131,6 +139,8 @@ public sealed class AssignmentListPage : BasePage
                 }
             }
         }
+
+        return this;
     }
 
     public string? GetCountOfQueryResults()
@@ -162,7 +172,7 @@ public sealed class AssignmentListPage : BasePage
         return _wait.Until(d => d.FindElements(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")).Count == 0);
     }
 
-    public void ClickMoreButton()
+    public AssignmentListPage ClickMoreButton()
     {
         IsNotLoading();
         var button = _wait.Until(d => d.FindElement(By.CssSelector($"{_rootCssSelector} button[data-testid=\"btnMore\"]")));
@@ -171,6 +181,8 @@ public sealed class AssignmentListPage : BasePage
             button.Click();
             IsNotLoading();
         }
+
+        return this;
     }
 
 }

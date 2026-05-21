@@ -10,10 +10,11 @@ public class ExamRunnerPage : BasePage
     public ExamRunnerPage(IWebDriver driver) : base(driver, "app-exam-runner")
     { }
 
-    public void GoTo(string id)
+    public ExamRunnerPage GoTo(string id)
     {
         _driver.Navigate().GoToUrl($"{Constants.BASE_URL}/examrun/run/{id}");
         IsNotLoading();
+        return this;
     }
 
     public string? GetCurrentProblemTitle()
@@ -27,7 +28,7 @@ public class ExamRunnerPage : BasePage
         return null;
     }
 
-    public void ClickAnswerButton(string answer)
+    public ExamRunnerPage ClickAnswerButton(string answer)
     {
         IsNotLoading();
         var selector = $"{_rootCssSelector} button[data-testid=\"btnAnswers\"]";
@@ -42,9 +43,10 @@ public class ExamRunnerPage : BasePage
                 break;
             }
         }
+        return this;
     }
 
-    public void ClickNavigateButton(string number)
+    public ExamRunnerPage ClickNavigateButton(string number)
     {
         IsNotLoading();
         var selector = $"{_rootCssSelector} button[data-testid=\"navigateButtons\"]";
@@ -59,9 +61,10 @@ public class ExamRunnerPage : BasePage
                 break;
             }
         }
+        return this;
     }
 
-    public void ClickDeleteAnswerButton(bool confirm = true)
+    public ExamRunnerPage ClickDeleteAnswerButton(bool confirm = true)
     {
         IsNotLoading();
         var selector = $"{_rootCssSelector} button[data-testid=\"btnDeleteAnswer\"]";
@@ -72,9 +75,10 @@ public class ExamRunnerPage : BasePage
             AlertHelper.HandleAlert(_wait, confirm);
             IsNotLoading();
         }
+        return this;
     }
 
-    public void ClickGuessButton()
+    public ExamRunnerPage ClickGuessButton()
     {
         IsNotLoading();
         var selector = $"{_rootCssSelector} mat-slide-toggle[data-testid=\"btnIsGuess\"]";
@@ -84,9 +88,10 @@ public class ExamRunnerPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
-    public void ClickSubmitButton()
+    public ExamRunnerPage ClickSubmitButton()
     {
         IsNotLoading();
         var selector = $"{_rootCssSelector} button[data-testid=\"btnSubmit\"]";
@@ -96,9 +101,10 @@ public class ExamRunnerPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
-    public void ClickCompleteButton(bool confirm = true)
+    public ExamRunnerPage ClickCompleteButton(bool confirm = true)
     {
         IsNotLoading();
         var selector = $"{_rootCssSelector} button[data-testid=\"btnComplete\"]";
@@ -109,9 +115,10 @@ public class ExamRunnerPage : BasePage
             AlertHelper.HandleAlert(_wait, confirm);
             IsNotLoading();
         }
+        return this;
     }
 
-    public void ClickFinalCompleteButton(bool confirm = true)
+    public ExamRunnerPage ClickFinalCompleteButton(bool confirm = true)
     {
         IsNotLoading();
         // there are two buttons which have the same data-testid. This shall be corrected in the future.
@@ -122,9 +129,10 @@ public class ExamRunnerPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
-    public void ClickNotCompleteButton()
+    public ExamRunnerPage ClickNotCompleteButton()
     {
         IsNotLoading();
         var selector = $"{_rootCssSelector} button[data-testid=\"btnNotComplete\"]";
@@ -134,9 +142,10 @@ public class ExamRunnerPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
-    public void ClickExpandSummaryPanel()
+    public ExamRunnerPage ClickExpandSummaryPanel()
     {
         IsNotLoading();
         var selector = $"{_rootCssSelector} mat-expansion-panel-header";
@@ -146,6 +155,7 @@ public class ExamRunnerPage : BasePage
             button.Click();
             IsNotLoading();
         }
+        return this;
     }
 
     public ExamRunDetail[]? GetExamRunDetail()
