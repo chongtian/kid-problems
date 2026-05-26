@@ -81,7 +81,7 @@ export class ExamDefDetailComponent implements OnInit {
  */
   onCreated(event: ExamDefinitionId): void {
     if (this.isNew && event) {
-      this.router.navigate([`examdef/edit/${event.ExamCategory}/${event.ExamTitle}`]);
+      this.router.navigate([`examdef/view/${event.ExamCategory}/${event.ExamTitle}`]);
     }
   }
 

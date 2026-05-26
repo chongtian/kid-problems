@@ -54,7 +54,7 @@ namespace KpUiTestxUnit.Tests
 
                         page.ClickSaveButton();
                         string examDefTitleEncoded = CommonHelper.EncodeUrl($"{testData.ExamCategory}/{testData.ExamTitle}");
-                        Assert.True(_wait.Until(d => d.Url.Contains($"/examdef/edit/{examDefTitleEncoded}")));
+                        Assert.True(_wait.Until(d => d.Url.Contains($"/examdef/view/{examDefTitleEncoded}")));
 
                         // rollback
                         await DeleteCall($"/examdef/{examDefTitleEncoded}");
