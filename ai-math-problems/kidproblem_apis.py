@@ -6,8 +6,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-API_URL_STAGING = "https://qajvrb7w7waa5icxlfm6tqustm0wspyy.lambda-url.us-east-2.on.aws/api/problem"
-API_URL_PROD = "https://yxawg4gswpwbcsfjthhubcjnj40wjqyg.lambda-url.us-east-2.on.aws/api/problem"
+API_BASE_URL_STAGING = "https://qajvrb7w7waa5icxlfm6tqustm0wspyy.lambda-url.us-east-2.on.aws/api"
+API_BASE_URL_PROD = "https://yxawg4gswpwbcsfjthhubcjnj40wjqyg.lambda-url.us-east-2.on.aws/api"
+API_URL_PROBLEM_STAGING = API_BASE_URL_STAGING + "problem"
+API_URL_PROBLEM_PROD = API_BASE_URL_PROD + "/problem"
+API_URL_EXAM_STAGING = API_BASE_URL_STAGING + "/examdef"
+API_URL_EXAM_PROD = API_BASE_URL_PROD + "/examdef"
+API_URL_ASN_STAGING = API_BASE_URL_STAGING + "/assignment"
+API_URL_ASN_PROD = API_BASE_URL_PROD + "/assignment"
 COGNITO_REGION = "us-east-2"
 COGNITO_CLIENT_ID = "6bgffqhdrg8a8d6mrqtc2e4plr"
 
@@ -60,9 +66,9 @@ def get_problem(problem_title:str, bearer_token: str, is_production = False) -> 
     """
     
     if is_production:
-        url = API_URL_PROD
+        url = API_URL_PROBLEM_PROD
     else: 
-        url = API_URL_STAGING
+        url = API_URL_PROBLEM_STAGING
         
     headers = {
         "Authorization": f"Bearer {bearer_token}",
@@ -93,9 +99,9 @@ def delete_problem(problem_title: str, bearer_token: str, is_production = False)
      """
     
     if is_production:
-        url = API_URL_PROD
+        url = API_URL_PROBLEM_PROD
     else: 
-        url = API_URL_STAGING
+        url = API_URL_PROBLEM_STAGING
         
     headers = {
         "Authorization": f"Bearer {bearer_token}",
@@ -126,9 +132,9 @@ def save_problem(problem: dict, bearer_token: str, is_production = False) -> dic
     """
     
     if is_production:
-        url = API_URL_PROD
+        url = API_URL_PROBLEM_PROD
     else: 
-        url = API_URL_STAGING
+        url = API_URL_PROBLEM_STAGING
         
     headers = {
         "Authorization": f"Bearer {bearer_token}",
@@ -164,9 +170,9 @@ def save_problems(payload:list, bearer_token: str, is_production = False) -> lis
     """
     
     if is_production:
-        url = API_URL_PROD
+        url = API_URL_PROBLEM_PROD
     else: 
-        url = API_URL_STAGING
+        url = API_URL_PROBLEM_STAGING
         
     headers = {
         "Authorization": f"Bearer {bearer_token}",
@@ -245,3 +251,91 @@ def process_problem_text(raw_text:str, problem_title:str) -> str :
     cleaned = re.sub(r'\\\\(?![\s])', r'\\', cleaned)
     return cleaned
 
+
+def create_exam_definition(examTitle: str, problems: list, bearer_token: str, is_production = False) -> dict:
+    """
+    Insert an exam definition. Return the result of the insertion.
+    
+    Args:
+        examTitle (str): the exam title.
+        problem (dict): The problem dictionary to be inserted.
+        bearer_token (str): The access token for authentication.
+        is_production (bool, optional): Whether to call the production API or staging API. Default is False.
+    
+    Returns:
+        dict: The result of the insertion.
+    """
+    
+    if is_production:
+        url = API_URL_EXAM_PROD
+    else: 
+        url = API_URL_EXAM_STAGING
+        
+    headers = {
+        "Authorization": f"Bearer {bearer_token}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "ExamCategory": problems[0]["ProblemCategory"],
+        "ExamTitle": examTitle,
+        "ExamType": "H",
+        "Active": True,
+        "Memo": "",
+        "ExamYear": problems[0]["ProblemYear"],
+        "ExamDetails": []
+    }
+
+    for problem in problems:
+        payload["ExamDetails"].append({"ProblemTitle": problem["ProblemTitle"]})
+
+    logger.info(f"Inserting ExamDefinition {payload['ExamTitle']} ...")
+    response = requests.post(url, json=payload, headers=headers)
+    
+    logger.debug(f"response status code {response.status_code}. {response.content}")
+    if response.status_code == 200:
+        logger.info(f"ExamDefinition {payload['ExamTitle']} inserted successfully.")   
+        return response.json()
+    
+    return {}
+
+
+def create_assignent(examCategory:str, examTitle: str, bearer_token: str, is_production = False) -> dict:
+    """
+    Insert an exam definition. Return the result of the insertion.
+    
+    Args:
+        exmCategory (str): the exam category
+        examTitle (str): the exam title.
+        bearer_token (str): The access token for authentication.
+        is_production (bool, optional): Whether to call the production API or staging API. Default is False.
+    
+    Returns:
+        dict: The result of the insertion.
+    """
+    
+    if is_production:
+        url = API_URL_ASN_PROD
+    else: 
+        url = API_URL_ASN_STAGING
+        
+    headers = {
+        "Authorization": f"Bearer {bearer_token}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "ExamCategory": examCategory,
+        "ExamTitle": examTitle,
+        "Active": True,
+    }
+
+    logger.info(f"Inserting Assignment {payload['ExamTitle']} ...")
+    response = requests.post(url, json=payload, headers=headers)
+    
+    logger.debug(f"response status code {response.status_code}. {response.content}")
+    if response.status_code == 200:
+        logger.info(f"ExamDefinition {payload['ExamTitle']} inserted successfully.")   
+        return response.json()
+    
+    return {}
