@@ -26,15 +26,18 @@ def generate_random_string(k:int) -> str:
 
 def generate_problem_year() -> str:
     today = datetime.today()
-    problem_year = f"C{today.strftime('%m%d')}{generate_random_string(2)}"
+    problem_year = f"C{today.strftime('%m%d')}{generate_random_string(2).upper()}"
     return problem_year
 
-def generate_exam_title() -> str:
-    today = datetime.today()
-    exam_title = f"Practice {today.strftime('%m%d')} - {generate_random_string(4)}"
+def generate_exam_title(exam_title_prefix:str=None) -> str:
+    if exam_title_prefix is None:
+        today = datetime.today()
+        exam_title = f"Practice {today.strftime('%m%d')} - {generate_random_string(4)}"
+    else:
+        exam_title = f"{exam_title_prefix} - {generate_random_string(2)}"
     return exam_title    
 
-def main(json_problem_file:str):
+def main(json_problem_file:str, exam_title:str=None):
 
     USERNAME = os.getenv("COGNITO_USERNAME")
     PASSWORD = os.getenv("COGNITO_PASSWORD")
@@ -69,7 +72,7 @@ def main(json_problem_file:str):
     logger.info("Math problems are saved.")
     logger.debug(saved_problems) 
 
-    exam_def = create_exam_definition(generate_exam_title(), saved_problems, access_token, PRODUCTION ) 
+    exam_def = create_exam_definition(generate_exam_title(exam_title), saved_problems, access_token, PRODUCTION ) 
     if not all([exam_def["ExamCategory"], exam_def["ExamTitle"]]):
         logger.error("Failed to create exam definition.")
         return
@@ -84,8 +87,11 @@ def main(json_problem_file:str):
 if __name__ == "__main__":
     args = sys.argv
     if len(args) < 2:
-        print("Usage: python create_assignment.py <json file>")
-        print("example: python create_assignment.py test.json")
+        print("Usage: python create_assignment.py <json file> [exam_title]")
+        print("example: python create_assignment.py test.json pratice")
         exit(1)
-    main(args[1])
+    json_file_path = args[1]
+    exam_title_prefix = args[2] if len(args)>2 else None
+
+    main(args[1], exam_title_prefix)
     
