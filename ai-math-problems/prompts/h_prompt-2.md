@@ -15,11 +15,11 @@ This part relates to operations with integers, rational numbers, and fractions.
 #### Example 1
 ```
 Angelica was asked to arrange the numbers below from least to greatest. Which answer choice correctly lists the numbers?
-$57%$  $.7$  $\dfrac{7}{8}$   $\dfrac{5}{7}$   $74%$ <br/>
-A. $74%,  .7, \dfrac{7}{8}, \dfrac{5}{7}, 57% $<br/> 
-B. $\dfrac{7}{8}, 74%, \dfrac{5}{7},  .7, 57% $ <br/> 
-C. $\dfrac{5}{7}, 57%, \dfrac{7}{8},  .7, 74% $ <br/> 
-D. $57%, .7, \dfrac{5}{7}, 74%, \dfrac{7}{8}$ <br/> 
+\[57%\]  \[.7\]  \[\dfrac{7}{8}\]   \[\dfrac{5}{7}\]   \[74%\] <br/>
+A. \[74%,  .7, \dfrac{7}{8}, \dfrac{5}{7}, 57% \]<br/> 
+B. \[\dfrac{7}{8}, 74%, \dfrac{5}{7},  .7, 57% \] <br/> 
+C. \[\dfrac{5}{7}, 57%, \dfrac{7}{8},  .7, 74% \] <br/> 
+D. \[57%, .7, \dfrac{5}{7}, 74%, \dfrac{7}{8}\] <br/> 
 ```
 Answer: D
 
@@ -27,7 +27,7 @@ Answer: D
 ```
 Below are three students’ explanations on how to calculate 10% of \$25.60.
 <ul>
-<li>Nick said, “I multiplied 25.6 by $\dfrac{1}{10}$.”</li>
+<li>Nick said, “I multiplied 25.6 by \[\dfrac{1}{10}\].”</li>
 <li>Samantha said, “I divided 25.6 by 10.”</li>
 <li>Amanda said, “I multiplied 25.6 by 0.1.”</li>
 <ul>
@@ -41,11 +41,11 @@ Answer:  D
 
 #### Example 3
 ```
-Which of the following describes the result of multiplying a postive number, $x$, by a fraction?<br/>
-A. $x\times \dfrac{1}{3} \lt x $ <br/> 
-B. $x\times \dfrac{7}{3} \lt x $ <br/> 
-C. $x\times \dfrac{1}{5} \gt x $ <br/> 
-D. $x\times \dfrac{3}{3} \gt x $ <br/> 
+Which of the following describes the result of multiplying a postive number, \[x\], by a fraction?<br/>
+A. \[x\times \dfrac{1}{3} \lt x \] <br/> 
+B. \[x\times \dfrac{7}{3} \lt x \] <br/> 
+C. \[x\times \dfrac{1}{5} \gt x \] <br/> 
+D. \[x\times \dfrac{3}{3} \gt x \] <br/> 
 ```
 Anwser: A
 
@@ -76,10 +76,10 @@ When generating math problems, follow all rules strictly:
     
 4. LaTeX Formatting
 - Use standard LaTeX for all math expressions.
-- Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
+- Inline math must be wrapped in \[...\] (e.g., \[x + 5 = 12\]).
 - Do NOT use LaTeX environments such as item, itemize, or similar.
 - Ensure all LaTeX is valid and properly escaped for JSON.
-- If the $ is used for US Dollar, escape it as \$.
+- The dollar sign $ should be escaped as \$.
 
 5. Line Breaks
 - Use ```<br/>``` for all line breaks inside "ProblemText" except for LaTex and Asymptote code.

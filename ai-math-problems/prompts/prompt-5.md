@@ -73,10 +73,10 @@ When generating math problems, follow all rules strictly:
     
 4. LaTeX Formatting
 - Use standard LaTeX for all math expressions.
-- Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
+- Inline math must be wrapped in \[...\] (e.g., \[x + 5 = 12\]).
 - Do NOT use LaTeX environments such as item, itemize, or similar.
 - Ensure all LaTeX is valid and properly escaped for JSON.
-- If the $ is used for US Dollar, escape it as \$.
+- The dollar sign $ should be escaped as \$.
 
 5. Line Breaks
 - Use ```<br/>``` for all line breaks inside "ProblemText" except for LaTex and Asymptote code.

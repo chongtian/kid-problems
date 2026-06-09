@@ -10,18 +10,18 @@ This part relates to your knowledge of number operations including the order of 
 
 #### Example 1
 ```
-What is the prime factorization of $156$? <br/>
-A. $2 \bullet 78$<br/>
-B. $22 \bullet 39$<br/>
-C. $22 \bullet 3 \bullet 13$<br/>
-D. $22 \bullet 32 \bullet 13$<br/>
+What is the prime factorization of 156? <br/>
+A. \[2 \bullet 78\]<br/>
+B. \[22 \bullet 39\]<br/>
+C. \[22 \bullet 3 \bullet 13\]<br/>
+D. \[22 \bullet 32 \bullet 13\]<br/>
 ```
 Answer: C
 
 #### Example 2
 ```
 Samantha and two friends split the cost of their lunch at Dandy Birds. They each had an order of chicken tenders and fries and all shared a sundae. The expression below can be used to find the amount each person will pay <br/>
-$\dfrac{3(9) + 3.75}{3} $ <br/>
+\[\dfrac{3(9) + 3.75}{3} \] <br/>
 How much will each person pay?<br/>
 A. 5.25<br/>
 B. 10.25<br/>
@@ -57,10 +57,10 @@ When generating math problems, follow all rules strictly:
     
 4. LaTeX Formatting
 - Use standard LaTeX for all math expressions.
-- Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
+- Inline math must be wrapped in \[...\] (e.g., \[x + 5 = 12\]).
 - Do NOT use LaTeX environments such as item, itemize, or similar.
 - Ensure all LaTeX is valid and properly escaped for JSON.
-- If the $ is used for US Dollar, escape it as \$.
+- The dollar sign $ should be escaped as \$.
 
 5. Line Breaks
 - Use ```<br/>``` for all line breaks inside "ProblemText" except for LaTex and Asymptote code.

@@ -27,7 +27,7 @@ Answer: D
 
 #### Example 2
 ```
-Which of the following models shows $10%$ shaded? <br/>
+Which of the following models shows \[10%\] shaded? <br/>
 A. <img src="img1.png" alt="[asy] size(200); int n = 5; real width = 10; real height = 1; draw((0,0)--(width,0)--(width,height)--(0,height)--cycle); for(int i=1; i<n; ++i){   real x = width*i/n;   draw((x,0)--(x,height)); } filldraw((0,0)--(width/n,0)--(width/n,1)--(0,1)--cycle, gray); [/asy]" /> <br/>
 B. <img src="img2.png" alt="[asy] size(200); int n = 2; real width = 10; real height = 1; draw((0,0)--(width,0)--(width,height)--(0,height)--cycle); for(int i=1; i<n; ++i){   real x = width*i/n;   draw((x,0)--(x,height)); } filldraw((0,0)--(width/n,0)--(width/n,1)--(0,1)--cycle, gray); [/asy]" /> <br/>
 C. <img src="img3.png" alt="[asy] size(200); int n = 10; real width = 10; real height = 1; draw((0,0)--(width,0)--(width,height)--(0,height)--cycle); for(int i=1; i<n; ++i){   real x = width*i/n;   draw((x,0)--(x,height)); } filldraw((0,0)--(width/n,0)--(width/n,1)--(0,1)--cycle, gray); [/asy]" /> <br/>
@@ -38,10 +38,10 @@ Answer: C
 #### Example 3
 ```
 Chandler received 60 out of 90 votes to be class treasurer. Which two values belowrepresent the number of votes Chandler received? <br/>
-A. $\dfrac{1}{3}$ and 33 1/3% <br/>
-B. $.3$ and 30%<br/>
-C. $.6$ and 60%<br/>
-D. $\dfrac{2}{3}$ and 66 2/3% <br/>
+A. \[\dfrac{1}{3}\] and 33 1/3% <br/>
+B. \[.3\] and 30%<br/>
+C. \[.6\] and 60%<br/>
+D. \[\dfrac{2}{3}\] and 66 2/3% <br/>
 ```
 Answer: D
 
@@ -72,10 +72,10 @@ When generating math problems, follow all rules strictly:
     
 4. LaTeX Formatting
 - Use standard LaTeX for all math expressions.
-- Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
+- Inline math must be wrapped in \[...\] (e.g., \[x + 5 = 12\]).
 - Do NOT use LaTeX environments such as item, itemize, or similar.
 - Ensure all LaTeX is valid and properly escaped for JSON.
-- If the $ is used for US Dollar, escape it as \$.
+- The dollar sign $ should be escaped as \$.
 
 5. Line Breaks
 - Use ```<br/>``` for all line breaks inside "ProblemText" except for LaTex and Asymptote code.

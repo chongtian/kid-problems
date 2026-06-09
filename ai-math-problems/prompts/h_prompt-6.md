@@ -30,13 +30,13 @@ Answer: B
 #### Example 2
 ```
 The equation can be used to determine the measure of the angle labeled x for the triangleshown below.<br/>
-$115+30+x=180$ <br/>
+\[115+30+x=180\] <br/>
 <img src="img1.png" alt="[asy] size(200); pair A = (-0.97,2.08); pair B = (0,0); pair C = (2,0); draw(A--B--C--cycle); label("$30^\circ$", A +(0.4,-0.4) ); label("$115^\circ$", B + (0.1,0.2)); label("$x^\circ$", C + (-0.3,0.1)); [/asy]" /> <br/>
 What value of x makes the equation true?<br/>
-A. $35\circ$ <br/>
-B. $65\circ$ <br/>
-C. $145\circ$ <br/>
-D. $150\circ$ <br/>
+A. \[35\circ\] <br/>
+B. \[65\circ\] <br/>
+C. \[145\circ\] <br/>
+D. \[150\circ\] <br/>
 ```
 Answer: A
 
@@ -67,10 +67,10 @@ When generating math problems, follow all rules strictly:
     
 4. LaTeX Formatting
 - Use standard LaTeX for all math expressions.
-- Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
+- Inline math must be wrapped in \[...\] (e.g., \[x + 5 = 12\]).
 - Do NOT use LaTeX environments such as item, itemize, or similar.
 - Ensure all LaTeX is valid and properly escaped for JSON.
-- If the $ is used for US Dollar, escape it as \$.
+- The dollar sign $ should be escaped as \$.
 
 5. Line Breaks
 - Use ```<br/>``` for all line breaks inside "ProblemText" except for LaTex and Asymptote code.

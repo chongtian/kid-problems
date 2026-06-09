@@ -31,10 +31,10 @@ Answer: D
 ```
  Which equation could be used to solve for a, the area of the parallelogram below? <br/>
  <img src="img1.png" alt="[asy] size(10cm); real s = 0.15; real base = 40*s; real side = 24*s; pair A = (0,0); pair B = (base,0); pair D = (side*0.5, side*0.8); pair C = B + (D - A); draw(A--B--C--D--cycle); pair foot = (D.x, 0); draw(D--foot, dashed); label("x", midpoint(D--foot), E); label("40", midpoint(A--B), S); label("24", midpoint(A--D), NW); [/asy]" /> <br/>
-A. $a=40 \bullet x $ <br/>
-B. $a=40 \bullet 24 $ <br/>
-C. $a=40 \bullet 24 \bullet x $ <br/>
-D. $a=40 \dfrac{\bullet 24 \bullet x}{2} $ <br/>
+A. \[a=40 \bullet x \] <br/>
+B. \[a=40 \bullet 24 \] <br/>
+C. \[a=40 \bullet 24 \bullet x \] <br/>
+D. \[a=40 \dfrac{\bullet 24 \bullet x}{2} \] <br/>
 ```
 Answer: A
 
@@ -65,10 +65,10 @@ When generating math problems, follow all rules strictly:
     
 4. LaTeX Formatting
 - Use standard LaTeX for all math expressions.
-- Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
+- Inline math must be wrapped in \[...\] (e.g., \[x + 5 = 12\]).
 - Do NOT use LaTeX environments such as item, itemize, or similar.
 - Ensure all LaTeX is valid and properly escaped for JSON.
-- If the $ is used for US Dollar, escape it as \$.
+- The dollar sign $ should be escaped as \$.
 
 5. Line Breaks
 - Use ```<br/>``` for all line breaks inside "ProblemText" except for LaTex and Asymptote code.

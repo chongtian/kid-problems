@@ -15,10 +15,10 @@ This part relates to your knowledge of relationships between sets of numbers, in
 ```
 Which equation represents the model shown below? <br/>
 <img src="img1.png" alt="[asy] size(10cm); int rows = 3; int cols = 6; real r = 0.25; pair P(int i, int j) {     return (j, rows - i + 1); } for (int i = 1; i <= rows; ++i) {     for (int j = 1; j <= cols; ++j) {         if (i == 1 && j == 1) {             label("X", P(i,j));         }         else if (j == 1) {             draw(circle(P(i,j), r));         }         else {             filldraw(circle(P(i,j), r), black);         }     } } real yline = rows - 1 + 0.5; draw((0.5, yline) -- (cols + 0.5, yline)); real xline = 1.5; draw((xline, 0.5) -- (xline, rows + 0.5)); real lx = cols + 1.2; real ly = rows; pair boxBL = (lx - 0.6, ly - 2.2); pair boxTR = (lx + 1.8, ly + 1.0); draw(boxBL--(boxTR.x,boxBL.y)--boxTR--(boxBL.x,boxTR.y)--cycle); label("Key", (lx + 0.6, ly + 0.6)); draw(circle((lx, ly), r)); label("= -1", (lx + 0.6, ly)); filldraw(circle((lx, ly - 1), r), black); label("= 1", (lx + 0.6, ly - 1)); [/asy]" /><br/>
-A. $2 \bullet 5 = 10$ <br/>
-B. $5 \bullet (-2) = 10$ <br/>
-C. $2 \bullet (-5) = -10$ <br/>
-D. $(-5) \bullet (-2) = 10$ <br/>
+A. \[2 \bullet 5 = 10\] <br/>
+B. \[5 \bullet (-2) = 10\] <br/>
+C. \[2 \bullet (-5) = -10\] <br/>
+D. \[(-5) \bullet (-2) = 10\] <br/>
 ```
 Anwser: C
 
@@ -60,10 +60,10 @@ When generating math problems, follow all rules strictly:
     
 4. LaTeX Formatting
 - Use standard LaTeX for all math expressions.
-- Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
+- Inline math must be wrapped in \[...\] (e.g., \[x + 5 = 12\]).
 - Do NOT use LaTeX environments such as item, itemize, or similar.
 - Ensure all LaTeX is valid and properly escaped for JSON.
-- If the $ is used for US Dollar, escape it as \$.
+- The dollar sign $ should be escaped as \$.
 
 5. Line Breaks
 - Use ```<br/>``` for all line breaks inside "ProblemText" except for LaTex and Asymptote code.

@@ -26,10 +26,10 @@ Mark Up Price of Clothing Items<br/>
 <table><thead><th>Whole Sale Price,w<th><th>Retail Price,r<th></thead>
 <tbody><tr><td>\$4</td><td>\$6</td></tr><tr><td>\$8</td><td>\$12</td></tr><tr><td>\$12</td><td>\$18</td></tr><tr><td>\$20</td><td>\$30</td></tr>
 </tbody></table> <br/>
-A. $r = 1.5w $<br/>
-B. $r = w ˗ 2$<br/>
-C. $r = w + 2$<br/>
-D. $r = 2w + 2$<br/>
+A. \[r = 1.5w \]<br/>
+B. \[r = w ˗ 2\]<br/>
+C. \[r = w + 2\]<br/>
+D. \[r = 2w + 2\]<br/>
 ```
 Answer: A
 
@@ -60,10 +60,10 @@ When generating math problems, follow all rules strictly:
     
 4. LaTeX Formatting
 - Use standard LaTeX for all math expressions.
-- Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
+- Inline math must be wrapped in \[...\] (e.g., \[x + 5 = 12\]).
 - Do NOT use LaTeX environments such as item, itemize, or similar.
 - Ensure all LaTeX is valid and properly escaped for JSON.
-- If the $ is used for US Dollar, escape it as \$.
+- The dollar sign $ should be escaped as \$.
 
 5. Line Breaks
 - Use ```<br/>``` for all line breaks inside "ProblemText" except for LaTex and Asymptote code.
