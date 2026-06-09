@@ -7,7 +7,9 @@ from kidproblem_apis import create_assignent, create_exam_definition, prepare_pr
 import random
 import string
 
-PRODUCTION = False
+PRODUCTION = True
+USERNAME = os.getenv("COGNITO_USERNAME")
+PASSWORD = os.getenv("COGNITO_PASSWORD")
 
 logging.basicConfig(
     level=logging.INFO,
@@ -26,7 +28,7 @@ def generate_random_string(k:int) -> str:
 
 def generate_problem_year() -> str:
     today = datetime.today()
-    problem_year = f"C{today.strftime('%m%d')}{generate_random_string(2).upper()}"
+    problem_year = f"C{today.strftime('%m%d')}{(generate_random_string(2)).upper()}"
     return problem_year
 
 def generate_exam_title(exam_title_prefix:str=None) -> str:
@@ -35,16 +37,12 @@ def generate_exam_title(exam_title_prefix:str=None) -> str:
         exam_title = f"Practice {today.strftime('%m%d')} - {generate_random_string(4)}"
     else:
         exam_title = f"{exam_title_prefix} - {generate_random_string(2)}"
-    return exam_title    
+    return exam_title      
 
 def main(json_problem_file:str, exam_title:str=None):
-
-    USERNAME = os.getenv("COGNITO_USERNAME")
-    PASSWORD = os.getenv("COGNITO_PASSWORD")
-    
     if not all([USERNAME, PASSWORD]):
         raise ValueError("One or more required environment variables are missing.")
-    
+       
     data = {}
 
     problem_year = generate_problem_year() 
@@ -52,7 +50,7 @@ def main(json_problem_file:str, exam_title:str=None):
     try:
         with open(json_problem_file, 'r', encoding='utf-8') as file:
             data = json.load(file)
-            
+            random.shuffle(data)
             problems = prepare_problems(data, 1, problem_year)
             if not problems or len(problems) == 0:
                 logger.info("No valid math problem is generated.")
@@ -87,11 +85,8 @@ def main(json_problem_file:str, exam_title:str=None):
 if __name__ == "__main__":
     args = sys.argv
     if len(args) < 2:
-        print("Usage: python create_assignment.py <json file> [exam_title]")
-        print("example: python create_assignment.py test.json pratice")
+        print("Usage: python create_assignment.py <json file> [exam title]")
+        print("example: python create_assignment.py test.json")
         exit(1)
-    json_file_path = args[1]
-    exam_title_prefix = args[2] if len(args)>2 else None
-
-    main(args[1], exam_title_prefix)
+    main(args[1], exam_title=args[2] if len(args) > 2 else None)
     

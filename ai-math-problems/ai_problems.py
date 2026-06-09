@@ -143,6 +143,18 @@ def create_math_prompt_template_2():
     return prompt_template
 
 
+def create_prompt_template_to_clean_json():
+    template = """
+    You are a senior software engineer. The below json contains errors due to un-escape characters, etc. Fix the json text so that it can be successfully parsed by a json deserailizer. 
+    You must only output json. Do not output any other comments.
+
+    {text}
+    """
+    
+    prompt_template = PromptTemplate.from_template(template)
+    return prompt_template
+
+
 def get_json_schema(simple_schema = False) -> str:
     if simple_schema:
         return """
@@ -165,13 +177,16 @@ def save_text_and_pass(x:str):
     Save the text to a log file and pass the text to the next step.
     Args:        x: the text to be saved and passed
     Returns:        the same text x, which is passed to the next step"""
-    log_dir = Path(config.LOGS_FOLDER)
-    log_dir.mkdir(exist_ok=True)
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    log_filename = f"res-{timestamp}.log"
-    log_file_path = log_dir / log_filename
-    log_file_path.write_text(x, encoding="utf-8")
-    return x  # pass-through to next parser/step
+    if config.ALWAYS_LOG_RESPONSE_FROM_LLM:
+        log_dir = Path(config.LOGS_FOLDER)
+        log_dir.mkdir(exist_ok=True)
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        log_filename = f"res-{timestamp}.log"
+        log_file_path = log_dir / log_filename
+        log_file_path.write_text(x, encoding="utf-8")
+        return x  # pass-through to next parser/step
+    else:
+        return x
 
 
 def clean_up_json(x:str):
@@ -207,6 +222,13 @@ def clean_up_json(x:str):
         fixed = json.dumps(problems)       
         return fixed
 
+def is_json_valid(j:str)->bool:
+    try:
+        json.loads(j, strict=False)
+        return True
+    except json.JSONDecodeError as e:
+        logger.error("json file has errors: %s", e)
+        return False 
 
 def generate_math_problems(llm, objectives: list, simple_schema = False):
     """
@@ -292,3 +314,108 @@ def generate_and_save_math_problems(llm, input_context: InputContext):
     inputs = {"count": input_context.Count, "text": input_context.ObjectiveText }
     response = chain.invoke(inputs)
     return response
+
+
+def generate_math_problems_json(llm, json_file:str)->list:
+    """
+    Generate math problems based on the objective and count specified in the input.
+    Args:
+        llm: the language model to be used for generating math problems
+        json_file: path to the json output file.
+        Returns:
+        True if the generated json is valid; False when the generated json contains errors and need human review.
+    """
+
+    text_parser = StrOutputParser()
+    save_response = RunnableLambda(lambda x: save_text_and_pass(x))
+    prompt_clean_json = create_prompt_template_to_clean_json()
+    input = RunnableParallel(
+        text=RunnableLambda(lambda x: x["text"])
+    )
+
+    chain = (
+        llm 
+        | text_parser
+        | save_response 
+        )
+    
+    clean_json_chain = (
+        input
+        | prompt_clean_json
+        | llm
+        | text_parser
+        | save_response         
+    )
+
+    folder = Path(config.PROMPTS_FOLDER)
+    prmopt_files = [f for f in folder.glob(config.PROMPTS_FILE) if f.is_file()]
+
+    pattern1 = r"```json\s*(.*?)\s*```"
+    pattern2 = r"^\s*\[\s*(.*?)\s*\]\s*$"
+
+    with open(json_file, "w", encoding="utf-8") as res:
+        res.write("[\n")
+
+        for i, prmopt_file in enumerate(prmopt_files):
+            logger.info(f"{prmopt_file}: processing prompt ... ")
+            is_last = i == len(prmopt_files) - 1
+            prompt = prmopt_file.read_text(encoding="utf-8")
+            result = chain.invoke(prompt)
+            raw_text = str(result)
+
+            # extract json text from the raw response
+            match1 = re.search(pattern1, raw_text, re.MULTILINE | re.DOTALL)
+            if match1:
+                logger.info(f"{prmopt_file}: extracted json from response. ")
+                extracted = match1.group(1)
+            else:
+                logger.info(f"{prmopt_file}: use raw response as the extracted json. ")
+                extracted = raw_text
+
+            # clean up json to ensure it is valid
+            is_valid = is_json_valid(extracted)
+            if is_valid:
+                logger.info(f"{prmopt_file}: json from response is valid. ")
+                clean_json_text = extracted
+            else:
+                logger.info(f"{prmopt_file}: cleaning up json.")
+                inputs = {"text": extracted }
+                clean_json = clean_json_chain.invoke(inputs)
+                clean_json_text = str(clean_json)
+                if is_json_valid(clean_json_text):
+                    logger.info(f"{prmopt_file}: json is cleaned and valid.")
+                else:
+                    logger.info(f"{prmopt_file}: json from response contains errors like un-escaped characters.")
+
+            match2 = re.search(pattern2, clean_json_text, re.MULTILINE | re.DOTALL)
+            if match2:
+                logger.info(f"{prmopt_file}: extracted elements from json array. ")
+                clean_json_text = match2.group(1)
+                res.write(clean_json_text)
+            else:
+                logger.info(f"{prmopt_file}: save response as is. ")
+                res.write(clean_json_text) 
+            
+            if is_last:
+                res.write("\n")
+            else:
+                res.write(",\n")
+
+            logger.info(f"{prmopt_file}: prompt has been processed. ")
+            # dev
+            # break   
+
+        res.write("\n]")
+
+    # validate the final result
+    try:
+        with open(json_file, 'r', encoding='utf-8') as f:
+            problems = json.load(f, strict=False)   
+        return problems
+    except json.JSONDecodeError as e:
+        logger.error("json file has errors: %s", e)
+        return []
+    except OSError as e:
+        logger.error("File error: %s", e)
+        return []
+

@@ -8,3 +8,6 @@ SCHEMA_FILE = "ai_problem_schema.json"
 TOPCIS_FILE = "resource_objectives.txt"
 LOGS_FOLDER = "logs"
 PROMPTS_FOLDER = "prompts"
+PROMPTS_FILE = "prompt-*.md"
+
+ALWAYS_LOG_RESPONSE_FROM_LLM = True
