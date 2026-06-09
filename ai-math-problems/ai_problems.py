@@ -30,47 +30,7 @@ def initialize_openai_llm():
     return ChatOpenAI(model=config.OPENAI_MODEL_ID, temperature=config.OPENAI_TEMPERATURE)
 
 
-def create_math_prompt_template_1():
-    """
-    Create a PromptTemplate for generating math problems based on user example.
-
-    Args:
-        None
-
-    Returns:
-        PromptTemplate: A PromptTemplate object configured for generating math problems.
-    """
-       
-    math_template = """
-    You are a Senior Math Teacher specializing in elementary and middle school education. 
-    You excel at creating engaging, grade-appropriate practice problems that reinforce core mathematical concepts.
-    Your task is to generate exactly {count} math practice problems based on the objective: 
-
-    {objective}
-
-    ### Guidelines:
-    - Only one math problem can be a simple expression or 1-sentence problem. The remaining math problems shall be word problems with 3 to 5 sentences. 
-    - The answer to the math problem is multi-choice, with 4 options: A, B, C, D. Only one of them is correct. 
-    - Each generated math problem shall have 3 properties: ProblemText, ProblemAnswer, AnswerOption
-    - ProblemText: the text of the problem including answer choices
-    - ProblemText: use standard LaTeX for all mathematical expressions, equations, and variables (e.g., $x + 5 = 12$). LaTex should be wrapped in $...$ for inline math. For line break, use "<br/>". Do not use "item" or "itemize" in Latex code. 
-    - ProblemText: if the problem requires chart, draw the chart with asymptote code without any comment and line break. Then add the chart to the problem text in an img tag: <img src="PlaceHolder_<sequence>.png" alt="[asy] ... asymptote code ... [/asy]" />
-    - ProblemText: do not use "table", "grid", "graphpaper", "crimson" in asymptote code. These are not supported by the asymptote compiler. You shall only write asymptote code which can compiles everywhere.
-    - ProblemText: put each answer choice and the text of answer choice in a new line with a line break "<br/>. You must not use Latex code "item" or "itemize". 
-    - ProblemAnswer: the Answer of the problem shall be a single selection from multi-choice options
-    - AnswerOption: this is like "A,B,C,D". The actual text of answer choices shall be put in the ProblemText.
-    - Output all problems as an json array using this json schema
-
-      {schema}  
-
-    - You must check if the latex code in ProblemText needing proper escaping to ensure the Json is valid
-    """
-    
-    prompt_template = PromptTemplate.from_template(math_template)
-    return prompt_template
-
-
-def create_math_prompt_template_2():
+def create_math_prompt_template():
     """
     Create a PromptTemplate for generating math problems based on user example.
 
@@ -115,7 +75,7 @@ def create_math_prompt_template_2():
     - Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
     - Do NOT use LaTeX environments such as item, itemize, or similar.
     - Ensure all LaTeX is valid and properly escaped for JSON.
-    - If the $ is used for US Dollar, escape it as \$.
+    - If the $ is used for US Dollar, escape it as \\$.
     
     5. Line Breaks
     - Use "<br/>" for all line breaks inside "ProblemText" except for LaTex and Asymptote code.
@@ -230,54 +190,6 @@ def is_json_valid(j:str)->bool:
         logger.error("json file has errors: %s", e)
         return False 
 
-def generate_math_problems(llm, objectives: list, simple_schema = False):
-    """
-    Generate math problems based on the objective and count specified in the input.
-    Args:
-        llm: the language model to be used for generating math problems
-        objectives: a list of learning objectives.
-        Returns:
-        a list of generated math problems, each problem has the schema:
-        {
-            "ProblemText": "the text of the problem including answer choices, with proper escaping for latex code and line breaks",
-            "ProblemAnswer": "the correct answer, which is a single selection from multi-choice options",
-            "AnswerOptions": "the multi-choice options, like A,B,C,D"   
-        }
-    """
-
-    prompt = create_math_prompt_template_2()
-    json_parser = JsonOutputParser()
-    text_parser = StrOutputParser()
-    save_response = RunnableLambda(lambda x: save_text_and_pass(x))
-    clean_up_response = RunnableLambda(lambda x: clean_up_json(x))
-    input = RunnableParallel(
-        count=RunnableLambda(lambda x: x["count"]),
-        objective=RunnableLambda(lambda x: x["text"]),
-        schema=RunnableLambda(lambda _: get_json_schema(simple_schema))
-    )
-
-    chain = (
-        input 
-        | prompt 
-        | llm 
-        | text_parser
-        | save_response 
-        | clean_up_response
-        | json_parser 
-        )
-
-    problems = []
-    for idx, objective in enumerate(objectives):    
-        inputs = {"count": objective.get("count", 1), "text": objective.get("text", None) }
-        logger.info(f"Processing #{idx + 1} objective which is Objective {objective.get("objective", "Unknown")} ... ")
-        logger.debug(inputs)
-        response = chain.invoke(inputs)
-        logger.info(f"#{idx + 1} objective has been processed. ")
-        problems.extend(response)
-    
-    return problems
-
-
 def generate_and_save_math_problems(llm, input_context: InputContext):
     # validate and clean up input_context   
     if not input_context.ObjectiveText:
@@ -285,7 +197,7 @@ def generate_and_save_math_problems(llm, input_context: InputContext):
     if not input_context.AccessToken:
         raise ValueError("AccessToken is not found in input_context.")    
     
-    prompt = create_math_prompt_template_2()
+    prompt = create_math_prompt_template()
     json_parser = JsonOutputParser()
     text_parser = StrOutputParser()
     save_response = RunnableLambda(lambda x: save_text_and_pass(x))
