@@ -1,11 +1,7 @@
 import json
 from pathlib import Path
 import logging
-# import re
 import sys
-# import config
-# from langchain_ollama import OllamaLLM
-# from langchain_openai import ChatOpenAI
 from ai_problems import initialize_local_llm, initialize_openai_llm, generate_math_problems_json
 
 logging.basicConfig(

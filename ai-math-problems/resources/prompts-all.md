@@ -33,10 +33,10 @@ When generating math problems, follow all rules strictly:
     
 4. LaTeX Formatting
 - Use standard LaTeX for all math expressions.
-- Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
+- Inline math must be wrapped in \[...\] (e.g., \[x + 5 = 12\]).
 - Do NOT use LaTeX environments such as item, itemize, or similar.
 - Ensure all LaTeX is valid and properly escaped for JSON.
-- If the $ is used for US Dollar, escape it as \$.
+- The dollar sign $ should be escaped as \$.
 
 5. Line Breaks
 - Use ```<br/>``` for all line breaks inside "ProblemText" except for LaTex and Asymptote code.
@@ -96,18 +96,18 @@ This part relates to your knowledge of number operations including the order of 
 
 #### Example 1
 ```
-What is the prime factorization of $156$? <br/>
-A. $2 \bullet 78$<br/>
-B. $22 \bullet 39$<br/>
-C. $22 \bullet 3 \bullet 13$<br/>
-D. $22 \bullet 32 \bullet 13$<br/>
+What is the prime factorization of 156? <br/>
+A. \[2 \bullet 78\]<br/>
+B. \[22 \bullet 39\]<br/>
+C. \[22 \bullet 3 \bullet 13\]<br/>
+D. \[22 \bullet 32 \bullet 13\]<br/>
 ```
 Answer: C
 
 #### Example 2
 ```
 Samantha and two friends split the cost of their lunch at Dandy Birds. They each had an order of chicken tenders and fries and all shared a sundae. The expression below can be used to find the amount each person will pay <br/>
-$\dfrac{3(9) + 3.75}{3} $ <br/>
+\[\dfrac{3(9) + 3.75}{3} \] <br/>
 How much will each person pay?<br/>
 A. 5.25<br/>
 B. 10.25<br/>
@@ -130,11 +130,11 @@ This part relates to operations with integers, rational numbers, and fractions.
 #### Example 1
 ```
 Angelica was asked to arrange the numbers below from least to greatest. Which answer choice correctly lists the numbers?
-$57%$  $.7$  $\dfrac{7}{8}$   $\dfrac{5}{7}$   $74%$ <br/>
-A. $74%,  .7, \dfrac{7}{8}, \dfrac{5}{7}, 57% $<br/> 
-B. $\dfrac{7}{8}, 74%, \dfrac{5}{7},  .7, 57% $ <br/> 
-C. $\dfrac{5}{7}, 57%, \dfrac{7}{8},  .7, 74% $ <br/> 
-D. $57%, .7, \dfrac{5}{7}, 74%, \dfrac{7}{8}$ <br/> 
+\[57%\]  \[.7\]  \[\dfrac{7}{8}\]   \[\dfrac{5}{7}\]   \[74%\] <br/>
+A. \[74%,  .7, \dfrac{7}{8}, \dfrac{5}{7}, 57% \]<br/> 
+B. \[\dfrac{7}{8}, 74%, \dfrac{5}{7},  .7, 57% \] <br/> 
+C. \[\dfrac{5}{7}, 57%, \dfrac{7}{8},  .7, 74% \] <br/> 
+D. \[57%, .7, \dfrac{5}{7}, 74%, \dfrac{7}{8}\] <br/> 
 ```
 Answer: D
 
@@ -142,7 +142,7 @@ Answer: D
 ```
 Below are three students’ explanations on how to calculate 10% of \$25.60.
 <ul>
-<li>Nick said, “I multiplied 25.6 by $\dfrac{1}{10}$.”</li>
+<li>Nick said, “I multiplied 25.6 by \[\dfrac{1}{10}\].”</li>
 <li>Samantha said, “I divided 25.6 by 10.”</li>
 <li>Amanda said, “I multiplied 25.6 by 0.1.”</li>
 <ul>
@@ -156,11 +156,11 @@ Answer:  D
 
 #### Example 3
 ```
-Which of the following describes the result of multiplying a postive number, $x$, by a fraction?<br/>
-A. $x\times \dfrac{1}{3} \lt x $ <br/> 
-B. $x\times \dfrac{7}{3} \lt x $ <br/> 
-C. $x\times \dfrac{1}{5} \gt x $ <br/> 
-D. $x\times \dfrac{3}{3} \gt x $ <br/> 
+Which of the following describes the result of multiplying a postive number, \[x\], by a fraction?<br/>
+A. \[x\times \dfrac{1}{3} \lt x \] <br/> 
+B. \[x\times \dfrac{7}{3} \lt x \] <br/> 
+C. \[x\times \dfrac{1}{5} \gt x \] <br/> 
+D. \[x\times \dfrac{3}{3} \gt x \] <br/> 
 ```
 Anwser: A
 
@@ -191,7 +191,7 @@ Answer: D
 
 #### Example 2
 ```
-Which of the following models shows $10%$ shaded? <br/>
+Which of the following models shows \[10%\] shaded? <br/>
 A. <img src="img1.png" alt="[asy] size(200); int n = 5; real width = 10; real height = 1; draw((0,0)--(width,0)--(width,height)--(0,height)--cycle); for(int i=1; i<n; ++i){   real x = width*i/n;   draw((x,0)--(x,height)); } filldraw((0,0)--(width/n,0)--(width/n,1)--(0,1)--cycle, gray); [/asy]" /> <br/>
 B. <img src="img2.png" alt="[asy] size(200); int n = 2; real width = 10; real height = 1; draw((0,0)--(width,0)--(width,height)--(0,height)--cycle); for(int i=1; i<n; ++i){   real x = width*i/n;   draw((x,0)--(x,height)); } filldraw((0,0)--(width/n,0)--(width/n,1)--(0,1)--cycle, gray); [/asy]" /> <br/>
 C. <img src="img3.png" alt="[asy] size(200); int n = 10; real width = 10; real height = 1; draw((0,0)--(width,0)--(width,height)--(0,height)--cycle); for(int i=1; i<n; ++i){   real x = width*i/n;   draw((x,0)--(x,height)); } filldraw((0,0)--(width/n,0)--(width/n,1)--(0,1)--cycle, gray); [/asy]" /> <br/>
@@ -202,10 +202,10 @@ Answer: C
 #### Example 3
 ```
 Chandler received 60 out of 90 votes to be class treasurer. Which two values belowrepresent the number of votes Chandler received? <br/>
-A. $\dfrac{1}{3}$ and 33 1/3% <br/>
-B. $.3$ and 30%<br/>
-C. $.6$ and 60%<br/>
-D. $\dfrac{2}{3}$ and 66 2/3% <br/>
+A. \[\dfrac{1}{3}\] and 33 1/3% <br/>
+B. \[.3\] and 30%<br/>
+C. \[.6\] and 60%<br/>
+D. \[\dfrac{2}{3}\] and 66 2/3% <br/>
 ```
 Answer: D
 
@@ -223,10 +223,10 @@ This part relates to your knowledge of relationships between sets of numbers, in
 ```
 Which equation represents the model shown below? <br/>
 <img src="img1.png" alt="[asy] size(10cm); int rows = 3; int cols = 6; real r = 0.25; pair P(int i, int j) {     return (j, rows - i + 1); } for (int i = 1; i <= rows; ++i) {     for (int j = 1; j <= cols; ++j) {         if (i == 1 && j == 1) {             label("X", P(i,j));         }         else if (j == 1) {             draw(circle(P(i,j), r));         }         else {             filldraw(circle(P(i,j), r), black);         }     } } real yline = rows - 1 + 0.5; draw((0.5, yline) -- (cols + 0.5, yline)); real xline = 1.5; draw((xline, 0.5) -- (xline, rows + 0.5)); real lx = cols + 1.2; real ly = rows; pair boxBL = (lx - 0.6, ly - 2.2); pair boxTR = (lx + 1.8, ly + 1.0); draw(boxBL--(boxTR.x,boxBL.y)--boxTR--(boxBL.x,boxTR.y)--cycle); label("Key", (lx + 0.6, ly + 0.6)); draw(circle((lx, ly), r)); label("= -1", (lx + 0.6, ly)); filldraw(circle((lx, ly - 1), r), black); label("= 1", (lx + 0.6, ly - 1)); [/asy]" /><br/>
-A. $2 \bullet 5 = 10$ <br/>
-B. $5 \bullet (-2) = 10$ <br/>
-C. $2 \bullet (-5) = -10$ <br/>
-D. $(-5) \bullet (-2) = 10$ <br/>
+A. \[2 \bullet 5 = 10\] <br/>
+B. \[5 \bullet (-2) = 10\] <br/>
+C. \[2 \bullet (-5) = -10\] <br/>
+D. \[(-5) \bullet (-2) = 10\] <br/>
 ```
 Anwser: C
 
@@ -315,13 +315,13 @@ Answer: B
 #### Example 2
 ```
 The equation can be used to determine the measure of the angle labeled x for the triangleshown below.<br/>
-$115+30+x=180$ <br/>
+\[115+30+x=180\] <br/>
 <img src="img1.png" alt="[asy] size(200); pair A = (-0.97,2.08); pair B = (0,0); pair C = (2,0); draw(A--B--C--cycle); label("$30^\circ$", A +(0.4,-0.4) ); label("$115^\circ$", B + (0.1,0.2)); label("$x^\circ$", C + (-0.3,0.1)); [/asy]" /> <br/>
 What value of x makes the equation true?<br/>
-A. $35\circ$ <br/>
-B. $65\circ$ <br/>
-C. $145\circ$ <br/>
-D. $150\circ$ <br/>
+A. \[35\circ\] <br/>
+B. \[65\circ\] <br/>
+C. \[145\circ\] <br/>
+D. \[150\circ\] <br/>
 ```
 Answer: A
 
@@ -350,10 +350,10 @@ Mark Up Price of Clothing Items<br/>
 <table><thead><th>Whole Sale Price,w<th><th>Retail Price,r<th></thead>
 <tbody><tr><td>\$4</td><td>\$6</td></tr><tr><td>\$8</td><td>\$12</td></tr><tr><td>\$12</td><td>\$18</td></tr><tr><td>\$20</td><td>\$30</td></tr>
 </tbody></table> <br/>
-A. $r = 1.5w $<br/>
-B. $r = w ˗ 2$<br/>
-C. $r = w + 2$<br/>
-D. $r = 2w + 2$<br/>
+A. \[r = 1.5w \]<br/>
+B. \[r = w ˗ 2\]<br/>
+C. \[r = w + 2\]<br/>
+D. \[r = 2w + 2\]<br/>
 ```
 Answer: A
 
@@ -387,10 +387,10 @@ Answer: D
 ```
  Which equation could be used to solve for a, the area of the parallelogram below? <br/>
  <img src="img1.png" alt="[asy] size(10cm); real s = 0.15; real base = 40*s; real side = 24*s; pair A = (0,0); pair B = (base,0); pair D = (side*0.5, side*0.8); pair C = B + (D - A); draw(A--B--C--D--cycle); pair foot = (D.x, 0); draw(D--foot, dashed); label("x", midpoint(D--foot), E); label("40", midpoint(A--B), S); label("24", midpoint(A--D), NW); [/asy]" /> <br/>
-A. $a=40 \bullet x $ <br/>
-B. $a=40 \bullet 24 $ <br/>
-C. $a=40 \bullet 24 \bullet x $ <br/>
-D. $a=40 \dfrac{\bullet 24 \bullet x}{2} $ <br/>
+A. \[a=40 \bullet x \] <br/>
+B. \[a=40 \bullet 24 \] <br/>
+C. \[a=40 \bullet 24 \bullet x \] <br/>
+D. \[a=40 \dfrac{\bullet 24 \bullet x}{2} \] <br/>
 ```
 Answer: A
 
