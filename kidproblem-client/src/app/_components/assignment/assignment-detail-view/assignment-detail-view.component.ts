@@ -2,7 +2,7 @@ import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular
 import { FormGroup, FormBuilder, Validators, FormArray, ReactiveFormsModule } from '@angular/forms';
 import { DisplayMessages } from '@app/_constants';
 import { Assignment } from '@app/_models';
-import { AssignmentService, LoadingBusService, MessageService } from '@app/_services';
+import { AdminService, AssignmentService, LoadingBusService, MessageService } from '@app/_services';
 import { BehaviorSubject } from 'rxjs';
 import { BooleanLikeToTextPipe } from '@app/_pipes';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -15,12 +15,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
 import { DatePipe } from '@angular/common';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-assignment-detail-view',
   templateUrl: './assignment-detail-view.component.html',
   styleUrls: ['./assignment-detail-view.component.css'],
-  imports: [ReactiveFormsModule, MatCardModule, MatListModule, MatFormFieldModule, MatInputModule, MatCheckboxModule, MatDividerModule, RouterLink, MatButtonModule, MatTooltipModule, DatePipe, BooleanLikeToTextPipe]
+  imports: [ReactiveFormsModule, MatCardModule, MatListModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatCheckboxModule, MatDividerModule, RouterLink, MatButtonModule, MatTooltipModule, DatePipe, BooleanLikeToTextPipe]
 })
 export class AssignmentDetailViewComponent implements OnInit {
 
@@ -34,11 +36,13 @@ export class AssignmentDetailViewComponent implements OnInit {
   private loading = inject(LoadingBusService);
   isEdit = false;
   editorForm: FormGroup | undefined;
+  childIds: string[] = [];
 
   constructor(
     private service: AssignmentService,
     private messageService: MessageService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private adminService: AdminService
   ) { }
 
   ngOnInit() {
@@ -48,6 +52,15 @@ export class AssignmentDetailViewComponent implements OnInit {
       }
     );
     this.isEdit$.subscribe(v => { this.isEdit = v; });
+
+    this.loading.start();
+    this.adminService.getChildren().then(
+      data => {
+        this.childIds = data || [];
+      }).catch(console.error)
+      .finally(() => {
+        this.loading.stop();
+      });
   }
 
   private getAssignment(id: string) {
@@ -76,6 +89,7 @@ export class AssignmentDetailViewComponent implements OnInit {
       ExamCategory: [this.assignment!.ExamCategory, Validators.required],
       ExamTitle: [this.assignment!.ExamTitle, Validators.required],
       CreateTime: this.assignment!.CreateTime,
+      ChildId: this.assignment?.ChildId,
       IsComplete: this.assignment!.IsComplete,
       Memo: this.assignment!.Memo,
       ExamRunIds: this.formBuilder.array(this.assignment!.ExamRunIds!)

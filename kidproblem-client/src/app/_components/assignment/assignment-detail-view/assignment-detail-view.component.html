@@ -7,7 +7,7 @@
       <mat-list>
         <mat-list-item>
           <span class="label">Exam Category: </span>
-          <span  data-testid="examCategory">{{editorForm.get('ExamCategory').value}}</span>
+          <span data-testid="examCategory">{{editorForm.get('ExamCategory').value}}</span>
         </mat-list-item>
         <mat-list-item>
           <span class="label">Exam Title: </span>
@@ -21,6 +21,18 @@
         @if (isEdit) {
         <mat-list-item>
           <mat-form-field class="w3-container w3-cell">
+            <mat-label>Assigned To</mat-label>
+            <mat-select formControlName="ChildId" data-testid="childId">
+              @for (childId of childIds; track childId) {
+              <mat-option [value]="childId">
+                {{childId}}
+              </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </mat-list-item>
+        <mat-list-item>
+          <mat-form-field class="w3-container w3-cell">
             <mat-label>Memo</mat-label>
             <input matInput formControlName="Memo" data-testid="memo">
           </mat-form-field>
@@ -30,6 +42,10 @@
         </mat-list-item>
         }
         @if (!isEdit) {
+        <mat-list-item>
+          <span class="label">Assigned To: </span>
+          <span data-testid="childId">{{editorForm.get('ChildId').value }}</span>
+        </mat-list-item>
         <mat-list-item>
           <span class="label">Memo: </span>
           <span data-testid="memo">{{editorForm.get('Memo').value }}</span>

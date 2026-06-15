@@ -32,5 +32,8 @@ namespace KidproblemService.Models
 
         [DynamoDBProperty("runs")]
         public List<string>? ExamRunIds { get; set; }
+
+        [DynamoDBProperty("child_id")]
+        public string? ChildId { get; set; }
     }
 }

@@ -84,7 +84,7 @@ namespace KidproblemService.Services
             return entity;
         }
 
-        public async Task<Tuple<List<Assignment>, string?>> QueryAssignmentsAsync(string familyId, DateTime start, DateTime end, bool usePagination = false, int? pageSize = 25, string? paginationToken = null)
+        public async Task<Tuple<List<Assignment>, string?>> QueryAssignmentsAsync(string familyId, string? childId, DateTime start, DateTime end, bool usePagination = false, int? pageSize = 25, string? paginationToken = null)
         {
             List<Assignment> result = new();
 
@@ -129,10 +129,19 @@ namespace KidproblemService.Services
             result.AddRange(_context.FromDocuments<Assignment>(entities));
 
             // populate all fields
-            for (int i = 0; i < result.Count; i++)
+            for (int i = result.Count - 1; i >= 0; i--)
             {
                 var assignment = await GetAssignmentAsync(result[i].Id!);
-                result[i] = assignment!;
+
+                // filter results. This is a temporary solution. The best way is adding child_id to index  
+                if (!string.IsNullOrWhiteSpace(childId) && assignment?.ChildId != childId)
+                {
+                    result.RemoveAt(i);
+                }
+                else
+                {
+                    result[i] = assignment!;
+                }
             }
 
             return new Tuple<List<Assignment>, string?>(result, paginationToken);

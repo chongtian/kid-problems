@@ -40,12 +40,17 @@ namespace KidproblemService.Controllers
             [FromQuery] int? size,
             [FromQuery] string? pagination)
         {
-            string familyId = _authService.GetCurrentUserInfo().FamilyId ?? string.Empty;
+            var currentUser = _authService.GetCurrentUserInfo();
+            string familyId = currentUser.FamilyId ?? string.Empty;
+
+            // child user has access 1
+            string? childId = currentUser.Access == 1 ? currentUser.Username : null;
+
             DateTime end = endTimeValue == null ? DateTime.UtcNow : Convert.ToDateTime(endTimeValue);
             DateTime start = startTimeValue == null ? end.AddDays(-14) : Convert.ToDateTime(startTimeValue);
             bool usePagination = pagination != null || pagination == indicatorPagination;
             pagination = pagination == indicatorPagination ? null : pagination;
-            var entity = await _service.QueryAssignmentsAsync(familyId, start, end, usePagination, size ?? 25, pagination);
+            var entity = await _service.QueryAssignmentsAsync(familyId, childId, start, end, usePagination, size ?? 25, pagination);
             return Ok(new { data = entity.Item1, pagination = entity.Item2 });
         }
 
@@ -84,7 +89,7 @@ namespace KidproblemService.Controllers
         [Authorize("ParentOnly")]
         public async Task<IActionResult> DeleteAssignment(string id)
         {
-            string familyId = _authService.GetCurrentUserInfo().FamilyId ?? string.Empty; 
+            string familyId = _authService.GetCurrentUserInfo().FamilyId ?? string.Empty;
             var existing = await _service.GetAssignmentAsync(id);
             if (existing == null)
             {
@@ -92,7 +97,7 @@ namespace KidproblemService.Controllers
             }
             else if (existing.FamilyId != familyId)
             {
-                return Unauthorized(id); 
+                return Unauthorized(id);
             }
             else
             {

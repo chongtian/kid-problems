@@ -23,6 +23,7 @@ def initialize_local_llm():
         model=config.OLLAMA_MODEL_ID
         )
 
+
 def initialize_openai_llm():
     """
     Initialize and return a OpenAI llm model
@@ -30,49 +31,10 @@ def initialize_openai_llm():
     return ChatOpenAI(model=config.OPENAI_MODEL_ID, temperature=config.OPENAI_TEMPERATURE)
 
 
-def create_math_prompt_template_1():
+def create_math_prompt_template():
     """
     Create a PromptTemplate for generating math problems based on user example.
-
-    Args:
-        None
-
-    Returns:
-        PromptTemplate: A PromptTemplate object configured for generating math problems.
-    """
-       
-    math_template = """
-    You are a Senior Math Teacher specializing in elementary and middle school education. 
-    You excel at creating engaging, grade-appropriate practice problems that reinforce core mathematical concepts.
-    Your task is to generate exactly {count} math practice problems based on the objective: 
-
-    {objective}
-
-    ### Guidelines:
-    - Only one math problem can be a simple expression or 1-sentence problem. The remaining math problems shall be word problems with 3 to 5 sentences. 
-    - The answer to the math problem is multi-choice, with 4 options: A, B, C, D. Only one of them is correct. 
-    - Each generated math problem shall have 3 properties: ProblemText, ProblemAnswer, AnswerOption
-    - ProblemText: the text of the problem including answer choices
-    - ProblemText: use standard LaTeX for all mathematical expressions, equations, and variables (e.g., $x + 5 = 12$). LaTex should be wrapped in $...$ for inline math. For line break, use "<br/>". Do not use "item" or "itemize" in Latex code. 
-    - ProblemText: if the problem requires chart, draw the chart with asymptote code without any comment and line break. Then add the chart to the problem text in an img tag: <img src="PlaceHolder_<sequence>.png" alt="[asy] ... asymptote code ... [/asy]" />
-    - ProblemText: do not use "table", "grid", "graphpaper", "crimson" in asymptote code. These are not supported by the asymptote compiler. You shall only write asymptote code which can compiles everywhere.
-    - ProblemText: put each answer choice and the text of answer choice in a new line with a line break "<br/>. You must not use Latex code "item" or "itemize". 
-    - ProblemAnswer: the Answer of the problem shall be a single selection from multi-choice options
-    - AnswerOption: this is like "A,B,C,D". The actual text of answer choices shall be put in the ProblemText.
-    - Output all problems as an json array using this json schema
-
-      {schema}  
-
-    - You must check if the latex code in ProblemText needing proper escaping to ensure the Json is valid
-    """
-    
-    prompt_template = PromptTemplate.from_template(math_template)
-    return prompt_template
-
-
-def create_math_prompt_template_2():
-    """
-    Create a PromptTemplate for generating math problems based on user example.
+    This method is only used by Gradio interface.
 
     Args:
         None
@@ -115,7 +77,7 @@ def create_math_prompt_template_2():
     - Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
     - Do NOT use LaTeX environments such as item, itemize, or similar.
     - Ensure all LaTeX is valid and properly escaped for JSON.
-    - If the $ is used for US Dollar, escape it as \$.
+    - If the $ is used for US Dollar, escape it as \\$.
     
     5. Line Breaks
     - Use "<br/>" for all line breaks inside "ProblemText" except for LaTex and Asymptote code.
@@ -143,6 +105,71 @@ def create_math_prompt_template_2():
     return prompt_template
 
 
+def create_prompt_template_to_clean_json():
+    template = """
+    You are a senior software engineer. The below json contains errors due to un-escape characters, etc. 
+    Fix the json text so that it can be successfully parsed by a json deserailizer. 
+    You must only output json. Do not output any other comments.
+
+    {text}
+    """
+    
+    prompt_template = PromptTemplate.from_template(template)
+    return prompt_template
+
+
+def create_prompt_template_to_verify_problem():
+    template = """
+    You are a math teacher. Your task is to verify the given multi-choice math question is valid or invalid.
+    1. Verify if the answer options in the problemText are duplicate, meaning the answer options have the same value. 
+    If the answer options are duplicate, this problem is invalid. Output BAD and stop. 
+    2. Otherwise, you will verify if the given ProblemAnswer is correct. If the given ProblemAnswer is correct, output GOOD. 
+    If the given ProblemAnswer is wrong, output the correct problem answer choice (A,B,C, or D).
+    Output format:
+    ```json
+    {{\"result\": <verification result> }}
+    ```
+    ---
+    ProblemText:
+    {problemText}
+    ---
+    ProblemAnswer:
+    {problemAnswer}
+    """
+    
+    prompt_template = PromptTemplate.from_template(template)
+    return prompt_template
+
+
+def create_prompt_template_to_fix_problem():
+    template = """
+    The below multi-choice math question is invalid, either due to duplicate answer options, or due to wrong given problem answer. 
+    Your task is to update it to make it valid.
+    Output format:
+    ```json
+    {{\"ProblemText\": <the updated ProblemText>, \"ProblemAnswer\": <the updated problem answer> }}
+    ```
+    ---
+    ProblemText:
+    {problemText}
+    ---
+    ProblemAnswer:
+    {problemAnswer}
+    """
+    
+    prompt_template = PromptTemplate.from_template(template)
+    return prompt_template
+
+
+def extract_json_text(x:str)->str:
+    pattern = r"```json\s*(.*?)\s*```"
+    match = re.search(pattern, x, re.MULTILINE | re.DOTALL)
+    if match:
+        return match.group(1)
+    else:
+        return x
+
+
 def get_json_schema(simple_schema = False) -> str:
     if simple_schema:
         return """
@@ -165,13 +192,16 @@ def save_text_and_pass(x:str):
     Save the text to a log file and pass the text to the next step.
     Args:        x: the text to be saved and passed
     Returns:        the same text x, which is passed to the next step"""
-    log_dir = Path(config.LOGS_FOLDER)
-    log_dir.mkdir(exist_ok=True)
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    log_filename = f"res-{timestamp}.log"
-    log_file_path = log_dir / log_filename
-    log_file_path.write_text(x, encoding="utf-8")
-    return x  # pass-through to next parser/step
+    if config.ALWAYS_LOG_RESPONSE_FROM_LLM:
+        log_dir = Path(config.LOGS_FOLDER)
+        log_dir.mkdir(exist_ok=True)
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        log_filename = f"res-{timestamp}.log"
+        log_file_path = log_dir / log_filename
+        log_file_path.write_text(x, encoding="utf-8")
+        return x  # pass-through to next parser/step
+    else:
+        return x
 
 
 def clean_up_json(x:str):
@@ -208,52 +238,13 @@ def clean_up_json(x:str):
         return fixed
 
 
-def generate_math_problems(llm, objectives: list, simple_schema = False):
-    """
-    Generate math problems based on the objective and count specified in the input.
-    Args:
-        llm: the language model to be used for generating math problems
-        objectives: a list of learning objectives.
-        Returns:
-        a list of generated math problems, each problem has the schema:
-        {
-            "ProblemText": "the text of the problem including answer choices, with proper escaping for latex code and line breaks",
-            "ProblemAnswer": "the correct answer, which is a single selection from multi-choice options",
-            "AnswerOptions": "the multi-choice options, like A,B,C,D"   
-        }
-    """
-
-    prompt = create_math_prompt_template_2()
-    json_parser = JsonOutputParser()
-    text_parser = StrOutputParser()
-    save_response = RunnableLambda(lambda x: save_text_and_pass(x))
-    clean_up_response = RunnableLambda(lambda x: clean_up_json(x))
-    input = RunnableParallel(
-        count=RunnableLambda(lambda x: x["count"]),
-        objective=RunnableLambda(lambda x: x["text"]),
-        schema=RunnableLambda(lambda _: get_json_schema(simple_schema))
-    )
-
-    chain = (
-        input 
-        | prompt 
-        | llm 
-        | text_parser
-        | save_response 
-        | clean_up_response
-        | json_parser 
-        )
-
-    problems = []
-    for idx, objective in enumerate(objectives):    
-        inputs = {"count": objective.get("count", 1), "text": objective.get("text", None) }
-        logger.info(f"Processing #{idx + 1} objective which is Objective {objective.get("objective", "Unknown")} ... ")
-        logger.debug(inputs)
-        response = chain.invoke(inputs)
-        logger.info(f"#{idx + 1} objective has been processed. ")
-        problems.extend(response)
-    
-    return problems
+def is_json_valid(j:str)->bool:
+    try:
+        json.loads(j, strict=False)
+        return True
+    except json.JSONDecodeError as e:
+        logger.error("json file has errors: %s", e)
+        return False 
 
 
 def generate_and_save_math_problems(llm, input_context: InputContext):
@@ -263,7 +254,7 @@ def generate_and_save_math_problems(llm, input_context: InputContext):
     if not input_context.AccessToken:
         raise ValueError("AccessToken is not found in input_context.")    
     
-    prompt = create_math_prompt_template_2()
+    prompt = create_math_prompt_template()
     json_parser = JsonOutputParser()
     text_parser = StrOutputParser()
     save_response = RunnableLambda(lambda x: save_text_and_pass(x))
@@ -292,3 +283,163 @@ def generate_and_save_math_problems(llm, input_context: InputContext):
     inputs = {"count": input_context.Count, "text": input_context.ObjectiveText }
     response = chain.invoke(inputs)
     return response
+
+
+def generate_math_problems_json(llm, json_file:str)->list:
+    """
+    Generate math problems based on the objective and count specified in the input.
+    Args:
+        llm: the language model to be used for generating math problems
+        json_file: path to the json output file.
+        Returns:
+        True if the generated json is valid; False when the generated json contains errors and need human review.
+    """
+
+    text_parser = StrOutputParser()
+    save_response = RunnableLambda(lambda x: save_text_and_pass(x))
+    prompt_clean_json = create_prompt_template_to_clean_json()
+    input = RunnableParallel(
+        text=RunnableLambda(lambda x: x["text"])
+    )
+    extract_json = RunnableLambda(lambda x: extract_json_text(x))
+
+    chain = (
+        llm 
+        | text_parser
+        | save_response 
+        | extract_json
+        )
+    
+    clean_json_chain = (
+        input
+        | prompt_clean_json
+        | llm
+        | text_parser
+        | save_response   
+        | extract_json      
+    )
+
+    folder = Path(config.PROMPTS_FOLDER)
+    prmopt_files = [f for f in folder.glob(config.PROMPTS_FILE) if f.is_file()]
+
+    pattern2 = r"^\s*\[\s*(.*?)\s*\]\s*$"
+
+    with open(json_file, "w", encoding="utf-8") as res:
+        res.write("[\n")
+
+        for i, prmopt_file in enumerate(prmopt_files):
+            logger.info(f"{prmopt_file}: processing prompt ... ")
+            is_last = i == len(prmopt_files) - 1
+            prompt = prmopt_file.read_text(encoding="utf-8")
+            result = chain.invoke(prompt)
+            raw_text = str(result)
+            extracted = raw_text.replace("$", "\\$")
+
+            # clean up json to ensure it is valid
+            is_valid = is_json_valid(extracted)
+            if is_valid:
+                logger.info(f"{prmopt_file}: json from response is valid. ")
+                clean_json_text = extracted
+            else:
+                logger.info(f"{prmopt_file}: cleaning up json.")
+                inputs = {"text": extracted }
+                clean_json = clean_json_chain.invoke(inputs)
+                clean_json_text = str(clean_json)
+                if is_json_valid(clean_json_text):
+                    logger.info(f"{prmopt_file}: json is cleaned and valid.")
+                else:
+                    logger.info(f"{prmopt_file}: json from response contains errors like un-escaped characters.")
+
+            match2 = re.search(pattern2, clean_json_text, re.MULTILINE | re.DOTALL)
+            if match2:
+                logger.info(f"{prmopt_file}: extracted elements from json array. ")
+                clean_json_text = match2.group(1)
+                res.write(clean_json_text)
+            else:
+                logger.info(f"{prmopt_file}: save response as is. ")
+                res.write(clean_json_text) 
+            
+            if is_last:
+                res.write("\n")
+            else:
+                res.write(",\n")
+
+            logger.info(f"{prmopt_file}: prompt has been processed. ")
+            # dev
+            # break   
+
+        res.write("\n]")
+
+    # validate the final result
+    try:
+        with open(json_file, 'r', encoding='utf-8') as f:
+            problems = json.load(f, strict=False)
+        return problems
+    except json.JSONDecodeError as e:
+        logger.error("json file has errors: %s", e)
+        return []
+    except OSError as e:
+        logger.error("File error: %s", e)
+        return []
+
+
+def verify_problem(llm, problem_json:str)->bool:
+    text_parser = StrOutputParser()
+    prompt_verify_json = create_prompt_template_to_verify_problem()
+    input = RunnableParallel(
+        problemText=RunnableLambda(lambda x: x["ProblemText"]),
+        problemAnswer=RunnableLambda(lambda x: x["ProblemAnswer"])
+    )
+    extract_json = RunnableLambda(lambda x: extract_json_text(x))
+
+    chain = (
+        input
+        | prompt_verify_json
+        | llm
+        | text_parser
+        | extract_json
+    )
+    
+    result = chain.invoke(problem_json)
+    return ("GOOD" in str(result))
+
+
+def fix_problem(llm, problem_json:str)->str:
+    text_parser = StrOutputParser()
+    prompt = create_prompt_template_to_fix_problem()
+    input = RunnableParallel(
+        problemText=RunnableLambda(lambda x: x["ProblemText"]),
+        problemAnswer=RunnableLambda(lambda x: x["ProblemAnswer"])
+    )
+    extract_json = RunnableLambda(lambda x: extract_json_text(x))
+
+    chain = (
+        input
+        | prompt
+        | llm
+        | text_parser
+        | extract_json
+    )
+    
+    result = chain.invoke(problem_json)
+    return str(result) 
+
+
+def verify_and_fix_problem(llm, problems:list)->list:
+    cleaned_problems = []
+    for i, problem in enumerate(problems):
+        is_valid = verify_problem(llm, problem)
+        if is_valid:
+            cleaned_problems.append(problem)
+            logger.info(f"Problem {i+1} is good.")
+        else:
+            fixed = fix_problem(llm, problem)
+            try:
+                fixed_json = json.loads(fixed, strict=False)
+                fixed_json["AnswerOptions"] = "A,B,C,D"
+                cleaned_problems.append(fixed_json)
+            except json.JSONDecodeError as e:
+                logger.error("json file has errors: %s", e)
+                cleaned_problems.append(problem)
+            logger.info(f"Fixed Problem {i+1} ")
+    return cleaned_problems    
