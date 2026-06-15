@@ -128,17 +128,20 @@ namespace KidproblemService.Services
             }
             result.AddRange(_context.FromDocuments<Assignment>(entities));
 
-            if (!string.IsNullOrWhiteSpace(childId))
-            {
-                // filter results. This is a temporary solution. The best way is adding child_id to index  
-                result = result.Where(a => a.ChildId == childId).ToList();
-            }
-
             // populate all fields
-            for (int i = 0; i < result.Count; i++)
+            for (int i = result.Count - 1; i >= 0; i--)
             {
                 var assignment = await GetAssignmentAsync(result[i].Id!);
-                result[i] = assignment!;
+
+                // filter results. This is a temporary solution. The best way is adding child_id to index  
+                if (!string.IsNullOrWhiteSpace(childId) && assignment?.ChildId != childId)
+                {
+                    result.RemoveAt(i);
+                }
+                else
+                {
+                    result[i] = assignment!;
+                }
             }
 
             return new Tuple<List<Assignment>, string?>(result, paginationToken);
