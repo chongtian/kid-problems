@@ -300,7 +300,7 @@ def create_exam_definition(examTitle: str, problems: list, bearer_token: str, is
     return {}
 
 
-def create_assignent(examCategory:str, examTitle: str, bearer_token: str, is_production = False) -> dict:
+def create_assignment(examCategory:str, examTitle: str, bearer_token: str, is_production = False) -> dict:
     """
     Insert an exam definition. Return the result of the insertion.
     

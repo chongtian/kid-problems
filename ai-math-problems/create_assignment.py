@@ -3,7 +3,7 @@ import json
 import logging
 import os
 import sys
-from kidproblem_apis import create_assignent, create_exam_definition, prepare_problems, save_problems, get_access_token_from_cognito
+from kidproblem_apis import create_assignment, create_exam_definition, prepare_problems, save_problems, get_access_token_from_cognito
 import random
 import string
 
@@ -75,7 +75,7 @@ def main(json_problem_file:str, exam_title:str=None):
         logger.error("Failed to create exam definition.")
         return
     
-    asn = create_assignent(exam_def["ExamCategory"], exam_def["ExamTitle"], access_token, PRODUCTION)
+    asn = create_assignment(exam_def["ExamCategory"], exam_def["ExamTitle"], access_token, PRODUCTION)
     if asn["Id"]:
         logger.info('Assignment has been created.')
     else:

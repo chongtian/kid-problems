@@ -14,7 +14,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def main(json_problem_file:str, output_file:str):
-    open_ai = False
+    open_ai = True
     if open_ai:
         llm = initialize_openai_llm()
     else:
