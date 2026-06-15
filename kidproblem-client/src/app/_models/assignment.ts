@@ -9,4 +9,5 @@ export class Assignment extends BaseModel {
     Memo?: string;
     IsComplete?: boolean;
     ExamRunIds?: string[];
+    ChildId?: string;
 }
