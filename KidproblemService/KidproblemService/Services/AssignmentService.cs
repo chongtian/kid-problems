@@ -94,20 +94,43 @@ namespace KidproblemService.Services
             }
 
             var table = _context.GetTargetTable<Assignment>();
-            QueryOperationConfig queryConfig = new QueryOperationConfig
+            QueryOperationConfig queryConfig;
+
+            if (string.IsNullOrWhiteSpace(childId))
             {
-                IndexName = "family_id-create_time-index",
-                Select = SelectValues.AllProjectedAttributes,
-                KeyExpression = new()
+                queryConfig = new QueryOperationConfig
                 {
-                    ExpressionAttributeValues = new() {
+                    IndexName = "family_id-create_time-index",
+                    Select = SelectValues.AllProjectedAttributes,
+                    KeyExpression = new()
+                    {
+                        ExpressionAttributeValues = new() {
                         { ":family_id", familyId },
                         { ":start", start },
                         { ":end", end },
                     },
-                    ExpressionStatement = "family_id = :family_id AND create_time BETWEEN :start AND :end"
-                }
-            };
+                        ExpressionStatement = "family_id = :family_id AND create_time BETWEEN :start AND :end"
+                    }
+                };
+            }
+            else
+            {
+                queryConfig = new QueryOperationConfig
+                {
+                    IndexName = "family_id-create_time-child_id-index",
+                    Select = SelectValues.AllProjectedAttributes,
+                    KeyExpression = new()
+                    {
+                        ExpressionAttributeValues = new() {
+                        { ":family_id", familyId },
+                        { ":start", start },
+                        { ":end", end },
+                        { ":child_id", childId }
+                    },
+                        ExpressionStatement = "family_id = :family_id AND child_id = :child_id AND create_time BETWEEN :start AND :end"
+                    }
+                };
+            }
 
             if (usePagination)
             {
