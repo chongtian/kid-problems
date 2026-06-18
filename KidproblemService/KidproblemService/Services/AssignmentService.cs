@@ -94,20 +94,43 @@ namespace KidproblemService.Services
             }
 
             var table = _context.GetTargetTable<Assignment>();
-            QueryOperationConfig queryConfig = new QueryOperationConfig
+            QueryOperationConfig queryConfig;
+
+            if (string.IsNullOrWhiteSpace(childId))
             {
-                IndexName = "family_id-create_time-index",
-                Select = SelectValues.AllProjectedAttributes,
-                KeyExpression = new()
+                queryConfig = new QueryOperationConfig
                 {
-                    ExpressionAttributeValues = new() {
+                    IndexName = "family_id-create_time-index",
+                    Select = SelectValues.AllProjectedAttributes,
+                    KeyExpression = new()
+                    {
+                        ExpressionAttributeValues = new() {
                         { ":family_id", familyId },
                         { ":start", start },
                         { ":end", end },
                     },
-                    ExpressionStatement = "family_id = :family_id AND create_time BETWEEN :start AND :end"
-                }
-            };
+                        ExpressionStatement = "family_id = :family_id AND create_time BETWEEN :start AND :end"
+                    }
+                };
+            }
+            else
+            {
+                queryConfig = new QueryOperationConfig
+                {
+                    IndexName = "family_id-create_time-child_id-index",
+                    Select = SelectValues.AllProjectedAttributes,
+                    KeyExpression = new()
+                    {
+                        ExpressionAttributeValues = new() {
+                        { ":family_id", familyId },
+                        { ":start", start },
+                        { ":end", end },
+                        { ":child_id", childId }
+                    },
+                        ExpressionStatement = "family_id = :family_id AND child_id = :child_id AND create_time BETWEEN :start AND :end"
+                    }
+                };
+            }
 
             if (usePagination)
             {
@@ -132,16 +155,7 @@ namespace KidproblemService.Services
             for (int i = result.Count - 1; i >= 0; i--)
             {
                 var assignment = await GetAssignmentAsync(result[i].Id!);
-
-                // filter results. This is a temporary solution. The best way is adding child_id to index  
-                if (!string.IsNullOrWhiteSpace(childId) && assignment?.ChildId != childId)
-                {
-                    result.RemoveAt(i);
-                }
-                else
-                {
-                    result[i] = assignment!;
-                }
+                result[i] = assignment!;
             }
 
             return new Tuple<List<Assignment>, string?>(result, paginationToken);
